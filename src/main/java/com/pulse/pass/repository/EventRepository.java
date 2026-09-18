@@ -15,6 +15,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     List<Event> findByStatusOrderByEventDateAsc(EventStatus status);
 
+	default List<Event> findPublishedEvents() {
+		return findByStatusOrderByEventDateAsc(EventStatus.PUBLISHED);
+	}
+
     List<Event> findByVenue_Code(String venueCode);
 
     @Query("""

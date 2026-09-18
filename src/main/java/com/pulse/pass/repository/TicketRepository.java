@@ -16,6 +16,10 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     List<Ticket> findByEvent_EventCodeAndStatus(String eventCode, TicketStatus status);
 
+	default List<Ticket> findPaidByEventCode(String eventCode) {
+		return findByEvent_EventCodeAndStatus(eventCode, TicketStatus.PAID);
+	}
+
     @Query("""
 	    select count(t)
 	    from Ticket t
@@ -25,6 +29,14 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     long countByEventCodeAndStatus(
 	    @Param("eventCode") String eventCode,
 	    @Param("status") TicketStatus status);
+
+	    @Query("""
+		    select count(t)
+		    from Ticket t
+		    where t.event.eventCode = :eventCode
+		      and t.status = com.pulse.pass.domain.TicketStatus.PAID
+		    """)
+	    long countPaidByEventCode(@Param("eventCode") String eventCode);
 
     @Query("""
 	    select t
