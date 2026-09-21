@@ -1,5 +1,8 @@
 package com.pulse.pass.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,8 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -32,10 +33,15 @@ public class User {
 	private UserProfile profile;
 
 	@OneToMany(mappedBy = "user")
-	private List<Ticket> tickets = new ArrayList<>();
+    private final List<Ticket> tickets = new ArrayList<>();
+	
+	public User() {}
 
-	protected User() {
-	}
+    public User(String username, String email, boolean active) {
+    this.username = username;
+    this.email = email;
+    this.active = active;
+    }
 
 	public Long getId() {
 		return id;
