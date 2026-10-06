@@ -7,6 +7,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.pulse.pass.domain.Artist;
 import com.pulse.pass.domain.Event;
 import com.pulse.pass.domain.EventCategory;
 import com.pulse.pass.domain.EventStatus;
@@ -82,8 +83,8 @@ class EventServiceImplTest {
 
         assertThat(eventService.create(request)).isSameAs(response);
 
-        verify(eventRepository).save(org.mockito.ArgumentMatchers.argThat(event ->
-                event.getStatus() == EventStatus.DRAFT
+        verify(eventRepository)
+                .save(org.mockito.ArgumentMatchers.argThat(event -> event.getStatus() == EventStatus.DRAFT
                         && event.getVenue() == venue
                         && event.getMinimumAge() == 18));
     }
@@ -173,6 +174,57 @@ class EventServiceImplTest {
         assertThatThrownBy(() -> eventService.publish("EVT-1"))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessage("Cannot publish an event in inactive venue: VEN-1");
+
+        verify(eventRepository, never()).save(any(Event.class));
+    }
+
+    @Test
+    void shouldAddArtistToEvent() {
+        Event event = eventFor(activeVenue(true), EventStatus.DRAFT);
+        Artist artist = new Artist("Solar Beat", "Colombia", "Pop", true);
+        artist.setId(7L);
+        EventResponse response = responseFor(EventStatus.DRAFT);
+
+        when(eventRepository.findByEventCode("EVT-1")).thenReturn(Optional.of(event));
+        when(artistRepository.findById(7L)).thenReturn(Optional.of(artist));
+        when(eventRepository.save(event)).thenReturn(event);
+        when(eventMapper.toResponse(event)).thenReturn(response);
+
+        assertThat(eventService.addArtist("EVT-1", 7L)).isSameAs(response);
+        assertThat(event.getArtists()).containsExactly(artist);
+
+        verify(eventRepository).save(event);
+    }
+
+    @Test
+    void shouldRejectDuplicatedArtistInEvent() {
+        Event event = eventFor(activeVenue(true), EventStatus.DRAFT);
+        Artist artist = new Artist("Solar Beat", "Colombia", "Pop", true);
+        artist.setId(7L);
+        event.getArtists().add(artist);
+
+        when(eventRepository.findByEventCode("EVT-1")).thenReturn(Optional.of(event));
+        when(artistRepository.findById(7L)).thenReturn(Optional.of(artist));
+
+        assertThatThrownBy(() -> eventService.addArtist("EVT-1", 7L))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("Artist is already associated with event: EVT-1");
+
+        verify(eventRepository, never()).save(any(Event.class));
+    }
+
+    @Test
+    void shouldRejectAddingArtistToFinishedEvent() {
+        Event event = eventFor(activeVenue(true), EventStatus.FINISHED);
+        Artist artist = new Artist("Solar Beat", "Colombia", "Pop", true);
+        artist.setId(7L);
+
+        when(eventRepository.findByEventCode("EVT-1")).thenReturn(Optional.of(event));
+        when(artistRepository.findById(7L)).thenReturn(Optional.of(artist));
+
+        assertThatThrownBy(() -> eventService.addArtist("EVT-1", 7L))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("Cannot add artists to event in status FINISHED: EVT-1");
 
         verify(eventRepository, never()).save(any(Event.class));
     }
