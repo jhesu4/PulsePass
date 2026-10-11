@@ -1,7 +1,6 @@
 package com.pulse.pass.dto.request;
 
 import com.pulse.pass.domain.EventCategory;
-import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -15,7 +14,6 @@ public record CreateEventRequest(
         @NotBlank(message = "name is required")
         String name,
 
-        @NotBlank(message = "description is required")
         @Size(max = 500, message = "description must be at most 500 characters")
         String description,
 
@@ -23,7 +21,6 @@ public record CreateEventRequest(
         EventCategory category,
 
         @NotNull(message = "eventDate is required")
-        @Future(message = "eventDate must be in the future")
         LocalDateTime eventDate,
 
         @NotNull(message = "minimumAge is required")

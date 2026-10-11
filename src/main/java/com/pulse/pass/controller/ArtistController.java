@@ -20,12 +20,12 @@ public class ArtistController {
         this.artistService = artistService;
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     public ResponseEntity<ArtistResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok(artistService.findById(id));
     }
 
-    @GetMapping({"/by-stage-name", "/search"})
+    @GetMapping("/by-stage-name")
     public ResponseEntity<ArtistResponse> findByStageName(@RequestParam String stageName) {
         return ResponseEntity.ok(artistService.findByStageName(stageName));
     }

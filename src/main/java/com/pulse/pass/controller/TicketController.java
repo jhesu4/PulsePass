@@ -26,12 +26,12 @@ public class TicketController {
         this.ticketService = ticketService;
     }
 
-    @PostMapping({"/", "/purchase"})
+    @PostMapping
     public ResponseEntity<TicketResponse> purchase(@Valid @RequestBody PurchaseTicketRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(ticketService.purchase(request));
     }
 
-    @GetMapping("/{ticketCode}")
+    @GetMapping("/{ticketCode:[Tt][Cc][Kk]-[A-Za-z0-9-]+}")
     public ResponseEntity<TicketResponse> findByCode(@PathVariable String ticketCode) {
         return ResponseEntity.ok(ticketService.findByCode(ticketCode));
     }
@@ -39,16 +39,6 @@ public class TicketController {
     @GetMapping("/by-user")
     public ResponseEntity<List<TicketResponse>> findByUserEmailQuery(@RequestParam String email) {
         return ResponseEntity.ok(ticketService.findByUserEmail(email));
-    }
-
-    @GetMapping("/user")
-    public ResponseEntity<List<TicketResponse>> findByUserEmail(@RequestParam String email) {
-        return ResponseEntity.ok(ticketService.findByUserEmail(email));
-    }
-
-    @GetMapping("/event/{eventCode}/paid")
-    public ResponseEntity<List<TicketResponse>> findPaidTicketsByEvent(@PathVariable String eventCode) {
-        return ResponseEntity.ok(ticketService.findPaidTicketsByEvent(eventCode));
     }
 
     @PatchMapping("/{ticketCode}/cancel")

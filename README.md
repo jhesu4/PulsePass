@@ -1,6 +1,6 @@
-# PulsePass — Capa de persistencia (MVP académico)
+# PulsePass — Capa de controladores REST (MVP académico)
 
-Plataforma de **eventos, artistas y entradas**. Este repositorio implementa el núcleo de datos descrito en el PRD de PulsePass: modelo relacional en PostgreSQL, migraciones versionadas con Flyway, entidades JPA, repositories Spring Data y pruebas de integración contra PostgreSQL real con Testcontainers.
+Plataforma de **eventos, artistas y entradas**. Este repositorio expone mediante una API REST los casos de uso de PulsePass definidos en el PRD, delegando la lógica de negocio a Services y la persistencia a PostgreSQL.
 
 
 ---
@@ -32,46 +32,6 @@ Plataforma de **eventos, artistas y entradas**. Este repositorio implementa el n
 | Build | Maven (wrapper incluido: `mvnw` / `mvnw.cmd`) |
 
 Restricciones del caso académico que se respetan: no se usa H2, no se usa SQL nativo, no se usa Lombok, y `spring.jpa.hibernate.ddl-auto=validate` (Flyway es el único responsable del esquema).
-
----
-
-## 1.1 Capa de controladores y contratos HTTP
-
-La capa web expone los endpoints REST del negocio con validación Bean Validation y respuestas uniformes mediante `GlobalExceptionHandler`.
-
-### Endpoints principales
-
-| Dominio | Rutas principales |
-|---|---|
-| Usuarios | `POST /api/users`, `POST /api/users/register`, `GET /api/users/by-email`, `GET /api/users/by-username` |
-| Artistas | `GET /api/artists/{id}`, `GET /api/artists/by-stage-name`, `GET /api/artists/active` |
-| Eventos | `POST /api/events`, `GET /api/events/{eventCode}`, `GET /api/events/published`, `PATCH /api/events/{eventCode}/publish`, `POST /api/events/{eventCode}/artists/{artistId}` |
-| Tickets | `POST /api/tickets`, `POST /api/tickets/purchase`, `GET /api/tickets/{ticketCode}`, `GET /api/tickets/by-user`, `PATCH /api/tickets/{ticketCode}/cancel` |
-| Venues | `GET /api/venues/{code}`, `GET /api/venues/active` |
-
-### Manejo de errores
-
-Los errores de validación, parámetros faltantes, rutas inexistentes y conflictos se devuelven con una estructura uniforme:
-
-```json
-{
-  "timestamp": "2026-10-11T15:28:07",
-  "status": 400,
-  "error": "Bad Request",
-  "message": "Validation failed",
-  "details": {
-    "name": "must not be blank"
-  }
-}
-```
-
-### Ejecución de pruebas del controlador
-
-```bash
-./mvnw test -Dtest='*ControllerTest'
-```
-
----
 
 ## 2. Estructura del proyecto
 
@@ -701,7 +661,7 @@ class EventServiceImplTest {
 | `TicketServiceImplTest` | TEST-TICKET-001 a 012 (compra válida con precio calculado, usuario inexistente/inactivo, evento inexistente/no publicado/pasado, edad insuficiente, sin capacidad, última unidad dispara `SOLD_OUT`, cancelar `PAID`/rechazar `USED`/rechazar tras la fecha, marcar `PAID` como usado/rechazar `CANCELLED`) |
 | `TicketPriceCalculatorTest` | Precio por cada `TicketType`, tipo nulo rechazado |
 
-**Resultado verificado:** 69 pruebas unitarias de servicio (más las de persistencia) registradas en `target/surefire-reports/`, `Failures: 0, Errors: 0`.
+**Resultado verificado:** 46 pruebas unitarias de servicio (más las de persistencia) registradas en `target/surefire-reports/`, `Failures: 0, Errors: 0`.
 
 ---
 
@@ -767,7 +727,7 @@ Para ejecutar únicamente la capa de servicios:
 - [x] No se levanta PostgreSQL en los unit tests de Service
 - [x] No se usa `@SpringBootTest` en los unit tests de Service
 - [x] `addArtist` tiene unit tests explícitos (asociación válida, recursos inexistentes, duplicado, estados `CANCELLED`/`FINISHED`)
-- [x] `mvn clean test` finaliza en verde (69 pruebas de servicio + 26 de persistencia, 0 fallos)
+- [x] `mvn clean test` finaliza en verde (46 pruebas de servicio + 26 de persistencia + 47 de controladores, 0 fallos)
 
 ## Guía de Sustentación — Capa de Servicios (Paso 51)
 Banco de respuestas técnicas y arquitectónicas para la defensa conceptual y práctica de la capa de servicios del proyecto PulsePass.
@@ -931,20 +891,61 @@ Controladores (a futuro): Se limitarán a deserializar peticiones HTTP, llamar a
 
 ---
 
-## 14. Capa de controladores (Fase 3)
+---
+
+## 1.1 Capa de controladores y contratos HTTP
+
+La capa web expone los endpoints REST del negocio con validación Bean Validation y respuestas uniformes mediante `GlobalExceptionHandler`.
+
+### Endpoints principales
+
+| Dominio | Rutas principales |
+|---|---|
+| Usuarios | `POST /api/users`, `GET /api/users/by-email?email=...`, `GET /api/users/by-username?username=...` |
+| Artistas | `GET /api/artists/{id}`, `GET /api/artists/by-stage-name?stageName=...`, `GET /api/artists/active` |
+| Eventos | `POST /api/events`, `GET /api/events/{eventCode}`, `GET /api/events/published`, `PATCH /api/events/{eventCode}/publish`, `POST /api/events/{eventCode}/artists/{artistId}`, `GET /api/events/by-artist?stageName=...`, `GET /api/events/{eventCode}/tickets/paid` |
+| Tickets | `POST /api/tickets`, `GET /api/tickets/{ticketCode}`, `GET /api/tickets/by-user?email=...`, `PATCH /api/tickets/{ticketCode}/cancel`, `PATCH /api/tickets/{ticketCode}/use` |
+| Venues | `GET /api/venues/{code}`, `GET /api/venues/active` |
+
+### Manejo de errores
+
+Los errores de validación, parámetros faltantes, rutas inexistentes y conflictos se devuelven con una estructura uniforme:
+
+```json
+{
+  "timestamp": "2026-10-11T15:28:07",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Validation failed",
+  "details": {
+    "name": "name is required"
+  }
+}
+```
+
+### Ejecución de pruebas del controlador
+
+```bash
+./mvnw test -Dtest='*ControllerTest'
+```
+
+---
+## 14. Capa de controladores
 
 La capa de controladores es la frontera HTTP del sistema. Su responsabilidad es recibir peticiones REST, validar la entrada básica, invocar a la capa de servicios y devolver la respuesta adecuada con códigos HTTP. No contiene lógica de negocio ni acceso directo a la base de datos.
 
 ### 14.1 Estructura
 
 ```text
-com.pulse.pass.controller
-├── ArtistController.java
-├── EventController.java
-├── TicketController.java
-├── UserController.java
-├── VenueController.java
-└── GlobalExceptionHandler.java
+com.pulse.pass
+├── controller
+│   ├── ArtistController.java
+│   ├── EventController.java
+│   ├── TicketController.java
+│   ├── UserController.java
+│   └── VenueController.java
+└── exception
+  └── GlobalExceptionHandler.java
 ```
 
 ### 14.2 Endpoints REST
@@ -952,23 +953,23 @@ com.pulse.pass.controller
 | Controlador | Método | Ruta | Descripción | Código esperado |
 |---|---|---|---|---|
 | `ArtistController` | `GET` | `/api/artists/{id}` | Busca un artista por ID | `200 OK` |
-| `ArtistController` | `GET` | `/api/artists/search?stageName=...` | Busca por nombre artístico | `200 OK` |
+| `ArtistController` | `GET` | `/api/artists/by-stage-name?stageName=...` | Busca por nombre artístico | `200 OK` |
 | `ArtistController` | `GET` | `/api/artists/active` | Lista artistas activos | `200 OK` |
 | `VenueController` | `GET` | `/api/venues/{code}` | Busca un venue por código | `200 OK` |
 | `VenueController` | `GET` | `/api/venues/active` | Lista venues activos | `200 OK` |
-| `UserController` | `POST` | `/api/users/register` | Registra un usuario | `201 Created` |
-| `UserController` | `GET` | `/api/users/email/{email}` | Busca usuario por email | `200 OK` |
-| `UserController` | `GET` | `/api/users/username/{username}` | Busca usuario por username | `200 OK` |
+| `UserController` | `POST` | `/api/users` | Registra un usuario | `201 Created` |
+| `UserController` | `GET` | `/api/users/by-email?email=...` | Busca usuario por email | `200 OK` |
+| `UserController` | `GET` | `/api/users/by-username?username=...` | Busca usuario por username | `200 OK` |
 | `EventController` | `POST` | `/api/events` | Crea un evento | `201 Created` |
 | `EventController` | `GET` | `/api/events/{eventCode}` | Busca evento por código | `200 OK` |
 | `EventController` | `GET` | `/api/events/published` | Lista eventos publicados | `200 OK` |
 | `EventController` | `PATCH` | `/api/events/{eventCode}/publish` | Publica un evento | `200 OK` |
-| `EventController` | `PATCH` | `/api/events/{eventCode}/artists/{artistId}` | Asocia artista a un evento | `200 OK` |
+| `EventController` | `POST` | `/api/events/{eventCode}/artists/{artistId}` | Asocia artista a un evento | `200 OK` |
 | `EventController` | `GET` | `/api/events/by-artist?stageName=...` | Busca eventos por artista | `200 OK` |
-| `TicketController` | `POST` | `/api/tickets/purchase` | Compra una entrada | `201 Created` |
+| `TicketController` | `POST` | `/api/tickets` | Compra una entrada | `201 Created` |
 | `TicketController` | `GET` | `/api/tickets/{ticketCode}` | Busca ticket por código | `200 OK` |
-| `TicketController` | `GET` | `/api/tickets/user?email=...` | Lista tickets por email del usuario | `200 OK` |
-| `TicketController` | `GET` | `/api/tickets/event/{eventCode}/paid` | Lista tickets pagados por evento | `200 OK` |
+| `TicketController` | `GET` | `/api/tickets/by-user?email=...` | Lista tickets por email del usuario | `200 OK` |
+| `EventController` | `GET` | `/api/events/{eventCode}/tickets/paid` | Lista tickets pagados por evento | `200 OK` |
 | `TicketController` | `PATCH` | `/api/tickets/{ticketCode}/cancel` | Cancela un ticket | `200 OK` |
 | `TicketController` | `PATCH` | `/api/tickets/{ticketCode}/use` | Marca un ticket como usado | `200 OK` |
 
@@ -990,7 +991,11 @@ public record ErrorResponse(
 
 - `MethodArgumentNotValidException` → `400 Bad Request`
 - `HttpMessageNotReadableException` → `400 Bad Request`
+- `MissingServletRequestParameterException`, `MethodArgumentTypeMismatchException` y `ConstraintViolationException` → `400 Bad Request`
 - `ResourceNotFoundException` → `404 Not Found`
+- `NoHandlerFoundException` y `NoResourceFoundException` → `404 Not Found`
+- `HttpRequestMethodNotSupportedException` → `405 Method Not Allowed`
+- `HttpMediaTypeNotSupportedException` → `415 Unsupported Media Type`
 - `BusinessRuleException` y `DuplicateResourceException` → `409 Conflict`
 - `Exception` → `500 Internal Server Error`
 
@@ -1004,15 +1009,15 @@ public record ErrorResponse(
 
 ### 14.5 Pruebas de controladores
 
-Las pruebas de controladores están implementadas con `MockMvc` y Mockito, sin arrancar el contenedor de Spring completo. Esto permite validar rutas, métodos HTTP, códigos de estado y cuerpos JSON de forma rápida y aislada.
+Las pruebas usan `@WebMvcTest`, `MockMvc` y mocks de los servicios. Se carga el slice MVC de Spring, incluido `GlobalExceptionHandler`, sin iniciar persistencia ni el contenedor completo de la aplicación. Se verifican rutas, validación, `Content-Type`, cuerpos JSON, respuestas 400/404/409 y que las entradas inválidas no invoquen los servicios.
 
 Ejemplo de ejecución:
 
 ```bash
-./mvnw test -Dtest='ArtistControllerTest,EventControllerTest,UserControllerTest,TicketControllerTest,VenueControllerTest'
+./mvnw test -Dtest='*ControllerTest'
 ```
 
-Resultado esperado: `BUILD SUCCESS` y 8 pruebas ejecutadas en la capa de controladores, 0 fallos.
+Resultado esperado: `BUILD SUCCESS` y 47 pruebas ejecutadas en la capa de controladores, 0 fallos.
 
 ---
 
@@ -1034,13 +1039,13 @@ Porque los controladores deben ser delgados. La lógica de negocio pertenece a l
 Centraliza el manejo de errores de la API. Convierte excepciones del dominio y validación en respuestas HTTP estructuradas con `ErrorResponse`, evitando que el cliente reciba errores genéricos o stacks de Java.
 
 ### 6. ¿Cómo se validan los endpoints en tests de controladores?
-Con `MockMvc` y mocks de servicio. Se simula una petición HTTP y se assertan código de estado y JSON esperado sin levantar toda la aplicación.
+Con `@WebMvcTest`, `MockMvc` y mocks de servicio. Se simula una petición HTTP dentro del slice MVC y se verifican código de estado, `Content-Type`, JSON y las interacciones con el servicio, sin levantar persistencia ni toda la aplicación.
 
 ### 7. ¿Qué endpoint usa `@PatchMapping` y por qué?
 Los endpoints de actualización parcial como `publish` y `addArtist` se implementan con `@PatchMapping`, porque modifican el estado del recurso sin reemplazarlo por completo.
 
 ### 8. ¿Por qué los endpoints usan rutas REST con recursos y subrecursos?
-Para reflejar el modelo del dominio y mantener la API clara: `/api/events/{eventCode}/artists/{artistId}`, `/api/tickets/{ticketCode}/cancel`, `/api/users/email/{email}`.
+Para reflejar el modelo del dominio y mantener la API clara: `/api/events/{eventCode}/artists/{artistId}`, `/api/tickets/{ticketCode}/cancel`, `/api/users/by-email?email=...`.
 
 ### 9. ¿Qué significa que la capa de controladores sea “delgada”?
 Significa que su trabajo principal es mapear HTTP a llamadas de servicio, sin lógica de negocio, sin consultas directas y sin control de persistencia. Esa responsabilidad recae en servicios, repositorios y validaciones del dominio.

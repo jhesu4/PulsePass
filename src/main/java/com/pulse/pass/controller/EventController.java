@@ -26,10 +26,6 @@ public class EventController {
     private final EventService eventService;
     private final TicketService ticketService;
 
-    public EventController(EventService eventService) {
-        this(eventService, null);
-    }
-
     public EventController(EventService eventService, TicketService ticketService) {
         this.eventService = eventService;
         this.ticketService = ticketService;
@@ -56,17 +52,12 @@ public class EventController {
     }
 
     @PostMapping("/{eventCode}/artists/{artistId}")
-    public ResponseEntity<EventResponse> addArtistByPost(@PathVariable String eventCode, @PathVariable Long artistId) {
-        return ResponseEntity.ok(eventService.addArtist(eventCode, artistId));
-    }
-
-    @PatchMapping("/{eventCode}/artists/{artistId}")
     public ResponseEntity<EventResponse> addArtist(@PathVariable String eventCode, @PathVariable Long artistId) {
         return ResponseEntity.ok(eventService.addArtist(eventCode, artistId));
     }
 
     @GetMapping("/{eventCode}/tickets/paid")
-    public ResponseEntity<List<com.pulse.pass.dto.response.TicketResponse>> findPaidTicketsByEvent(@PathVariable String eventCode) {
+    public ResponseEntity<List<TicketResponse>> findPaidTicketsByEvent(@PathVariable String eventCode) {
         return ResponseEntity.ok(ticketService.findPaidTicketsByEvent(eventCode));
     }
 
