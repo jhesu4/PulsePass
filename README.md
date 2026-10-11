@@ -889,3 +889,126 @@ Repositorios: Se limitan a interactuar con la base de datos (consultas JPQL/SQL 
 Servicios: Coordinan casos de uso, aplican reglas de dominio, gestionan transacciones y manejan excepciones. No escriben SQL directo ni atienden protocolos de transporte (HTTP).
 
 Controladores (a futuro): Se limitarán a deserializar peticiones HTTP, llamar a los servicios y devolver respuestas con códigos de estado adecuados.
+
+
+---
+
+## 14. Capa de controladores (Fase 3)
+
+La capa de controladores es la frontera HTTP del sistema. Su responsabilidad es recibir peticiones REST, validar la entrada básica, invocar a la capa de servicios y devolver la respuesta adecuada con códigos HTTP. No contiene lógica de negocio ni acceso directo a la base de datos.
+
+### 14.1 Estructura
+
+```text
+com.pulse.pass.controller
+├── ArtistController.java
+├── EventController.java
+├── TicketController.java
+├── UserController.java
+├── VenueController.java
+└── GlobalExceptionHandler.java
+```
+
+### 14.2 Endpoints REST
+
+| Controlador | Método | Ruta | Descripción | Código esperado |
+|---|---|---|---|---|
+| `ArtistController` | `GET` | `/api/artists/{id}` | Busca un artista por ID | `200 OK` |
+| `ArtistController` | `GET` | `/api/artists/search?stageName=...` | Busca por nombre artístico | `200 OK` |
+| `ArtistController` | `GET` | `/api/artists/active` | Lista artistas activos | `200 OK` |
+| `VenueController` | `GET` | `/api/venues/{code}` | Busca un venue por código | `200 OK` |
+| `VenueController` | `GET` | `/api/venues/active` | Lista venues activos | `200 OK` |
+| `UserController` | `POST` | `/api/users/register` | Registra un usuario | `201 Created` |
+| `UserController` | `GET` | `/api/users/email/{email}` | Busca usuario por email | `200 OK` |
+| `UserController` | `GET` | `/api/users/username/{username}` | Busca usuario por username | `200 OK` |
+| `EventController` | `POST` | `/api/events` | Crea un evento | `201 Created` |
+| `EventController` | `GET` | `/api/events/{eventCode}` | Busca evento por código | `200 OK` |
+| `EventController` | `GET` | `/api/events/published` | Lista eventos publicados | `200 OK` |
+| `EventController` | `PATCH` | `/api/events/{eventCode}/publish` | Publica un evento | `200 OK` |
+| `EventController` | `PATCH` | `/api/events/{eventCode}/artists/{artistId}` | Asocia artista a un evento | `200 OK` |
+| `EventController` | `GET` | `/api/events/by-artist?stageName=...` | Busca eventos por artista | `200 OK` |
+| `TicketController` | `POST` | `/api/tickets/purchase` | Compra una entrada | `201 Created` |
+| `TicketController` | `GET` | `/api/tickets/{ticketCode}` | Busca ticket por código | `200 OK` |
+| `TicketController` | `GET` | `/api/tickets/user?email=...` | Lista tickets por email del usuario | `200 OK` |
+| `TicketController` | `GET` | `/api/tickets/event/{eventCode}/paid` | Lista tickets pagados por evento | `200 OK` |
+| `TicketController` | `PATCH` | `/api/tickets/{ticketCode}/cancel` | Cancela un ticket | `200 OK` |
+| `TicketController` | `PATCH` | `/api/tickets/{ticketCode}/use` | Marca un ticket como usado | `200 OK` |
+
+### 14.3 Manejo centralizado de errores
+
+La aplicación usa `@RestControllerAdvice` para devolver errores en un formato uniforme mediante `ErrorResponse`:
+
+```java
+public record ErrorResponse(
+        LocalDateTime timestamp,
+        int status,
+        String error,
+        String message,
+        Map<String, String> details
+) {}
+```
+
+`GlobalExceptionHandler` maneja:
+
+- `MethodArgumentNotValidException` → `400 Bad Request`
+- `HttpMessageNotReadableException` → `400 Bad Request`
+- `ResourceNotFoundException` → `404 Not Found`
+- `BusinessRuleException` y `DuplicateResourceException` → `409 Conflict`
+- `Exception` → `500 Internal Server Error`
+
+### 14.4 Diseño de la capa controladora
+
+- Los controladores se limitan a transformar HTTP en invocaciones de servicios.
+- Cada controlador usa `@RequestMapping` con base funcional (`/api/artists`, `/api/events`, etc.).
+- Los `DTOs` de request y response son independientes de la persistencia.
+- Los servicios siguen siendo la única capa que conoce la lógica de negocio.
+- Los endpoints usan `ResponseEntity` para controlar explícitamente el código HTTP y el cuerpo.
+
+### 14.5 Pruebas de controladores
+
+Las pruebas de controladores están implementadas con `MockMvc` y Mockito, sin arrancar el contenedor de Spring completo. Esto permite validar rutas, métodos HTTP, códigos de estado y cuerpos JSON de forma rápida y aislada.
+
+Ejemplo de ejecución:
+
+```bash
+./mvnw test -Dtest='ArtistControllerTest,EventControllerTest,UserControllerTest,TicketControllerTest,VenueControllerTest'
+```
+
+Resultado esperado: `BUILD SUCCESS` y 8 pruebas ejecutadas en la capa de controladores, 0 fallos.
+
+---
+
+## 15. Guía de Sustentación — Capa de Controladores
+
+### 1. ¿Qué responsabilidad tiene la capa de controladores en PulsePass?
+La capa de controladores recibe las peticiones HTTP, valida el formato mínimo de la entrada y delega el caso de uso a la capa de servicios. Su foco es la exposición REST, no la lógica de dominio.
+
+### 2. ¿Por qué no se coloca la lógica de negocio en los controladores?
+Porque los controladores deben ser delgados. La lógica de negocio pertenece a los servicios, donde están definidas las reglas de negocio, las validaciones transaccionales y la coordinación entre repositorios.
+
+### 3. ¿Qué diferencia existe entre un `@RestController` y un `@Controller` clásico?
+`@RestController` combina `@Controller` y `@ResponseBody`, por lo que cada método devuelve directamente un objeto serializado en JSON sin necesidad de `ModelAndView`.
+
+### 4. ¿Qué es un `ResponseEntity` y para qué se usa?
+`ResponseEntity` permite definir el código HTTP exacto y el cuerpo de la respuesta. Por ejemplo, `201 Created` para registro o compra, y `200 OK` para consultas.
+
+### 5. ¿Qué hace `GlobalExceptionHandler`?
+Centraliza el manejo de errores de la API. Convierte excepciones del dominio y validación en respuestas HTTP estructuradas con `ErrorResponse`, evitando que el cliente reciba errores genéricos o stacks de Java.
+
+### 6. ¿Cómo se validan los endpoints en tests de controladores?
+Con `MockMvc` y mocks de servicio. Se simula una petición HTTP y se assertan código de estado y JSON esperado sin levantar toda la aplicación.
+
+### 7. ¿Qué endpoint usa `@PatchMapping` y por qué?
+Los endpoints de actualización parcial como `publish` y `addArtist` se implementan con `@PatchMapping`, porque modifican el estado del recurso sin reemplazarlo por completo.
+
+### 8. ¿Por qué los endpoints usan rutas REST con recursos y subrecursos?
+Para reflejar el modelo del dominio y mantener la API clara: `/api/events/{eventCode}/artists/{artistId}`, `/api/tickets/{ticketCode}/cancel`, `/api/users/email/{email}`.
+
+### 9. ¿Qué significa que la capa de controladores sea “delgada”?
+Significa que su trabajo principal es mapear HTTP a llamadas de servicio, sin lógica de negocio, sin consultas directas y sin control de persistencia. Esa responsabilidad recae en servicios, repositorios y validaciones del dominio.
+
+### 10. ¿Qué pasa si un recurso no existe o llega un JSON inválido?
+El `GlobalExceptionHandler` devuelve un cuerpo uniforme con `timestamp`, `status`, `error`, `message` y `details` según el caso. Esto mantiene la API consistente y facilita el consumo desde frontend o terceros.
+
+---
+
