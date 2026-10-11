@@ -1,0 +1,68 @@
+package com.pulse.pass.controller;
+
+import com.pulse.pass.domain.EventCategory;
+import com.pulse.pass.domain.EventStatus;
+import com.pulse.pass.dto.request.CreateEventRequest;
+import com.pulse.pass.dto.response.EventResponse;
+import com.pulse.pass.service.EventService;
+import java.time.LocalDateTime;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+class EventControllerTest {
+
+    @Test
+    @DisplayName("POST /api/events should create event")
+    void shouldCreateEvent() throws Exception {
+        EventService eventService = mock(EventService.class);
+        EventResponse response = new EventResponse(
+                1L,
+                "EVT-001",
+                "Music Festival",
+                "Festival description",
+                EventCategory.MUSIC,
+                EventStatus.DRAFT,
+                LocalDateTime.now().plusDays(10),
+                18,
+                "VEN-001",
+                "Main Venue",
+                List.of()
+        );
+
+        given(eventService.create(any(CreateEventRequest.class))).willReturn(response);
+
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new EventController(eventService)).build();
+
+        mockMvc.perform(post("/api/events")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"eventCode\":\"EVT-001\",\"name\":\"Music Festival\",\"description\":\"Festival description\",\"category\":\"MUSIC\",\"eventDate\":\"2099-12-31T20:00:00\",\"minimumAge\":18,\"venueCode\":\"VEN-001\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.eventCode").value("EVT-001"));
+    }
+
+    @Test
+    @DisplayName("GET /api/events/published should return published events")
+    void shouldReturnPublishedEvents() throws Exception {
+        EventService eventService = mock(EventService.class);
+        given(eventService.findPublishedEvents()).willReturn(List.of());
+
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new EventController(eventService)).build();
+
+        mockMvc.perform(get("/api/events/published"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray());
+    }
+}
