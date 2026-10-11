@@ -26,7 +26,7 @@ public class TicketController {
         this.ticketService = ticketService;
     }
 
-    @PostMapping("/purchase")
+    @PostMapping({"/", "/purchase"})
     public ResponseEntity<TicketResponse> purchase(@Valid @RequestBody PurchaseTicketRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(ticketService.purchase(request));
     }
@@ -34,6 +34,11 @@ public class TicketController {
     @GetMapping("/{ticketCode}")
     public ResponseEntity<TicketResponse> findByCode(@PathVariable String ticketCode) {
         return ResponseEntity.ok(ticketService.findByCode(ticketCode));
+    }
+
+    @GetMapping("/by-user")
+    public ResponseEntity<List<TicketResponse>> findByUserEmailQuery(@RequestParam String email) {
+        return ResponseEntity.ok(ticketService.findByUserEmail(email));
     }
 
     @GetMapping("/user")

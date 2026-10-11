@@ -29,4 +29,18 @@ class ArtistControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].stageName").value("Solar Beat"));
     }
+
+    @Test
+    @DisplayName("GET /api/artists/by-stage-name should match the PRD contract")
+    void shouldExposeByStageNameAliasEndpoint() throws Exception {
+        ArtistService artistService = mock(ArtistService.class);
+        given(artistService.findByStageName("Solar Beat"))
+                .willReturn(new ArtistResponse(1L, "Solar Beat", "Spain", "Electronic", true));
+
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ArtistController(artistService)).build();
+
+        mockMvc.perform(get("/api/artists/by-stage-name").param("stageName", "Solar Beat"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.stageName").value("Solar Beat"));
+    }
 }

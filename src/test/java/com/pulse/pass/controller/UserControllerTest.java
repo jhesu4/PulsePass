@@ -61,4 +61,19 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("john@pulse.com"));
     }
+
+    @Test
+    @DisplayName("GET /api/users/by-email should match the PRD contract")
+    void shouldExposeByEmailAliasEndpoint() throws Exception {
+        UserService userService = mock(UserService.class);
+        given(userService.findByEmail("john@pulse.com")).willReturn(
+                new UserResponse(1L, "johndoe", "john@pulse.com", "John", "Doe", "3001234567", "Santa Marta", LocalDate.of(1995, 8, 15), true)
+        );
+
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new UserController(userService)).build();
+
+        mockMvc.perform(get("/api/users/by-email").param("email", "john@pulse.com"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("john@pulse.com"));
+    }
 }

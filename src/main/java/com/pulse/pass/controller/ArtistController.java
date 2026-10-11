@@ -25,7 +25,7 @@ public class ArtistController {
         return ResponseEntity.ok(artistService.findById(id));
     }
 
-    @GetMapping("/search")
+    @GetMapping({"/by-stage-name", "/search"})
     public ResponseEntity<ArtistResponse> findByStageName(@RequestParam String stageName) {
         return ResponseEntity.ok(artistService.findByStageName(stageName));
     }

@@ -3,7 +3,9 @@ package com.pulse.pass.controller;
 import com.pulse.pass.dto.request.CreateEventRequest;
 import com.pulse.pass.dto.response.EventResponse;
 import com.pulse.pass.dto.response.EventSummaryResponse;
+import com.pulse.pass.dto.response.TicketResponse;
 import com.pulse.pass.service.EventService;
+import com.pulse.pass.service.TicketService;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -22,9 +24,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class EventController {
 
     private final EventService eventService;
+    private final TicketService ticketService;
 
     public EventController(EventService eventService) {
+        this(eventService, null);
+    }
+
+    public EventController(EventService eventService, TicketService ticketService) {
         this.eventService = eventService;
+        this.ticketService = ticketService;
     }
 
     @PostMapping
@@ -47,9 +55,19 @@ public class EventController {
         return ResponseEntity.ok(eventService.publish(eventCode));
     }
 
+    @PostMapping("/{eventCode}/artists/{artistId}")
+    public ResponseEntity<EventResponse> addArtistByPost(@PathVariable String eventCode, @PathVariable Long artistId) {
+        return ResponseEntity.ok(eventService.addArtist(eventCode, artistId));
+    }
+
     @PatchMapping("/{eventCode}/artists/{artistId}")
     public ResponseEntity<EventResponse> addArtist(@PathVariable String eventCode, @PathVariable Long artistId) {
         return ResponseEntity.ok(eventService.addArtist(eventCode, artistId));
+    }
+
+    @GetMapping("/{eventCode}/tickets/paid")
+    public ResponseEntity<List<com.pulse.pass.dto.response.TicketResponse>> findPaidTicketsByEvent(@PathVariable String eventCode) {
+        return ResponseEntity.ok(ticketService.findPaidTicketsByEvent(eventCode));
     }
 
     @GetMapping("/by-artist")

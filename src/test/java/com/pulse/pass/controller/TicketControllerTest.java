@@ -7,6 +7,7 @@ import com.pulse.pass.dto.response.TicketResponse;
 import com.pulse.pass.service.TicketService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -63,5 +64,20 @@ class TicketControllerTest {
         mockMvc.perform(get("/api/tickets/TCK-001"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.ticketCode").value("TCK-001"));
+    }
+
+    @Test
+    @DisplayName("GET /api/tickets/by-user should match the PRD contract")
+    void shouldExposeByUserAliasEndpoint() throws Exception {
+        TicketService ticketService = mock(TicketService.class);
+        given(ticketService.findByUserEmail("john@pulse.com")).willReturn(List.of(
+                new TicketResponse(1L, "TCK-001", TicketType.GENERAL, new BigDecimal("150000.00"), TicketStatus.PAID, LocalDateTime.now(), "john@pulse.com", "EVT-001", "Music Festival")
+        ));
+
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new TicketController(ticketService)).build();
+
+        mockMvc.perform(get("/api/tickets/by-user").param("email", "john@pulse.com"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].ticketCode").value("TCK-001"));
     }
 }
