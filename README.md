@@ -35,6 +35,44 @@ Restricciones del caso académico que se respetan: no se usa H2, no se usa SQL n
 
 ---
 
+## 1.1 Capa de controladores y contratos HTTP
+
+La capa web expone los endpoints REST del negocio con validación Bean Validation y respuestas uniformes mediante `GlobalExceptionHandler`.
+
+### Endpoints principales
+
+| Dominio | Rutas principales |
+|---|---|
+| Usuarios | `POST /api/users`, `POST /api/users/register`, `GET /api/users/by-email`, `GET /api/users/by-username` |
+| Artistas | `GET /api/artists/{id}`, `GET /api/artists/by-stage-name`, `GET /api/artists/active` |
+| Eventos | `POST /api/events`, `GET /api/events/{eventCode}`, `GET /api/events/published`, `PATCH /api/events/{eventCode}/publish`, `POST /api/events/{eventCode}/artists/{artistId}` |
+| Tickets | `POST /api/tickets`, `POST /api/tickets/purchase`, `GET /api/tickets/{ticketCode}`, `GET /api/tickets/by-user`, `PATCH /api/tickets/{ticketCode}/cancel` |
+| Venues | `GET /api/venues/{code}`, `GET /api/venues/active` |
+
+### Manejo de errores
+
+Los errores de validación, parámetros faltantes, rutas inexistentes y conflictos se devuelven con una estructura uniforme:
+
+```json
+{
+  "timestamp": "2026-10-11T15:28:07",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Validation failed",
+  "details": {
+    "name": "must not be blank"
+  }
+}
+```
+
+### Ejecución de pruebas del controlador
+
+```bash
+./mvnw test -Dtest='*ControllerTest'
+```
+
+---
+
 ## 2. Estructura del proyecto
 
 ```
