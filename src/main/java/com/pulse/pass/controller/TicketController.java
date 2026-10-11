@@ -3,6 +3,7 @@ package com.pulse.pass.controller;
 import com.pulse.pass.dto.request.PurchaseTicketRequest;
 import com.pulse.pass.dto.response.TicketResponse;
 import com.pulse.pass.service.TicketService;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class TicketController {
     }
 
     @PostMapping("/purchase")
-    public ResponseEntity<TicketResponse> purchase(@RequestBody PurchaseTicketRequest request) {
+    public ResponseEntity<TicketResponse> purchase(@Valid @RequestBody PurchaseTicketRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(ticketService.purchase(request));
     }
 

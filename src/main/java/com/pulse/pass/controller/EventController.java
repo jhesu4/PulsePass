@@ -4,6 +4,7 @@ import com.pulse.pass.dto.request.CreateEventRequest;
 import com.pulse.pass.dto.response.EventResponse;
 import com.pulse.pass.dto.response.EventSummaryResponse;
 import com.pulse.pass.service.EventService;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity<EventResponse> create(@RequestBody CreateEventRequest request) {
+    public ResponseEntity<EventResponse> create(@Valid @RequestBody CreateEventRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(eventService.create(request));
     }
 

@@ -3,6 +3,7 @@ package com.pulse.pass.controller;
 import com.pulse.pass.dto.request.RegisterUserRequest;
 import com.pulse.pass.dto.response.UserResponse;
 import com.pulse.pass.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +24,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@RequestBody RegisterUserRequest request) {
+    public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterUserRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(request));
     }
 

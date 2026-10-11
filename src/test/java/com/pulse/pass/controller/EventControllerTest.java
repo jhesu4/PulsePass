@@ -4,6 +4,7 @@ import com.pulse.pass.domain.EventCategory;
 import com.pulse.pass.domain.EventStatus;
 import com.pulse.pass.dto.request.CreateEventRequest;
 import com.pulse.pass.dto.response.EventResponse;
+import com.pulse.pass.exception.GlobalExceptionHandler;
 import com.pulse.pass.service.EventService;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -64,5 +65,21 @@ class EventControllerTest {
         mockMvc.perform(get("/api/events/published"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test
+    @DisplayName("POST /api/events with invalid fields should return 400")
+    void shouldRejectInvalidEventRequest() throws Exception {
+        EventService eventService = mock(EventService.class);
+
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new EventController(eventService))
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
+
+        mockMvc.perform(post("/api/events")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"eventCode\":\"\",\"name\":\"\",\"description\":\"\",\"category\":\"MUSIC\",\"eventDate\":\"2020-01-01T20:00:00\",\"minimumAge\":-1,\"venueCode\":\"\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
     }
 }
