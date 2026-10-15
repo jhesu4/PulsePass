@@ -12,7 +12,6 @@ import com.pulse.pass.repository.EventRepository;
 import com.pulse.pass.repository.TicketRepository;
 import com.pulse.pass.repository.UserRepository;
 import com.pulse.pass.security.SecurityPrincipal;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

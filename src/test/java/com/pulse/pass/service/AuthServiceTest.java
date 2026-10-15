@@ -9,8 +9,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.pulse.pass.domain.User;
-import com.pulse.pass.domain.UserCredential;
-import com.pulse.pass.domain.UserRole;
 import com.pulse.pass.domain.UserRoleType;
 import com.pulse.pass.dto.request.LoginRequest;
 import com.pulse.pass.dto.request.RegisterUserRequest;
