@@ -290,21 +290,51 @@ Todos los repositories extienden `JpaRepository`. Criterio aplicado: **Query Met
 
 ### Política de acceso por operación
 
-| Operación | Anónimo | `USER` | `STAFF` | `ADMIN` | Nota |
-|---|---|---|---|---|---|
-| Login / registro | ✅ | ✅ (solo perfil propio) | ✅ (solo perfil propio) | ✅ (solo perfil propio) | No se crean cuentas privilegiadas en el registro público. |
-| Ver eventos publicados | ✅ | ✅ | ✅ | ✅ | Los eventos DRAFT/privados no aparecen en la vista pública. |
-| Comprar ticket | ❌ | ✅ solo para sí mismo | ❌ | ❌ | La compra exige pertenencia propia y evento publicado. |
-| Ver/gestionar tickets ajenos | ❌ | ❌ | ✅ lectura global | ✅ con `X-Admin-Purpose: TICKET_SUPPORT` | La lectura del staff es de soporte operativo; la gestión requiere propósito admin. |
-| Gestionar usuarios ajenos | ❌ | ❌ | ❌ | ✅ con `X-Admin-Purpose: CUSTOMER_SUPPORT` | El 403 se usa para acceso no autorizado; el 404 se usa cuando el recurso no existe. |
+La matriz de permisos del MVP queda documentada con estas 20 operaciones REST y el resultado esperado para cada rol:
+
+| # | Operación | Anónimo | `USER` | `STAFF` | `ADMIN` | Nota |
+|---|---|---|---|---|---|---|
+| 1 | `POST /api/users` | ✅ | ✅ (solo propio) | ✅ (solo propio) | ✅ (solo propio) | Registro público solo crea `USER`. |
+| 2 | `POST /api/auth/login` | ✅ | ✅ | ✅ | ✅ | Autenticación con username o email. |
+| 3 | `GET /api/auth/me` | ❌ | ✅ | ✅ | ✅ | Solo principal autenticado. |
+| 4 | `GET /api/venues` | ✅ | ✅ | ✅ | ✅ | Lista pública de sedes activas. |
+| 5 | `GET /api/venues/{code}` | ✅ | ✅ | ✅ | ✅ | La ruta devuelve la sede si existe y está activa. |
+| 6 | `GET /api/artists` | ✅ | ✅ | ✅ | ✅ | Catálogo público. |
+| 7 | `GET /api/artists/{id}` | ✅ | ✅ | ✅ | ✅ | Recurso público si el artista existe. |
+| 8 | `GET /api/events/published` | ✅ | ✅ | ✅ | ✅ | Solo eventos con estado `PUBLISHED`. |
+| 9 | `GET /api/events/{eventCode}` | ✅ | ✅ | ✅ | ✅ | Si el evento es público, el usuario puede consultarlo. |
+| 10 | `GET /api/events/{eventCode}/tickets` | ❌ | ✅ (solo para su propia compra) | ✅ lectura operativa | ✅ con `X-Admin-Purpose: TICKET_SUPPORT` | Consulta de ventas del evento. |
+| 11 | `PATCH /api/events/{eventCode}/publish` | ❌ | ❌ | ❌ | ✅ | Solo el `ADMIN` puede publicar. |
+| 12 | `POST /api/events/{eventCode}/artists/{artistId}` | ❌ | ❌ | ❌ | ✅ | Asociación de artista a evento. |
+| 13 | `POST /api/tickets` | ❌ | ✅ solo para sí mismo | ❌ | ❌ | Requiere usuario autenticado y evento publicado. |
+| 14 | `GET /api/tickets/{ticketCode}` | ❌ | ✅ solo propio | ✅ lectura global | ✅ con `X-Admin-Purpose: TICKET_SUPPORT` | La lectura del `STAFF` es operativa; el `USER` solo ve sus entradas. |
+| 15 | `PATCH /api/tickets/{ticketCode}/cancel` | ❌ | ✅ solo propio | ❌ | ✅ con `X-Admin-Purpose: TICKET_SUPPORT` | Solo transiciones válidas. |
+| 16 | `PATCH /api/tickets/{ticketCode}/use` | ❌ | ❌ | ✅ | ✅ con `X-Admin-Purpose: TICKET_SUPPORT` | El `STAFF` marca el ticket como usado. |
+| 17 | `GET /api/users/{id}` | ❌ | ✅ solo propio | ❌ | ✅ con `X-Admin-Purpose: CUSTOMER_SUPPORT` | Se respeta ownership y propósito admin. |
+| 18 | `GET /api/users/{id}/tickets` | ❌ | ✅ solo propio | ❌ | ✅ con `X-Admin-Purpose: CUSTOMER_SUPPORT` | El `USER` solo consulta su información. |
+| 19 | `GET /api/admin/users` | ❌ | ❌ | ❌ | ✅ con `X-Admin-Purpose: CUSTOMER_SUPPORT` | Búsqueda administrativa con filtro de propósito. |
+| 20 | `GET /api/admin/tickets` | ❌ | ❌ | ✅ lectura operativa | ✅ con `X-Admin-Purpose: TICKET_SUPPORT` | Soporte y auditoría sin exponer datos ajenos. |
 
 ### Crear `STAFF` y `ADMIN` en desarrollo
 
-Las pruebas y la demo crean roles privilegiados de forma controlada en la capa de seguridad, nunca por un endpoint público de registro. En desarrollo, se insertan usuarios transitorios con roles `STAFF` o `ADMIN` mediante datos de prueba o helpers de integración. El registro público solo concede `USER` por diseño.
+Las pruebas y la demo crean roles privilegiados de forma controlada en la capa de seguridad, nunca por un endpoint público de registro. En desarrollo, se insertan usuarios transitorios con roles `STAFF` o `ADMIN` mediante un proceso explícito y reproducible, por ejemplo:
+
+```sql
+INSERT INTO users (username, email, active, created_at, updated_at)
+VALUES ('admin_demo', 'admin.demo@pulse.com', true, NOW(), NOW());
+
+INSERT INTO user_roles (user_id, role)
+VALUES ((SELECT id FROM users WHERE email = 'admin.demo@pulse.com'), 'ADMIN');
+
+INSERT INTO user_roles (user_id, role)
+VALUES ((SELECT id FROM users WHERE email = 'staff.demo@pulse.com'), 'STAFF');
+```
+
+El registro público solo concede `USER` por diseño. En producción no hay cuentas privilegiadas ni contraseñas de demostración persistidas; si un usuario viejo necesita activarse, la activación se hace con un hash BCrypt escrito explícitamente en `user_credentials` y, si corresponde, añadiendo el rol requerido en `user_roles` mediante un proceso de administración controlada.
 
 ### Usuarios ligados y estrategia de acceso
 
-La estrategia de usuarios ligados aplica la identidad actual del principal. La comparación se realiza con `user.id` o con `user.email`/`user.username` del usuario autenticado; si hay un usuario anónimo o un principal distinto del recurso, la operación queda bloqueada. Esto evita que un `USER` pueda comprar tickets o consultar datos de otra persona aunque la entidad exista en base de datos.
+La estrategia de usuarios ligados aplica la identidad actual del principal. La comparación se realiza con `user.id` o con `user.email`/`user.username` del usuario autenticado; si hay un usuario anónimo o un principal distinto del recurso, la operación queda bloqueada. Esto evita que un `USER` pueda comprar tickets o consultar datos de otra persona aunque la entidad exista en base de datos. En la práctica, los usuarios legados (aquellos que ya existen en `users` sin una fila en `user_credentials` o `user_roles`) siguen sin poder iniciar sesión ni contar con privilegios; solo se activan cuando un administrador los provisiona explícitamente insertando el hash BCrypt en `user_credentials` y, si hace falta, el rol en `user_roles`.
 
 ### Decisión 403 frente a 404
 
@@ -349,10 +379,12 @@ Para ejecutar una sola clase:
 | `SecurityRouteMatrixIntegrationTest`(2 tests) | Recorre las 20 rutas como anónimo y con los roles `USER`, `STAFF` y `ADMIN`. |
 | `SecurityAuditLoggerTest`(1 test) | Verifica eventos de seguridad con request ID y ausencia de secretos en los logs. |
 | `ValidPasswordValidatorTest`(3 tests) | Longitud mínima de 12 caracteres y límite de 72 bytes UTF-8 de BCrypt. |
-| `JwtServiceTest`(6 tests) | Claims obligatorios, HS256, expiración, firma manipulada, issuer, algoritmo, configuración de clave, token vacío y `alg=none`. |
+| `AuthServiceTest`(4 tests) | Registro de usuario con credencial BCrypt, autenticación y auditoría, login JWT y TTL. |
+| `AuthorizationServiceTest`(8 tests) | Ownership, roles, propósito admin, lectura de tickets, eventos publicados y permisos de `STAFF`/`ADMIN`. |
+| `JwtServiceTest`(5 tests) | Claims obligatorios, HS256, expiración, firma manipulada, issuer, algoritmo, configuración de clave, token vacío y `alg=none`. |
 | `JwtAuthenticationFilterTest`(7 tests) | Ausencia de header, esquema no Bearer, autenticación real, header mal formados, doble header, soporte de contexto existente y rechazo de principal deshabilitado. |
 | `AuthControllerTest`(3 tests) | Contrato de `POST /api/auth/login`, error 401 genérico y validación de request. |
-| `ScenarioFinalIntegrationTest`(1 test) | Escenario final de demostración: registro/login, publicación de evento, asociación de artista, compra, uso de ticket, JWT alterado y usuario desactivado. |
+| `ScenarioFinalIntegrationTest`(1 test) | Escenario final de demostración: registro/login, publicación de evento, asociación de artista, compra, uso de ticket, ticket cancelado con conflicto, JWT alterado y usuario desactivado. |
 
 La suite completa pasa 167 pruebas. La suite de persistencia cubre 29 (1 + 14 + 7 + 4 + 3); las pruebas de seguridad se ejecutan además de esa suite.
 
