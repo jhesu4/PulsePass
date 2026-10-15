@@ -113,7 +113,7 @@ class EventRepositoryTest {
         eventRepository.saveAllAndFlush(List.of(e1, e2, e3));
 
         List<Event> published = eventRepository.findByStatusOrderByEventDateAsc(EventStatus.PUBLISHED);
-        assertThat(published).extracting(Event::getEventCode).containsExactly("EVT-P2", "EVT-P1");
+        assertThat(published).extracting(event -> event.getEventCode()).containsExactly("EVT-P2", "EVT-P1");
     }
 
     @Test
@@ -166,7 +166,7 @@ class EventRepositoryTest {
 
         Event found = eventRepository.findByEventCode("EVT-ART-01").orElse(null);
         assertThat(found).isNotNull();
-        assertThat(found.getArtists()).hasSize(3).extracting(Artist::getStageName).contains("Artist 1", "Artist 2", "Artist 3");
+        assertThat(found.getArtists()).hasSize(3).extracting(artist -> artist.getStageName()).contains("Artist 1", "Artist 2", "Artist 3");
     }
 
 
@@ -184,7 +184,7 @@ class EventRepositoryTest {
         eventRepository.saveAllAndFlush(List.of(e1, e2));
 
         List<Event> events = eventRepository.findByArtistStageName("Solar Beat");
-        assertThat(events).hasSize(2).extracting(Event::getEventCode).contains("EVT-SB-1", "EVT-SB-2");
+        assertThat(events).hasSize(2).extracting(event -> event.getEventCode()).contains("EVT-SB-1", "EVT-SB-2");
     }
 
     @Test

@@ -45,13 +45,15 @@ PulsePass/
     │   │   ├── PulsePassApplication.java
     │   │   ├── domain/          # Entidades JPA y enums
     │   │   │   ├── Venue, Event, Artist, User, UserProfile, Ticket
-    │   │   │   └── EventCategory, EventStatus, TicketType, TicketStatus
+    │   │   │   ├── UserCredential, UserRole, UserRoleId
+    │   │   │   └── EventCategory, EventStatus, TicketType, TicketStatus, UserRoleType
     │   │   └── repository/      # Interfaces Spring Data JPA
     │   │       ├── VenueRepository, EventRepository, ArtistRepository
-    │   │       └── UserRepository, UserProfileRepository, TicketRepository
+    │   │       └── UserRepository, UserProfileRepository, TicketRepository,
+    │   │           UserCredentialRepository, UserRoleRepository
     │   └── resources/
     │       ├── application.yaml
-    │       └── db/migration/    # V1, V2, V3 (Flyway)
+    │       └── db/migration/    # V1, V2, V3, V4 (Flyway)
     └── test/
         └── java/com/pulse/pass/
             ├── TestcontainersConfiguration.java
@@ -68,6 +70,8 @@ erDiagram
     VENUE ||--o{ EVENT : hosts
     EVENT }o--o{ ARTIST : features
     USER ||--|| USER_PROFILE : has
+    USER ||--|| USER_CREDENTIAL : authenticates
+    USER ||--o{ USER_ROLE : assigned
     USER ||--o{ TICKET : purchases
     EVENT ||--o{ TICKET : sells
 
@@ -105,6 +109,15 @@ erDiagram
         varchar email UK
         boolean active
     }
+    USER_CREDENTIAL {
+      bigint user_id PK, FK
+      varchar password_hash
+      timestamp password_changed_at "nullable"
+    }
+    USER_ROLE {
+      bigint user_id PK, FK
+      varchar role PK "USER, STAFF, ADMIN"
+    }
     USER_PROFILE {
         bigint id PK
         varchar first_name
@@ -133,6 +146,8 @@ erDiagram
 | Venue 1 : N Event | `Event.venue` `@ManyToOne(LAZY)` ↔ `Venue.events` `@OneToMany(mappedBy)` | `venue_id` es `NOT NULL` |
 | Event N : M Artist | `Event.artists` (lado propietario, `@JoinTable event_artists`) ↔ `Artist.events` (`mappedBy`) | Tabla puente con PK compuesta |
 | User 1 : 1 UserProfile | `UserProfile.user` (lado propietario, `unique = true`) ↔ `User.profile` (`mappedBy`) | La FK `user_id` es `UNIQUE` |
+| User 1 : 1 UserCredential | `UserCredential.user` con `@MapsId` | `user_id` es PK y FK compartida |
+| User 1 : N UserRole | `UserRole.user` con `@MapsId("userId")` | PK compuesta `(user_id, role)` |
 | User 1 : N Ticket | `Ticket.user` `@ManyToOne(LAZY, optional = false)` | |
 | Event 1 : N Ticket | `Ticket.event` `@ManyToOne(LAZY, optional = false)` | |
 
@@ -146,12 +161,13 @@ Todos se persisten con `@Enumerated(EnumType.STRING)` (nunca por ordinal) y adem
 | `EventStatus` | DRAFT, PUBLISHED, SOLD_OUT, CANCELLED, FINISHED |
 | `TicketType` | GENERAL, VIP, BACKSTAGE, STUDENT |
 | `TicketStatus` | RESERVED, PAID, CANCELLED, USED |
+| `UserRoleType` | USER, STAFF, ADMIN |
 
 ---
 
 ## 4. Esquema relacional e integridad
 
-Siete tablas: `venues`, `events`, `artists`, `event_artists`, `users`, `user_profiles`, `tickets`.
+Nueve tablas: `venues`, `events`, `artists`, `event_artists`, `users`, `user_profiles`, `tickets`, `user_credentials` y `user_roles`.
 
 | Campo / relación | Regla en PostgreSQL |
 |---|---|
@@ -163,6 +179,9 @@ Siete tablas: `venues`, `events`, `artists`, `event_artists`, `users`, `user_pro
 | `artists.stage_name` | `UNIQUE NOT NULL` |
 | `users.username`, `users.email` | `UNIQUE NOT NULL` |
 | `user_profiles.user_id` | FK + `UNIQUE` (garantiza 1:1) |
+| `user_credentials.user_id` | PK + FK (garantiza 1:1 con `users`) |
+| `user_credentials.password_hash` | `VARCHAR(255) NOT NULL`; contiene únicamente el hash |
+| `user_roles (user_id, role)` | PK compuesta; `role` limitado a USER, STAFF o ADMIN |
 | `tickets.ticket_code` | `UNIQUE NOT NULL` |
 | `tickets.price` | `NUMERIC(12,2)` + `CHECK (price >= 0)` |
 | `tickets.type`, `tickets.status` | `CHECK (... IN (...))` con los valores del enum |
@@ -182,8 +201,11 @@ Ubicación: `src/main/resources/db/migration/`. Se aplican en orden sobre una ba
 | `V1__create_schema.sql` | Crea las 7 tablas con PK, FK, UNIQUE, CHECK e índices. |
 | `V2__insert_initial.artists.sql` | Inserta el catálogo inicial: Solar Beat, Neon Waves, Caribbean Sound, Ocean Drive y Digital Pulse. |
 | `V3__add_streaming_url_to_event.sql` | Agrega `streaming_url VARCHAR(500)` (nullable) a `events`, sin modificar V1. |
+| `V4__security_credentials_roles.sql` | Crea las tablas `user_credentials` y `user_roles`, sin cambiar las migraciones anteriores. |
 
-**Regla de oro:** una migración ya aplicada nunca se edita. Cualquier cambio estructural nuevo va en un `V4__...`, `V5__...`, etc. Editar V1 en un entorno compartido rompería la validación de checksums de Flyway.
+**Regla de oro:** una migración ya aplicada nunca se edita. Cualquier cambio estructural nuevo va en la siguiente versión disponible (`V5__...`, `V6__...`, etc.). Editar una migración aplicada en un entorno compartido rompería la validación de checksums de Flyway.
+
+Los usuarios existentes permanecen sin filas en estas tablas y no pueden iniciar sesión hasta ser activados mediante un proceso controlado. No se asignan contraseñas predeterminadas ni roles privilegiados durante la migración. El registro implementado en una fase posterior creará de forma atómica la credencial hasheada y el rol inicial `USER`.
 
 ---
 
@@ -226,6 +248,13 @@ Todos los repositories extienden `JpaRepository`. Criterio aplicado: **Query Met
 | `UserProfileRepository.findByUser_Id(Long)` | Query Method | FR-USR-003/004 |
 | `ArtistRepository.findByStageName(String)` | Query Method | FR-ART-001 |
 
+### Persistencia de seguridad
+
+| Repository | Método | Uso |
+|---|---|---|
+| `UserCredentialRepository` | `findByUser_Id(Long)` | Recuperar la credencial asociada al usuario. |
+| `UserRoleRepository` | `findAllByUser_Id(Long)` | Recuperar los roles persistidos del usuario. |
+
 ---
 
 ## 7. Ejecución de pruebas
@@ -256,12 +285,13 @@ Para ejecutar una sola clase:
 
 | Clase | Qué verifica |
 |---|---|
-| `PulsePassApplicationTests` | El contexto arranca: Testcontainers + Flyway (V1–V3) + validación de Hibernate. |
+| `PulsePassApplicationTests` | El contexto arranca: Testcontainers + Flyway (V1–V4) + validación de Hibernate. |
 | `EventRepositoryTest`(14 tests) | Venue (FR-VEN-001/002/003/004), Event (FR-EVT-001/002/005/006), Artist (FR-ART-001/002/003) y descubrimiento (FR-SRC-001/002/003). |
 | `TicketRepositoryTest`(7 tests) | FK obligatorias (FR-TKT-001), ticketCode único (FR-TKT-002), precio no negativo (FR-TKT-003), consultas por usuario/estado (FR-TKT-006), tickets PAID por evento (FR-TKT-007), conteo por estado (FR-TKT-008) y tickets de eventos futuros (FR-SRC-004). |
 | `UserProfileTest`(4 tests) | 	Registro de usuario y perfil (FR-USR-001/004), username/email únicos (FR-USR-002), segundo perfil para el mismo usuario rechazado — 1:1 (FR-USR-003).|
+| `UserSecurityPersistenceTest`(3 tests) | PK compartida de credenciales, roles con clave compuesta y usuarios existentes sin credenciales/roles automáticos. |
 
-Resultado verificado: las 26 pruebas (1 + 14 + 7 + 4) están registradas en target/surefire-reports/ con Failures: 0, Errors: 0, confirmando BUILD SUCCESS end-to-end (QT-010).
+La suite de persistencia queda compuesta por 29 pruebas (1 + 14 + 7 + 4 + 3). Las tres pruebas de `UserSecurityPersistenceTest` se validaron contra PostgreSQL con Flyway V4 y Hibernate `ddl-auto=validate`.
 
 Las pruebas usan `@SpringBootTest` + `@Transactional` (rollback automático) y `saveAndFlush` para forzar que las violaciones de constraints salgan de PostgreSQL.
 
@@ -287,7 +317,7 @@ docker run --name pulsepass-db -e POSTGRES_DB=pulsepass \
 ./mvnw spring-boot:run
 ```
 
-Flyway aplicará V1, V2 y V3 automáticamente al iniciar.
+Flyway aplicará V1, V2, V3 y V4 automáticamente al iniciar.
 
 **Opción B — con Testcontainers (sin instalar nada):**
 
@@ -318,6 +348,7 @@ Usa `TestPulsePassApplication`, que levanta la app con un PostgreSQL efímero.
 | FR-EVT-* | `Event` + `Venue` | `EventRepository` | `EventRepositoryTest` |
 | FR-ART-* | `Event` + `Artist` | `EventRepository`, `ArtistRepository` | `EventRepositoryTest` |
 | FR-USR-* | `User` + `UserProfile` | `UserRepository`, `UserProfileRepository` | `UserProfileTest` |
+| Persistencia de FR-SEC-AUTH-001 | `UserCredential`, `UserRole` | `UserCredentialRepository`, `UserRoleRepository` | `UserSecurityPersistenceTest` |
 | FR-TKT-* | `Ticket` + `User` + `Event` | `TicketRepository` | `TicketRepositoryTest` |
 | FR-SRC-* | `Event` / `Artist` / `Venue` | `EventRepository`, `TicketRepository` | `EventRepositoryTest`, `TicketRepositoryTest` |
 | NFR-002/003 | Flyway | — | `PulsePassApplicationTests` (implícita) |
