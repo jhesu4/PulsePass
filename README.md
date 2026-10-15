@@ -219,7 +219,7 @@ Ubicación: `src/main/resources/db/migration/`. Se aplican en orden sobre una ba
 
 Los usuarios existentes permanecen sin filas en estas tablas y no pueden iniciar sesión hasta ser activados mediante un proceso controlado. No se asignan contraseñas predeterminadas ni roles privilegiados durante la migración. El registro mediante `AuthService` crea usuario, perfil, credencial BCrypt y rol inicial `USER` en una sola transacción.
 
-El registro exige una contraseña de al menos 12 caracteres y como máximo 72 bytes UTF-8 para respetar el límite de BCrypt. La clave en texto plano no se persiste ni se devuelve. `AuthenticationManager` y `CustomUserDetailsService` autentican por username o email y cargan estado y roles actuales. `POST /api/auth/login` devuelve un JWT de acceso firmado, tipo `Bearer` y duración en segundos. La protección de las demás rutas mediante filtros y reglas HTTP corresponde al punto 6 del plan.
+El registro exige una contraseña de al menos 12 caracteres y como máximo 72 bytes UTF-8 para respetar el límite de BCrypt. La clave en texto plano no se persiste ni se devuelve. `AuthenticationManager` y `CustomUserDetailsService` autentican por username o email y cargan estado y roles actuales. `POST /api/auth/login` devuelve un JWT de acceso firmado, tipo `Bearer` y duración en segundos. `GET /api/auth/me` devuelve únicamente el ID, username y roles del principal autenticado. La API es stateless, valida el Bearer JWT en cada solicitud y aplica roles y ownership en la capa de servicios; los errores de seguridad usan `ErrorResponse` con 401/403.
 
 ---
 
@@ -306,12 +306,13 @@ Para ejecutar una sola clase:
 | `UserSecurityPersistenceTest`(3 tests) | PK compartida de credenciales, roles con clave compuesta y usuarios existentes sin credenciales/roles automáticos. |
 | `SecurityConfigTest`(1 test) | El encoder usa BCrypt y verifica correctamente contraseña/hash. |
 | `CustomUserDetailsServiceTest`(5 tests) | Carga por username/email, authorities, cuentas legadas, usuarios inactivos y credenciales persistidas. |
-| `AuthServiceIntegrationTest`(5 tests) | Registro con BCrypt/rol `USER`, login JWT, autenticación por username/email y rechazo de usuarios legados, credenciales incorrectas o cuentas inactivas. |
+| `AuthServiceIntegrationTest`(11 tests) | Registro con BCrypt/rol `USER`, login JWT, autenticación por username/email, HTTP 401/403, usuario inactivo y contrato de `/api/auth/me`. |
+| `SecurityAuthorizationIntegrationTest`(5 tests) | Ownership de tickets y usuarios, compra para tercero, borradores y filtrado público por artista. |
 | `ValidPasswordValidatorTest`(3 tests) | Longitud mínima de 12 caracteres y límite de 72 bytes UTF-8 de BCrypt. |
 | `JwtServiceTest`(4 tests) | Claims obligatorios, HS256, expiración, firma manipulada, issuer, algoritmo y configuración de clave. |
 | `AuthControllerTest`(3 tests) | Contrato de `POST /api/auth/login`, error 401 genérico y validación de request. |
 
-La suite completa pasa 143 pruebas. La suite de persistencia cubre 29 (1 + 14 + 7 + 4 + 3); las pruebas de seguridad se ejecutan además de esa suite.
+La suite completa pasa 154 pruebas. La suite de persistencia cubre 29 (1 + 14 + 7 + 4 + 3); las pruebas de seguridad se ejecutan además de esa suite.
 
 Las pruebas usan `@SpringBootTest` + `@Transactional` (rollback automático) y `saveAndFlush` para forzar que las violaciones de constraints salgan de PostgreSQL.
 
@@ -958,6 +959,7 @@ La capa web expone los endpoints REST del negocio con validación Bean Validatio
 
 | Dominio | Rutas principales |
 |---|---|
+| Autenticación | `POST /api/auth/login`, `GET /api/auth/me` |
 | Usuarios | `POST /api/users`, `GET /api/users/by-email?email=...`, `GET /api/users/by-username?username=...` |
 | Artistas | `GET /api/artists/{id}`, `GET /api/artists/by-stage-name?stageName=...`, `GET /api/artists/active` |
 | Eventos | `POST /api/events`, `GET /api/events/{eventCode}`, `GET /api/events/published`, `PATCH /api/events/{eventCode}/publish`, `POST /api/events/{eventCode}/artists/{artistId}`, `GET /api/events/by-artist?stageName=...`, `GET /api/events/{eventCode}/tickets/paid` |
@@ -1009,6 +1011,8 @@ com.pulse.pass
 
 | Controlador | Método | Ruta | Descripción | Código esperado |
 |---|---|---|---|---|
+| `AuthController` | `POST` | `/api/auth/login` | Autentica credenciales y emite JWT | `200 OK` |
+| `AuthController` | `GET` | `/api/auth/me` | Devuelve el principal y sus roles actuales | `200 OK` |
 | `ArtistController` | `GET` | `/api/artists/{id}` | Busca un artista por ID | `200 OK` |
 | `ArtistController` | `GET` | `/api/artists/by-stage-name?stageName=...` | Busca por nombre artístico | `200 OK` |
 | `ArtistController` | `GET` | `/api/artists/active` | Lista artistas activos | `200 OK` |

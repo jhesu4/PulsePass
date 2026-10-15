@@ -21,6 +21,7 @@ import com.pulse.pass.mapper.EventMapper;
 import com.pulse.pass.repository.ArtistRepository;
 import com.pulse.pass.repository.EventRepository;
 import com.pulse.pass.repository.VenueRepository;
+import com.pulse.pass.service.AuthorizationService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -45,11 +46,15 @@ class EventServiceImplTest {
     @Mock
     private EventMapper eventMapper;
 
+    @Mock
+    private AuthorizationService authorizationService;
+
     private EventServiceImpl eventService;
 
     @BeforeEach
     void setUp() {
-        eventService = new EventServiceImpl(eventRepository, venueRepository, artistRepository, eventMapper);
+        eventService = new EventServiceImpl(eventRepository, venueRepository, artistRepository, eventMapper,
+            authorizationService);
     }
 
     @Test

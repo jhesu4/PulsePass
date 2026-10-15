@@ -1,7 +1,6 @@
 package com.pulse.pass.security;
 
 import com.pulse.pass.domain.User;
-import com.pulse.pass.domain.UserRole;
 import com.pulse.pass.repository.UserCredentialRepository;
 import com.pulse.pass.repository.UserRepository;
 import com.pulse.pass.repository.UserRoleRepository;
@@ -34,13 +33,22 @@ public class CustomUserDetailsService implements UserDetailsService {
 		User user = userRepository.findByUsername(identifier)
 				.or(() -> userRepository.findByEmailIgnoreCase(identifier))
 				.orElseThrow(() -> new UsernameNotFoundException(INVALID_CREDENTIALS_MESSAGE));
+		return createPrincipal(user);
+	}
 
+	public SecurityPrincipal loadUserById(Long userId) {
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new UsernameNotFoundException(INVALID_CREDENTIALS_MESSAGE));
+		return createPrincipal(user);
+	}
+
+	private SecurityPrincipal createPrincipal(User user) {
 		String passwordHash = userCredentialRepository.findByUser_Id(user.getId())
 				.map(credential -> credential.getPasswordHash())
 				.orElseThrow(() -> new UsernameNotFoundException(INVALID_CREDENTIALS_MESSAGE));
 
 		List<GrantedAuthority> authorities = userRoleRepository.findAllByUser_Id(user.getId()).stream()
-				.map(UserRole::getRole)
+				.map(userRole -> userRole.getRole())
 				.map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
 				.map(authority -> (GrantedAuthority) authority)
 				.toList();

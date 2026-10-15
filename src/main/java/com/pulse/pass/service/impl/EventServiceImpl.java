@@ -14,9 +14,11 @@ import com.pulse.pass.mapper.EventMapper;
 import com.pulse.pass.repository.ArtistRepository;
 import com.pulse.pass.repository.EventRepository;
 import com.pulse.pass.repository.VenueRepository;
+import com.pulse.pass.service.AuthorizationService;
 import com.pulse.pass.service.EventService;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,19 +29,23 @@ public class EventServiceImpl implements EventService {
     private final VenueRepository venueRepository;
     private final ArtistRepository artistRepository;
     private final EventMapper eventMapper;
+    private final AuthorizationService authorizationService;
 
     public EventServiceImpl(
             EventRepository eventRepository,
             VenueRepository venueRepository,
             ArtistRepository artistRepository,
-            EventMapper eventMapper) {
+            EventMapper eventMapper,
+            AuthorizationService authorizationService) {
         this.eventRepository = eventRepository;
         this.venueRepository = venueRepository;
         this.artistRepository = artistRepository;
         this.eventMapper = eventMapper;
+        this.authorizationService = authorizationService;
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public EventResponse create(CreateEventRequest request) {
         if (eventRepository.existsByEventCode(request.eventCode())) {
@@ -73,6 +79,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @PreAuthorize("@authorizationService.canViewEvent(#p0)")
     @Transactional(readOnly = true)
     public EventResponse findByCode(String eventCode) {
         Event event = eventRepository.findByEventCode(eventCode)
@@ -89,6 +96,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public EventResponse publish(String eventCode) {
         Event event = eventRepository.findByEventCode(eventCode)
@@ -109,6 +117,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public EventResponse addArtist(String eventCode, Long artistId) {
         Event event = eventRepository.findByEventCode(eventCode)
@@ -130,7 +139,10 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional(readOnly = true)
     public List<EventSummaryResponse> findByArtist(String stageName) {
-        return eventRepository.findByArtistStageName(stageName).stream()
+        List<Event> events = authorizationService.isStaffOrAdmin()
+            ? eventRepository.findByArtistStageName(stageName)
+            : eventRepository.findPublishedByArtistStageName(stageName);
+        return events.stream()
                 .map(eventMapper::toSummary)
                 .toList();
     }

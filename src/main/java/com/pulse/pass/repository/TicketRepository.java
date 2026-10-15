@@ -17,6 +17,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     Optional<Ticket> findByTicketCode(String ticketCode);
 
+    boolean existsByTicketCodeAndUser_Id(String ticketCode, Long userId);
+
     // FR-TKT-006
     List<Ticket> findByUserEmail(String email);
 

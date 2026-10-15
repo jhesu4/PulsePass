@@ -5,17 +5,26 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.web.servlet.MockMvc;
 
 import com.pulse.pass.TestcontainersConfiguration;
 import com.pulse.pass.domain.User;
+import com.pulse.pass.domain.UserCredential;
 import com.pulse.pass.domain.UserRole;
 import com.pulse.pass.domain.UserRoleType;
 import com.pulse.pass.dto.request.LoginRequest;
@@ -29,6 +38,7 @@ import com.pulse.pass.security.SecurityPrincipal;
 import com.pulse.pass.service.AuthService;
 
 @SpringBootTest
+@AutoConfigureMockMvc
 @Import(TestcontainersConfiguration.class)
 @Transactional
 class AuthServiceIntegrationTest {
@@ -37,6 +47,9 @@ class AuthServiceIntegrationTest {
 
 	@Autowired
 	private AuthService authService;
+
+	@Autowired
+	private MockMvc mockMvc;
 
 	@Autowired
 	private UserRepository userRepository;
@@ -64,7 +77,7 @@ class AuthServiceIntegrationTest {
 		assertThat(response.username()).isEqualTo("auth_register");
 		assertThat(credential.getPasswordHash()).isNotEqualTo(PASSWORD);
 		assertThat(passwordEncoder.matches(PASSWORD, credential.getPasswordHash())).isTrue();
-		assertThat(roles).extracting(UserRole::getRole).containsExactly(UserRoleType.USER);
+		assertThat(roles).extracting(userRole -> userRole.getRole()).containsExactly(UserRoleType.USER);
 	}
 
 	@Test
@@ -113,6 +126,82 @@ class AuthServiceIntegrationTest {
 
 		assertThatThrownBy(() -> authService.authenticate(new LoginRequest("auth_inactive", PASSWORD)))
 				.isInstanceOf(DisabledException.class);
+	}
+
+	@Test
+	void shouldAllowAnonymousPublishedEvents() throws Exception {
+		mockMvc.perform(get("/api/events/published"))
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	void shouldReturnUniformUnauthorizedForProtectedRequests() throws Exception {
+		mockMvc.perform(post("/api/events")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content("{}"))
+				.andExpect(status().isUnauthorized())
+				.andExpect(jsonPath("$.error").value("Unauthorized"))
+				.andExpect(jsonPath("$.status").value(401));
+
+		mockMvc.perform(post("/api/events")
+					.header(HttpHeaders.AUTHORIZATION, "Bearer not-a-jwt")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content("{}"))
+				.andExpect(status().isUnauthorized())
+				.andExpect(jsonPath("$.error").value("Unauthorized"));
+	}
+
+	@Test
+	void shouldDenyUserFromAdminOperation() throws Exception {
+		String token = tokenFor("http_user", UserRoleType.USER, true);
+
+		mockMvc.perform(post("/api/events")
+					.header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content("{}"))
+				.andExpect(status().isForbidden())
+				.andExpect(jsonPath("$.error").value("Forbidden"))
+				.andExpect(jsonPath("$.status").value(403));
+	}
+
+	@Test
+	void shouldRejectTokenForInactiveUserOnEachRequest() throws Exception {
+		String token = tokenFor("http_inactive", UserRoleType.ADMIN, false);
+
+		mockMvc.perform(post("/api/events")
+					.header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content("{}"))
+				.andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	void shouldReturnCurrentPrincipalWithoutCredentials() throws Exception {
+		String token = tokenFor("auth_me", UserRoleType.USER, true);
+		User user = userRepository.findByUsername("auth_me").orElseThrow();
+
+		mockMvc.perform(get("/api/auth/me")
+					.header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.userId").value(user.getId()))
+				.andExpect(jsonPath("$.username").value("auth_me"))
+				.andExpect(jsonPath("$.roles[0]").value("USER"))
+				.andExpect(jsonPath("$.password").doesNotExist())
+				.andExpect(jsonPath("$.passwordHash").doesNotExist());
+	}
+
+	@Test
+	void shouldRequireAuthenticationForCurrentPrincipal() throws Exception {
+		mockMvc.perform(get("/api/auth/me"))
+				.andExpect(status().isUnauthorized())
+				.andExpect(jsonPath("$.error").value("Unauthorized"));
+	}
+
+	private String tokenFor(String username, UserRoleType role, boolean active) {
+		User user = userRepository.saveAndFlush(new User(username, username + "@pulse.com", active));
+		userCredentialRepository.saveAndFlush(new UserCredential(user, "test-password-hash"));
+		userRoleRepository.saveAndFlush(new UserRole(user, role));
+		return jwtService.createAccessToken(user.getId());
 	}
 
 	private RegisterUserRequest request(String username, String email) {
