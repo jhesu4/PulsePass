@@ -26,6 +26,8 @@ Plataforma de **eventos, artistas y entradas**. Este repositorio expone mediante
 |---|---|
 | Lenguaje | Java 21 |
 | Framework | Spring Boot 4.1.1 (Spring Data JPA / Hibernate) |
+| Seguridad base | Spring Security Core 7.1.1 y Crypto (BCrypt) |
+| Tokens | JJWT 0.13.0 (HS256) |
 | Base de datos | PostgreSQL |
 | Migraciones | Flyway (`spring-boot-starter-flyway` + `flyway-database-postgresql`) |
 | Pruebas | JUnit 5, AssertJ, Spring Boot Test, Testcontainers (PostgreSQL) |
@@ -42,15 +44,22 @@ PulsePass/
 └── src/
     ├── main/
     │   ├── java/com/pulse/pass/
-    │   │   ├── PulsePassApplication.java
-    │   │   ├── domain/          # Entidades JPA y enums
-    │   │   │   ├── Venue, Event, Artist, User, UserProfile, Ticket
-    │   │   │   ├── UserCredential, UserRole, UserRoleId
-    │   │   │   └── EventCategory, EventStatus, TicketType, TicketStatus, UserRoleType
-    │   │   └── repository/      # Interfaces Spring Data JPA
-    │   │       ├── VenueRepository, EventRepository, ArtistRepository
-    │   │       └── UserRepository, UserProfileRepository, TicketRepository,
-    │   │           UserCredentialRepository, UserRoleRepository
+    │   │   ├── controller/  # Controladores existentes + AuthController
+    │   │   ├── service/     # Servicios existentes + AuthService
+    │   │   │   └── AuthorizationService.java (punto 7)
+    │   │   ├── dto/
+    │   │   │   ├── request/LoginRequest.java, RegisterUserRequest.java
+    │   │   │   └── response/AuthResponse.java, AuthenticatedUserResponse.java (punto 6)
+    │   │   ├── security/
+    │   │   │   ├── SecurityConfig.java, JwtProperties.java, JwtService.java
+    │   │   │   ├── CustomUserDetailsService.java, SecurityPrincipal.java
+    │   │   │   ├── JwtAuthenticationFilter.java (punto 6)
+    │   │   │   ├── RestAuthenticationEntryPoint.java (punto 6)
+    │   │   │   └── RestAccessDeniedHandler.java (punto 6)
+    │   │   ├── domain/      # Entidades existentes + credenciales/roles
+    │   │   ├── repository/  # Repositories existentes + credenciales/roles
+    │   │   ├── exception/   # GlobalExceptionHandler
+    │   │   └── mapper/      # Mappers existentes
     │   └── resources/
     │       ├── application.yaml
     │       └── db/migration/    # V1, V2, V3, V4 (Flyway)
@@ -58,7 +67,10 @@ PulsePass/
         └── java/com/pulse/pass/
             ├── TestcontainersConfiguration.java
             ├── PulsePassApplicationTests.java
-            └── repository/      # Pruebas de integración de repositories
+            ├── security/        # Pruebas unitarias de seguridad
+            ├── controller/     # Pruebas MockMvc
+            ├── integration/    # Pruebas con PostgreSQL/Testcontainers
+            └── repository/     # Pruebas de repositories
 ```
 
 ---
@@ -205,7 +217,9 @@ Ubicación: `src/main/resources/db/migration/`. Se aplican en orden sobre una ba
 
 **Regla de oro:** una migración ya aplicada nunca se edita. Cualquier cambio estructural nuevo va en la siguiente versión disponible (`V5__...`, `V6__...`, etc.). Editar una migración aplicada en un entorno compartido rompería la validación de checksums de Flyway.
 
-Los usuarios existentes permanecen sin filas en estas tablas y no pueden iniciar sesión hasta ser activados mediante un proceso controlado. No se asignan contraseñas predeterminadas ni roles privilegiados durante la migración. El registro implementado en una fase posterior creará de forma atómica la credencial hasheada y el rol inicial `USER`.
+Los usuarios existentes permanecen sin filas en estas tablas y no pueden iniciar sesión hasta ser activados mediante un proceso controlado. No se asignan contraseñas predeterminadas ni roles privilegiados durante la migración. El registro mediante `AuthService` crea usuario, perfil, credencial BCrypt y rol inicial `USER` en una sola transacción.
+
+El registro exige una contraseña de al menos 12 caracteres y como máximo 72 bytes UTF-8 para respetar el límite de BCrypt. La clave en texto plano no se persiste ni se devuelve. `AuthenticationManager` y `CustomUserDetailsService` autentican por username o email y cargan estado y roles actuales. `POST /api/auth/login` devuelve un JWT de acceso firmado, tipo `Bearer` y duración en segundos. La protección de las demás rutas mediante filtros y reglas HTTP corresponde al punto 6 del plan.
 
 ---
 
@@ -290,8 +304,14 @@ Para ejecutar una sola clase:
 | `TicketRepositoryTest`(7 tests) | FK obligatorias (FR-TKT-001), ticketCode único (FR-TKT-002), precio no negativo (FR-TKT-003), consultas por usuario/estado (FR-TKT-006), tickets PAID por evento (FR-TKT-007), conteo por estado (FR-TKT-008) y tickets de eventos futuros (FR-SRC-004). |
 | `UserProfileTest`(4 tests) | 	Registro de usuario y perfil (FR-USR-001/004), username/email únicos (FR-USR-002), segundo perfil para el mismo usuario rechazado — 1:1 (FR-USR-003).|
 | `UserSecurityPersistenceTest`(3 tests) | PK compartida de credenciales, roles con clave compuesta y usuarios existentes sin credenciales/roles automáticos. |
+| `SecurityConfigTest`(1 test) | El encoder usa BCrypt y verifica correctamente contraseña/hash. |
+| `CustomUserDetailsServiceTest`(5 tests) | Carga por username/email, authorities, cuentas legadas, usuarios inactivos y credenciales persistidas. |
+| `AuthServiceIntegrationTest`(5 tests) | Registro con BCrypt/rol `USER`, login JWT, autenticación por username/email y rechazo de usuarios legados, credenciales incorrectas o cuentas inactivas. |
+| `ValidPasswordValidatorTest`(3 tests) | Longitud mínima de 12 caracteres y límite de 72 bytes UTF-8 de BCrypt. |
+| `JwtServiceTest`(4 tests) | Claims obligatorios, HS256, expiración, firma manipulada, issuer, algoritmo y configuración de clave. |
+| `AuthControllerTest`(3 tests) | Contrato de `POST /api/auth/login`, error 401 genérico y validación de request. |
 
-La suite de persistencia queda compuesta por 29 pruebas (1 + 14 + 7 + 4 + 3). Las tres pruebas de `UserSecurityPersistenceTest` se validaron contra PostgreSQL con Flyway V4 y Hibernate `ddl-auto=validate`.
+La suite completa pasa 143 pruebas. La suite de persistencia cubre 29 (1 + 14 + 7 + 4 + 3); las pruebas de seguridad se ejecutan además de esa suite.
 
 Las pruebas usan `@SpringBootTest` + `@Transactional` (rollback automático) y `saveAndFlush` para forzar que las violaciones de constraints salgan de PostgreSQL.
 
@@ -306,6 +326,11 @@ La aplicación toma la conexión de variables de entorno, con estos valores por 
 | `DB_URL` | `jdbc:postgresql://localhost:5432/pulsepass` |
 | `DB_USER` | `postgres` |
 | `DB_PASSWORD` | `postgres` |
+| `PULSEPASS_JWT_ISSUER` | `pulsepass-api` |
+| `PULSEPASS_JWT_SECRET_BASE64` | Obligatoria; Base64 de al menos 32 bytes aleatorios |
+| `PULSEPASS_JWT_ACCESS_TOKEN_TTL` | `PT15M` |
+
+El archivo `.env.example` es solo una plantilla, no lo carga Spring automáticamente. Genera una clave local y expórtala como variable de entorno antes de iniciar la aplicación; no guardes una clave real en el repositorio. Por ejemplo, `openssl rand -base64 32` genera una clave aleatoria adecuada.
 
 **Opción A — PostgreSQL con Docker:**
 
@@ -349,6 +374,7 @@ Usa `TestPulsePassApplication`, que levanta la app con un PostgreSQL efímero.
 | FR-ART-* | `Event` + `Artist` | `EventRepository`, `ArtistRepository` | `EventRepositoryTest` |
 | FR-USR-* | `User` + `UserProfile` | `UserRepository`, `UserProfileRepository` | `UserProfileTest` |
 | Persistencia de FR-SEC-AUTH-001 | `UserCredential`, `UserRole` | `UserCredentialRepository`, `UserRoleRepository` | `UserSecurityPersistenceTest` |
+| FR-SEC-AUTH-001/002 | `AuthService`, `CustomUserDetailsService`, `PasswordEncoder`, `JwtService` | Repositories de usuarios/credenciales/roles | `AuthServiceIntegrationTest`, `CustomUserDetailsServiceTest`, `JwtServiceTest`, `AuthControllerTest` |
 | FR-TKT-* | `Ticket` + `User` + `Event` | `TicketRepository` | `TicketRepositoryTest` |
 | FR-SRC-* | `Event` / `Artist` / `Venue` | `EventRepository`, `TicketRepository` | `EventRepositoryTest`, `TicketRepositoryTest` |
 | NFR-002/003 | Flyway | — | `PulsePassApplicationTests` (implícita) |

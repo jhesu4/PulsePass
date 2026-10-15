@@ -24,5 +24,9 @@ public record RegisterUserRequest(
         String city,
 
         @NotNull(message = "birthDate is required")
-        LocalDate birthDate) {
+        LocalDate birthDate,
+
+        @NotBlank(message = "password is required")
+        @ValidPassword
+        String password) {
 }
