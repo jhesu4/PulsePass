@@ -69,6 +69,26 @@ class JwtServiceTest {
 	}
 
 	@Test
+	void shouldRejectBlankTokensAndAlgNoneTokens() {
+		JwtService validator = new JwtService(properties("pulsepass-api", SECRET, Duration.ofMinutes(15)), CLOCK);
+		String algNoneToken = Jwts.builder()
+				.header().type("JWT").add("alg", "none").and()
+				.subject("42")
+				.issuer("pulsepass-api")
+				.issuedAt(java.util.Date.from(NOW))
+				.expiration(java.util.Date.from(NOW.plusSeconds(900)))
+				.id("token-id")
+				.compact();
+
+		assertThatThrownBy(() -> validator.validateAccessToken(""))
+				.isInstanceOf(BadCredentialsException.class);
+		assertThatThrownBy(() -> validator.validateAccessToken("   "))
+				.isInstanceOf(BadCredentialsException.class);
+		assertThatThrownBy(() -> validator.validateAccessToken(algNoneToken))
+				.isInstanceOf(BadCredentialsException.class);
+	}
+
+	@Test
 	void shouldRejectWrongIssuerAndUnexpectedAlgorithm() {
 		JwtService validator = new JwtService(properties("pulsepass-api", SECRET, Duration.ofMinutes(15)), CLOCK);
 		JwtService otherIssuerService = new JwtService(properties("other-api", SECRET, Duration.ofMinutes(15)), CLOCK);

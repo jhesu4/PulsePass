@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -115,6 +116,44 @@ class JwtAuthenticationFilterTest {
 				org.mockito.ArgumentMatchers.any(BadCredentialsException.class));
 		verify(filterChain, never()).doFilter(request, response);
 		verify(jwtService, never()).validateAccessToken(org.mockito.ArgumentMatchers.anyString());
+	}
+
+	@Test
+	void shouldRejectMultipleAuthorizationHeadersWithoutOverwritingContext() throws Exception {
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		request.addHeader("Authorization", "Bearer valid-token");
+		request.addHeader("Authorization", "Bearer another-token");
+		MockHttpServletResponse response = new MockHttpServletResponse();
+
+		filter.doFilter(request, response, filterChain);
+
+		verify(authenticationEntryPoint).commence(
+				org.mockito.ArgumentMatchers.eq(request),
+				org.mockito.ArgumentMatchers.eq(response),
+				org.mockito.ArgumentMatchers.any(BadCredentialsException.class));
+		verify(filterChain, never()).doFilter(request, response);
+		verify(jwtService, never()).validateAccessToken(org.mockito.ArgumentMatchers.anyString());
+		assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+	}
+
+	@Test
+	void shouldNotOverwriteAnExistingAuthentication() throws Exception {
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		request.addHeader("Authorization", "Bearer valid-token");
+		MockHttpServletResponse response = new MockHttpServletResponse();
+		UsernamePasswordAuthenticationToken existing = UsernamePasswordAuthenticationToken.authenticated(
+				"existing-principal", "password", List.of(new SimpleGrantedAuthority("ROLE_USER")));
+		SecurityContextHolder.getContext().setAuthentication(existing);
+
+		filter.doFilter(request, response, filterChain);
+
+		assertThat(SecurityContextHolder.getContext().getAuthentication()).isSameAs(existing);
+		verify(jwtService, never()).validateAccessToken(org.mockito.ArgumentMatchers.anyString());
+		verify(authenticationEntryPoint, never()).commence(
+				org.mockito.ArgumentMatchers.any(HttpServletRequest.class),
+				org.mockito.ArgumentMatchers.any(HttpServletResponse.class),
+				org.mockito.ArgumentMatchers.any());
+		verify(filterChain).doFilter(request, response);
 	}
 
 	@Test

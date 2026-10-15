@@ -1,4 +1,4 @@
-# PulsePass — Capa de controladores REST (MVP académico)
+# PulsePass — Seguridad, API REST y pruebas (MVP académico)
 
 Plataforma de **eventos, artistas y entradas**. Este repositorio expone mediante una API REST los casos de uso de PulsePass definidos en el PRD, delegando la lógica de negocio a Services y la persistencia a PostgreSQL.
 
@@ -288,6 +288,28 @@ Todos los repositories extienden `JpaRepository`. Criterio aplicado: **Query Met
 
 ## 7. Ejecución de pruebas
 
+### Política de acceso por operación
+
+| Operación | Anónimo | `USER` | `STAFF` | `ADMIN` | Nota |
+|---|---|---|---|---|---|
+| Login / registro | ✅ | ✅ (solo perfil propio) | ✅ (solo perfil propio) | ✅ (solo perfil propio) | No se crean cuentas privilegiadas en el registro público. |
+| Ver eventos publicados | ✅ | ✅ | ✅ | ✅ | Los eventos DRAFT/privados no aparecen en la vista pública. |
+| Comprar ticket | ❌ | ✅ solo para sí mismo | ❌ | ❌ | La compra exige pertenencia propia y evento publicado. |
+| Ver/gestionar tickets ajenos | ❌ | ❌ | ✅ lectura global | ✅ con `X-Admin-Purpose: TICKET_SUPPORT` | La lectura del staff es de soporte operativo; la gestión requiere propósito admin. |
+| Gestionar usuarios ajenos | ❌ | ❌ | ❌ | ✅ con `X-Admin-Purpose: CUSTOMER_SUPPORT` | El 403 se usa para acceso no autorizado; el 404 se usa cuando el recurso no existe. |
+
+### Crear `STAFF` y `ADMIN` en desarrollo
+
+Las pruebas y la demo crean roles privilegiados de forma controlada en la capa de seguridad, nunca por un endpoint público de registro. En desarrollo, se insertan usuarios transitorios con roles `STAFF` o `ADMIN` mediante datos de prueba o helpers de integración. El registro público solo concede `USER` por diseño.
+
+### Usuarios ligados y estrategia de acceso
+
+La estrategia de usuarios ligados aplica la identidad actual del principal. La comparación se realiza con `user.id` o con `user.email`/`user.username` del usuario autenticado; si hay un usuario anónimo o un principal distinto del recurso, la operación queda bloqueada. Esto evita que un `USER` pueda comprar tickets o consultar datos de otra persona aunque la entidad exista en base de datos.
+
+### Decisión 403 frente a 404
+
+Se prioriza `403 Forbidden` cuando el usuario está autenticado pero no tiene permisos suficientes para acceder al recurso o para realizar la acción, incluso si la entidad existe. El `404` se utiliza solo si la entidad no existe o el identificador no corresponde a ningún recurso válido. Así la API mantiene una semántica clara entre permisos y ausencia de recurso.
+
 Las pruebas **no usan H2 ni una base instalada a mano**: cada ejecución levanta un contenedor PostgreSQL efímero con Testcontainers, Flyway construye el esquema desde cero, Hibernate lo valida (`ddl-auto=validate`) y luego se ejercitan los repositories.
 
 **Requisito previo:** tener **Docker** en ejecución (Docker Desktop en Windows/macOS, o el daemon en Linux).
@@ -327,8 +349,10 @@ Para ejecutar una sola clase:
 | `SecurityRouteMatrixIntegrationTest`(2 tests) | Recorre las 20 rutas como anónimo y con los roles `USER`, `STAFF` y `ADMIN`. |
 | `SecurityAuditLoggerTest`(1 test) | Verifica eventos de seguridad con request ID y ausencia de secretos en los logs. |
 | `ValidPasswordValidatorTest`(3 tests) | Longitud mínima de 12 caracteres y límite de 72 bytes UTF-8 de BCrypt. |
-| `JwtServiceTest`(4 tests) | Claims obligatorios, HS256, expiración, firma manipulada, issuer, algoritmo y configuración de clave. |
+| `JwtServiceTest`(6 tests) | Claims obligatorios, HS256, expiración, firma manipulada, issuer, algoritmo, configuración de clave, token vacío y `alg=none`. |
+| `JwtAuthenticationFilterTest`(7 tests) | Ausencia de header, esquema no Bearer, autenticación real, header mal formados, doble header, soporte de contexto existente y rechazo de principal deshabilitado. |
 | `AuthControllerTest`(3 tests) | Contrato de `POST /api/auth/login`, error 401 genérico y validación de request. |
+| `ScenarioFinalIntegrationTest`(1 test) | Escenario final de demostración: registro/login, publicación de evento, asociación de artista, compra, uso de ticket, JWT alterado y usuario desactivado. |
 
 La suite completa pasa 167 pruebas. La suite de persistencia cubre 29 (1 + 14 + 7 + 4 + 3); las pruebas de seguridad se ejecutan además de esa suite.
 
