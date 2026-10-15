@@ -2,6 +2,7 @@ package com.pulse.pass.integration;
 
 import java.time.LocalDate;
 import java.util.List;
+import jakarta.persistence.EntityManagerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -21,6 +22,8 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.web.servlet.MockMvc;
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
 
 import com.pulse.pass.TestcontainersConfiguration;
 import com.pulse.pass.domain.User;
@@ -65,6 +68,9 @@ class AuthServiceIntegrationTest {
 
 	@Autowired
 	private JwtService jwtService;
+
+	@Autowired
+	private EntityManagerFactory entityManagerFactory;
 
 	@Test
 	void shouldRegisterUserWithBcryptCredentialAndUserRole() {
@@ -188,6 +194,20 @@ class AuthServiceIntegrationTest {
 				.andExpect(jsonPath("$.roles[0]").value("USER"))
 				.andExpect(jsonPath("$.password").doesNotExist())
 				.andExpect(jsonPath("$.passwordHash").doesNotExist());
+	}
+
+	@Test
+	void shouldLoadAuthenticationPrincipalWithinThreeDatabaseStatements() throws Exception {
+		String token = tokenFor("auth_query_count", UserRoleType.USER, true);
+		Statistics statistics = entityManagerFactory.unwrap(SessionFactory.class).getStatistics();
+		statistics.setStatisticsEnabled(true);
+		statistics.clear();
+
+		mockMvc.perform(get("/api/auth/me")
+				.header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+			.andExpect(status().isOk());
+
+		assertThat(statistics.getPrepareStatementCount()).isBetween(1L, 3L);
 	}
 
 	@Test

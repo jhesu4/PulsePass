@@ -6,9 +6,12 @@ import com.pulse.pass.repository.TicketRepository;
 import com.pulse.pass.repository.UserRepository;
 import com.pulse.pass.security.SecurityPrincipal;
 import java.util.Objects;
+import java.util.Set;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Service("authorizationService")
 public class AuthorizationService {
@@ -35,19 +38,33 @@ public class AuthorizationService {
 	}
 
 	public boolean canPurchaseForEmail(String email) {
-		return hasRole("ADMIN") || isCurrentUserEmail(email);
+		return isCurrentUserEmail(email);
 	}
 
 	public boolean canReadTicket(String ticketCode) {
-		return hasRole("STAFF") || hasRole("ADMIN") || ownsTicket(ticketCode);
+		return hasRole("STAFF") || ownsTicket(ticketCode) || hasAdminPurpose("TICKET_SUPPORT");
 	}
 
 	public boolean canManageTicket(String ticketCode) {
-		return hasRole("ADMIN") || ownsTicket(ticketCode);
+		return ownsTicket(ticketCode) || hasAdminPurpose("TICKET_SUPPORT");
 	}
 
 	public boolean canReadTicketsForEmail(String email) {
-		return hasRole("ADMIN") || isCurrentUserEmail(email);
+		return isCurrentUserEmail(email) || hasAdminPurpose("TICKET_SUPPORT");
+	}
+
+	public boolean hasAdminPurpose(String expectedPurpose) {
+		if (!hasRole("ADMIN") || !Set.of("CUSTOMER_SUPPORT", "TICKET_SUPPORT").contains(expectedPurpose)) {
+			return false;
+		}
+
+		var requestAttributes = RequestContextHolder.getRequestAttributes();
+		if (!(requestAttributes instanceof ServletRequestAttributes servletAttributes)
+				|| !expectedPurpose.equals(servletAttributes.getRequest().getHeader("X-Admin-Purpose"))) {
+			return false;
+		}
+
+		return true;
 	}
 
 	public boolean canViewEvent(String eventCode) {

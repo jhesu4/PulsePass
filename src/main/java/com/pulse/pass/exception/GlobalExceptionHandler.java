@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import com.pulse.pass.security.SecurityAuditLogger;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -20,9 +21,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.beans.factory.ObjectProvider;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private final ObjectProvider<SecurityAuditLogger> securityAuditLogger;
+
+    public GlobalExceptionHandler(ObjectProvider<SecurityAuditLogger> securityAuditLogger) {
+        this.securityAuditLogger = securityAuditLogger;
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
@@ -140,6 +148,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
+        securityAuditLogger.ifAvailable(auditLogger -> auditLogger.accessDenied());
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.FORBIDDEN.value(),

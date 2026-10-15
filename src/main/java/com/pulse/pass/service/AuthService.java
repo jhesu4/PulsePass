@@ -12,9 +12,11 @@ import com.pulse.pass.repository.UserCredentialRepository;
 import com.pulse.pass.repository.UserRepository;
 import com.pulse.pass.repository.UserRoleRepository;
 import com.pulse.pass.security.JwtService;
+import com.pulse.pass.security.SecurityAuditLogger;
 import com.pulse.pass.security.SecurityPrincipal;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,10 +32,12 @@ public class AuthService {
 	private final PasswordEncoder passwordEncoder;
 	private final AuthenticationManager authenticationManager;
 	private final JwtService jwtService;
+	private final SecurityAuditLogger securityAuditLogger;
 
 	public AuthService(UserService userService, UserRepository userRepository,
 			UserCredentialRepository userCredentialRepository, UserRoleRepository userRoleRepository,
-			PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService) {
+			PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService,
+			SecurityAuditLogger securityAuditLogger) {
 		this.userService = userService;
 		this.userRepository = userRepository;
 		this.userCredentialRepository = userCredentialRepository;
@@ -41,6 +45,7 @@ public class AuthService {
 		this.passwordEncoder = passwordEncoder;
 		this.authenticationManager = authenticationManager;
 		this.jwtService = jwtService;
+		this.securityAuditLogger = securityAuditLogger;
 	}
 
 	@Transactional
@@ -56,9 +61,16 @@ public class AuthService {
 	}
 
 	public SecurityPrincipal authenticate(LoginRequest request) {
-		Authentication authentication = authenticationManager.authenticate(
-				UsernamePasswordAuthenticationToken.unauthenticated(request.identifier(), request.password()));
-		return (SecurityPrincipal) authentication.getPrincipal();
+		try {
+			Authentication authentication = authenticationManager.authenticate(
+					UsernamePasswordAuthenticationToken.unauthenticated(request.identifier(), request.password()));
+			SecurityPrincipal principal = (SecurityPrincipal) authentication.getPrincipal();
+			securityAuditLogger.loginSucceeded(principal.getUserId());
+			return principal;
+		} catch (AuthenticationException exception) {
+			securityAuditLogger.loginFailed();
+			throw exception;
+		}
 	}
 
 	public AuthResponse login(LoginRequest request) {

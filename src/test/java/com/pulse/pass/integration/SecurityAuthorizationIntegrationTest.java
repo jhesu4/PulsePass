@@ -1,11 +1,14 @@
 package com.pulse.pass.integration;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.pulse.pass.TestcontainersConfiguration;
@@ -29,8 +32,10 @@ import com.pulse.pass.repository.UserRepository;
 import com.pulse.pass.repository.UserRoleRepository;
 import com.pulse.pass.repository.VenueRepository;
 import com.pulse.pass.security.JwtService;
+import com.pulse.pass.security.RequestIdFilter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -73,6 +78,93 @@ class SecurityAuthorizationIntegrationTest {
 
 	@Autowired
 	private JwtService jwtService;
+
+	@Test
+	void shouldEchoProvidedRequestIdOnAuthenticationFailure() throws Exception {
+		var response = mockMvc.perform(get("/api/auth/me")
+					.header(RequestIdFilter.HEADER_NAME, "trace-2026-001"))
+				.andReturn()
+				.getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(401);
+		assertThat(response.getHeader(RequestIdFilter.HEADER_NAME)).isEqualTo("trace-2026-001");
+	}
+
+	@Test
+	void shouldRequireHttpsOutsideLocalhost() throws Exception {
+		mockMvc.perform(get("/api/events/published")
+					.with(request -> {
+						request.setServerName("localhost");
+						request.setRemoteAddr("198.51.100.10");
+						return request;
+					}))
+			.andExpect(status().isForbidden())
+			.andExpect(jsonPath("$.message").value("HTTPS is required"));
+
+		mockMvc.perform(get("/api/events/published")
+					.with(request -> {
+						request.setServerName("api.pulsepass.example");
+						request.setRemoteAddr("198.51.100.10");
+						request.setSecure(true);
+						return request;
+					}))
+			.andExpect(status().isOk());
+
+		mockMvc.perform(get("/api/events/published")
+					.with(request -> {
+						request.setRemoteAddr("127.0.0.1");
+						return request;
+					}))
+			.andExpect(status().isOk());
+	}
+
+	@Test
+	void shouldReplaceMalformedRequestId() throws Exception {
+		var response = mockMvc.perform(get("/api/auth/me")
+					.header(RequestIdFilter.HEADER_NAME, "invalid request id"))
+				.andReturn()
+				.getResponse();
+
+		String requestId = response.getHeader(RequestIdFilter.HEADER_NAME);
+		assertThat(response.getStatus()).isEqualTo(401);
+		assertThat(requestId).isNotEqualTo("invalid request id");
+		assertThat(UUID.fromString(requestId)).isNotNull();
+	}
+
+	@Test
+	void shouldAllowConfiguredCorsOriginAndRejectOtherOrigins() throws Exception {
+		var allowedResponse = mockMvc.perform(options("/api/auth/me")
+					.header("Origin", "http://localhost:3000")
+					.header("Access-Control-Request-Method", "GET"))
+				.andReturn()
+				.getResponse();
+
+		assertThat(allowedResponse.getStatus()).isEqualTo(200);
+		assertThat(allowedResponse.getHeader("Access-Control-Allow-Origin")).isEqualTo("http://localhost:3000");
+		assertThat(allowedResponse.getHeader("Access-Control-Expose-Headers")).contains(RequestIdFilter.HEADER_NAME);
+		assertThat(allowedResponse.getHeader(RequestIdFilter.HEADER_NAME)).isNotBlank();
+
+		var adminPurposeResponse = mockMvc.perform(options("/api/tickets/TCK-1/cancel")
+					.header("Origin", "http://localhost:3000")
+					.header("Access-Control-Request-Method", "PATCH")
+					.header("Access-Control-Request-Headers", "authorization,content-type,x-admin-purpose"))
+				.andReturn()
+				.getResponse();
+
+		assertThat(adminPurposeResponse.getStatus()).isEqualTo(200);
+		assertThat(adminPurposeResponse.getHeader("Access-Control-Allow-Headers"))
+				.containsIgnoringCase("x-admin-purpose");
+
+		var rejectedResponse = mockMvc.perform(options("/api/auth/me")
+					.header("Origin", "https://untrusted.example")
+					.header("Access-Control-Request-Method", "GET"))
+				.andReturn()
+				.getResponse();
+
+		assertThat(rejectedResponse.getStatus()).isEqualTo(403);
+		assertThat(rejectedResponse.getHeader("Access-Control-Allow-Origin")).isNull();
+		assertThat(rejectedResponse.getHeader(RequestIdFilter.HEADER_NAME)).isNotBlank();
+	}
 
 	@Test
 	void shouldAllowTicketOwnerAndDenyAnotherUserBeforeCancellation() throws Exception {
@@ -130,6 +222,109 @@ class SecurityAuthorizationIntegrationTest {
 					.param("email", "LOOKUP_CURRENT@pulse.com")
 					.header(HttpHeaders.AUTHORIZATION, bearer(currentUser)))
 				.andExpect(status().isOk());
+	}
+
+	@Test
+	void shouldRestrictTicketListToItsOwner() throws Exception {
+		User owner = createUser("list_owner", UserRoleType.USER);
+		User attacker = createUser("list_attacker", UserRoleType.USER);
+		createTicket("TCK-LIST-OWNER", owner);
+
+		mockMvc.perform(get("/api/tickets/by-user")
+					.param("email", owner.getEmail())
+					.header(HttpHeaders.AUTHORIZATION, bearer(attacker)))
+				.andExpect(status().isForbidden());
+
+		mockMvc.perform(get("/api/tickets/by-user")
+					.param("email", owner.getEmail())
+					.header(HttpHeaders.AUTHORIZATION, bearer(owner)))
+				.andExpect(status().isOk())
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("TCK-LIST-OWNER")));
+	}
+
+	@Test
+	void shouldRestrictUsernameLookupToTheAuthenticatedIdentity() throws Exception {
+		User currentUser = createUser("username_current", UserRoleType.USER);
+		createUser("username_other", UserRoleType.USER);
+
+		mockMvc.perform(get("/api/users/by-username")
+					.param("username", "username_other")
+					.header(HttpHeaders.AUTHORIZATION, bearer(currentUser)))
+				.andExpect(status().isForbidden());
+
+		mockMvc.perform(get("/api/users/by-username")
+					.param("username", "username_current")
+					.header(HttpHeaders.AUTHORIZATION, bearer(currentUser)))
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	void shouldRequireAnApprovedPurposeForAdminAccessToOtherUsersData() throws Exception {
+		User owner = createUser("admin_purpose_owner", UserRoleType.USER);
+		User admin = createUser("admin_purpose_admin", UserRoleType.ADMIN);
+		Ticket ticket = createTicket("TCK-ADMIN-PURPOSE", owner);
+
+		mockMvc.perform(get("/api/users/by-email")
+					.param("email", owner.getEmail())
+					.header(HttpHeaders.AUTHORIZATION, bearer(admin)))
+				.andExpect(status().isForbidden());
+
+		mockMvc.perform(get("/api/users/by-email")
+					.param("email", owner.getEmail())
+					.header(HttpHeaders.AUTHORIZATION, bearer(admin))
+					.header("X-Admin-Purpose", "TICKET_SUPPORT"))
+				.andExpect(status().isForbidden());
+
+		mockMvc.perform(get("/api/users/by-email")
+					.param("email", owner.getEmail())
+					.header(HttpHeaders.AUTHORIZATION, bearer(admin))
+					.header("X-Admin-Purpose", "CUSTOMER_SUPPORT"))
+				.andExpect(status().isOk());
+
+		mockMvc.perform(get("/api/tickets/{ticketCode}", ticket.getTicketCode())
+					.header(HttpHeaders.AUTHORIZATION, bearer(admin)))
+				.andExpect(status().isForbidden());
+
+		mockMvc.perform(get("/api/tickets/{ticketCode}", ticket.getTicketCode())
+					.header(HttpHeaders.AUTHORIZATION, bearer(admin))
+					.header("X-Admin-Purpose", "TICKET_SUPPORT"))
+				.andExpect(status().isOk());
+
+		mockMvc.perform(get("/api/tickets/by-user")
+					.param("email", owner.getEmail())
+					.header(HttpHeaders.AUTHORIZATION, bearer(admin)))
+				.andExpect(status().isForbidden());
+
+		mockMvc.perform(get("/api/tickets/by-user")
+					.param("email", owner.getEmail())
+					.header(HttpHeaders.AUTHORIZATION, bearer(admin))
+					.header("X-Admin-Purpose", "TICKET_SUPPORT"))
+				.andExpect(status().isOk());
+
+		mockMvc.perform(patch("/api/tickets/{ticketCode}/cancel", ticket.getTicketCode())
+					.header(HttpHeaders.AUTHORIZATION, bearer(admin)))
+				.andExpect(status().isForbidden());
+
+		mockMvc.perform(patch("/api/tickets/{ticketCode}/cancel", ticket.getTicketCode())
+					.header(HttpHeaders.AUTHORIZATION, bearer(admin))
+					.header("X-Admin-Purpose", "TICKET_SUPPORT"))
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	void shouldAllowUserToPurchaseTicketForTheirOwnEmail() throws Exception {
+		User buyer = createUser("purchase_owner", UserRoleType.USER);
+		createEvent("EVT-OWN-PURCHASE", EventStatus.PUBLISHED, null);
+
+		mockMvc.perform(post("/api/tickets")
+					.header(HttpHeaders.AUTHORIZATION, bearer(buyer))
+					.contentType(MediaType.APPLICATION_JSON)
+					.content("{\"userEmail\":\"purchase_owner@pulse.com\","
+							+ "\"eventCode\":\"EVT-OWN-PURCHASE\",\"type\":\"GENERAL\"}"))
+				.andExpect(status().isCreated());
+
+		org.assertj.core.api.Assertions.assertThat(ticketRepository
+				.findByUserEmailIgnoreCaseOrderByPurchaseDateDesc(buyer.getEmail())).hasSize(1);
 	}
 
 	@Test

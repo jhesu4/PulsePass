@@ -45,17 +45,17 @@ PulsePass/
     ├── main/
     │   ├── java/com/pulse/pass/
     │   │   ├── controller/  # Controladores existentes + AuthController
-    │   │   ├── service/     # Servicios existentes + AuthService
-    │   │   │   └── AuthorizationService.java (punto 7)
+    │   │   ├── service/     # Servicios existentes + AuthService + AuthorizationService
     │   │   ├── dto/
     │   │   │   ├── request/LoginRequest.java, RegisterUserRequest.java
     │   │   │   └── response/AuthResponse.java, AuthenticatedUserResponse.java (punto 6)
     │   │   ├── security/
-    │   │   │   ├── SecurityConfig.java, JwtProperties.java, JwtService.java
+    │   │   │   ├── SecurityConfig.java, JwtProperties.java, CorsProperties.java
+    │   │   │   ├── JwtService.java, JwtAuthenticationFilter.java
     │   │   │   ├── CustomUserDetailsService.java, SecurityPrincipal.java
-    │   │   │   ├── JwtAuthenticationFilter.java (punto 6)
-    │   │   │   ├── RestAuthenticationEntryPoint.java (punto 6)
-    │   │   │   └── RestAccessDeniedHandler.java (punto 6)
+    │   │   │   ├── RequestIdFilter.java, SecurityAuditLogger.java
+    │   │   │   ├── RestAuthenticationEntryPoint.java, RestAccessDeniedHandler.java
+    │   │   │   └── RestSecurityErrorResponseWriter.java
     │   │   ├── domain/      # Entidades existentes + credenciales/roles
     │   │   ├── repository/  # Repositories existentes + credenciales/roles
     │   │   ├── exception/   # GlobalExceptionHandler
@@ -72,6 +72,8 @@ PulsePass/
             ├── integration/    # Pruebas con PostgreSQL/Testcontainers
             └── repository/     # Pruebas de repositories
 ```
+
+El paquete base concreto permanece como `com.pulse.pass` para conservar la estructura de las fases anteriores. Los auxiliares de CORS, request ID, auditoría y escritura de errores complementan la estructura propuesta en el PRD para cumplir sus NFR.
 
 ---
 
@@ -219,9 +221,22 @@ Ubicación: `src/main/resources/db/migration/`. Se aplican en orden sobre una ba
 
 Los usuarios existentes permanecen sin filas en estas tablas y no pueden iniciar sesión hasta ser activados mediante un proceso controlado. No se asignan contraseñas predeterminadas ni roles privilegiados durante la migración. El registro mediante `AuthService` crea usuario, perfil, credencial BCrypt y rol inicial `USER` en una sola transacción.
 
-El registro exige una contraseña de al menos 12 caracteres y como máximo 72 bytes UTF-8 para respetar el límite de BCrypt. La clave en texto plano no se persiste ni se devuelve. `AuthenticationManager` y `CustomUserDetailsService` autentican por username o email y cargan estado y roles actuales. `POST /api/auth/login` devuelve un JWT de acceso firmado, tipo `Bearer` y duración en segundos. `GET /api/auth/me` devuelve únicamente el ID, username y roles del principal autenticado. La API es stateless, valida el Bearer JWT en cada solicitud y aplica roles y ownership en la capa de servicios; los errores de seguridad usan `ErrorResponse` con 401/403.
+El registro exige una contraseña de al menos 12 caracteres y como máximo 72 bytes UTF-8 para respetar el límite de BCrypt. La clave en texto plano no se persiste ni se devuelve. `AuthenticationManager` y `CustomUserDetailsService` autentican por username o email y cargan estado y roles actuales. `POST /api/auth/login` devuelve un JWT de acceso firmado, tipo `Bearer` y duración en segundos. `GET /api/auth/me` devuelve únicamente el ID, username y roles del principal autenticado. La API es stateless, valida el Bearer JWT en cada solicitud y aplica roles y ownership en la capa de servicios; los errores de seguridad usan `ErrorResponse` con 401/403. La compra de tickets requiere `USER` y correo propio. Para que ADMIN consulte o cancele recursos ajenos, debe enviar `X-Admin-Purpose: CUSTOMER_SUPPORT` para búsquedas de usuario o `X-Admin-Purpose: TICKET_SUPPORT` para tickets; el propósito se valida en la capa de servicio.
 
 ---
+
+### Política de acceso y roles de prueba
+
+| Rol / actor | Acceso relevante |
+|---|---|
+| Anónimo | Login, registro, venues, artistas y eventos publicados. Los eventos no publicados no se exponen en búsquedas públicas. |
+| `USER` | Compra, consulta, lista y cancela únicamente sus propios tickets; las búsquedas de usuario se limitan a su propia identidad. |
+| `STAFF` | Consulta tickets y ventas, y marca tickets como usados. El MVP permite estas operaciones globalmente porque el dominio aún no asocia personal con eventos; debe restringirse por evento en producción. |
+| `ADMIN` | Crea/publica eventos y asocia artistas. El acceso a datos ajenos requiere `X-Admin-Purpose: CUSTOMER_SUPPORT` para usuarios o `X-Admin-Purpose: TICKET_SUPPORT` para tickets. |
+
+No hay cuentas privilegiadas ni contraseñas de demostración persistidas. Las pruebas crean usuarios transitorios con roles `USER`, `STAFF` y `ADMIN`; el registro público siempre asigna únicamente `USER`. Para desarrollo, los roles privilegiados deben provisionarse por un proceso controlado, nunca mediante parámetros del endpoint de registro. La tabla de endpoints REST más abajo enumera las 22 rutas: las 20 heredadas y los dos endpoints de autenticación.
+
+**Brechas de producción fuera del MVP:** no hay límite de intentos ni protección distribuida contra fuerza bruta; la clave HMAC requiere un gestor de secretos y un proceso de rotación; y STAFF debe quedar limitado a eventos asignados cuando el dominio incorpore esa relación. No se presentan estas capacidades como implementadas.
 
 ## 6. Consultas y repositories
 
@@ -300,19 +315,22 @@ Para ejecutar una sola clase:
 | Clase | Qué verifica |
 |---|---|
 | `PulsePassApplicationTests` | El contexto arranca: Testcontainers + Flyway (V1–V4) + validación de Hibernate. |
+| `SecurityMigrationUpgradeTest` | Aplica V1–V3 a una base nueva y verifica que V4 actualiza el esquema ya migrado y crea las tablas de seguridad. |
 | `EventRepositoryTest`(14 tests) | Venue (FR-VEN-001/002/003/004), Event (FR-EVT-001/002/005/006), Artist (FR-ART-001/002/003) y descubrimiento (FR-SRC-001/002/003). |
 | `TicketRepositoryTest`(7 tests) | FK obligatorias (FR-TKT-001), ticketCode único (FR-TKT-002), precio no negativo (FR-TKT-003), consultas por usuario/estado (FR-TKT-006), tickets PAID por evento (FR-TKT-007), conteo por estado (FR-TKT-008) y tickets de eventos futuros (FR-SRC-004). |
 | `UserProfileTest`(4 tests) | 	Registro de usuario y perfil (FR-USR-001/004), username/email únicos (FR-USR-002), segundo perfil para el mismo usuario rechazado — 1:1 (FR-USR-003).|
 | `UserSecurityPersistenceTest`(3 tests) | PK compartida de credenciales, roles con clave compuesta y usuarios existentes sin credenciales/roles automáticos. |
 | `SecurityConfigTest`(1 test) | El encoder usa BCrypt y verifica correctamente contraseña/hash. |
 | `CustomUserDetailsServiceTest`(5 tests) | Carga por username/email, authorities, cuentas legadas, usuarios inactivos y credenciales persistidas. |
-| `AuthServiceIntegrationTest`(11 tests) | Registro con BCrypt/rol `USER`, login JWT, autenticación por username/email, HTTP 401/403, usuario inactivo y contrato de `/api/auth/me`. |
-| `SecurityAuthorizationIntegrationTest`(5 tests) | Ownership de tickets y usuarios, compra para tercero, borradores y filtrado público por artista. |
+| `AuthServiceIntegrationTest`(12 tests) | Registro con BCrypt/rol `USER`, login JWT, autenticación por username/email, HTTP 401/403, usuario inactivo y contrato de `/api/auth/me`. |
+| `SecurityAuthorizationIntegrationTest`(13 tests) | Ownership de tickets/usuarios, compra propia y para tercero, borradores, filtrado público, request ID y CORS. |
+| `SecurityRouteMatrixIntegrationTest`(2 tests) | Recorre las 20 rutas como anónimo y con los roles `USER`, `STAFF` y `ADMIN`. |
+| `SecurityAuditLoggerTest`(1 test) | Verifica eventos de seguridad con request ID y ausencia de secretos en los logs. |
 | `ValidPasswordValidatorTest`(3 tests) | Longitud mínima de 12 caracteres y límite de 72 bytes UTF-8 de BCrypt. |
 | `JwtServiceTest`(4 tests) | Claims obligatorios, HS256, expiración, firma manipulada, issuer, algoritmo y configuración de clave. |
 | `AuthControllerTest`(3 tests) | Contrato de `POST /api/auth/login`, error 401 genérico y validación de request. |
 
-La suite completa pasa 154 pruebas. La suite de persistencia cubre 29 (1 + 14 + 7 + 4 + 3); las pruebas de seguridad se ejecutan además de esa suite.
+La suite completa pasa 167 pruebas. La suite de persistencia cubre 29 (1 + 14 + 7 + 4 + 3); las pruebas de seguridad se ejecutan además de esa suite.
 
 Las pruebas usan `@SpringBootTest` + `@Transactional` (rollback automático) y `saveAndFlush` para forzar que las violaciones de constraints salgan de PostgreSQL.
 
@@ -330,8 +348,13 @@ La aplicación toma la conexión de variables de entorno, con estos valores por 
 | `PULSEPASS_JWT_ISSUER` | `pulsepass-api` |
 | `PULSEPASS_JWT_SECRET_BASE64` | Obligatoria; Base64 de al menos 32 bytes aleatorios |
 | `PULSEPASS_JWT_ACCESS_TOKEN_TTL` | `PT15M` |
+| `PULSEPASS_CORS_ALLOWED_ORIGINS` | `http://localhost:3000`; lista de orígenes exactos separada por comas |
 
 El archivo `.env.example` es solo una plantilla, no lo carga Spring automáticamente. Genera una clave local y expórtala como variable de entorno antes de iniciar la aplicación; no guardes una clave real en el repositorio. Por ejemplo, `openssl rand -base64 32` genera una clave aleatoria adecuada.
+
+La carga del principal autenticado se mantiene en un máximo de tres sentencias SQL por solicitud; la prueba de integración mide el conteo con Hibernate Statistics y actualmente observa dos.
+
+La API devuelve `X-Request-ID` en cada respuesta. Acepta valores de 1 a 64 caracteres alfanuméricos o `._-`; si falta o no cumple el formato, genera un UUID. Los logs de seguridad incluyen ese ID y el tipo de evento, nunca contraseñas, tokens ni hashes. Configura `PULSEPASS_CORS_ALLOWED_ORIGINS` con los orígenes concretos de cada entorno; no uses `*` en despliegues reales. HTTP se rechaza con `403` fuera de localhost/loopback. Para TLS terminado en proxy, `server.forward-headers-strategy=framework` respeta los encabezados reenviados: el proxy confiable debe sanearlos y el backend no debe ser accesible directamente desde redes no confiables.
 
 **Opción A — PostgreSQL con Docker:**
 

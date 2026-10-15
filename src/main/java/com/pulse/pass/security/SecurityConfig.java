@@ -1,7 +1,9 @@
 package com.pulse.pass.security;
 
 import java.time.Clock;
+import java.util.List;
 
+import tools.jackson.databind.ObjectMapper;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +16,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,7 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
 @EnableMethodSecurity
-@EnableConfigurationProperties(JwtProperties.class)
+@EnableConfigurationProperties({JwtProperties.class, CorsProperties.class})
 public class SecurityConfig {
 
 	@Bean
@@ -48,13 +54,31 @@ public class SecurityConfig {
 	}
 
 	@Bean
+	CorsConfigurationSource corsConfigurationSource(CorsProperties properties) {
+		CorsConfiguration cors = new CorsConfiguration();
+		cors.setAllowedOrigins(properties.getAllowedOrigins());
+		cors.setAllowedMethods(List.of("GET", "POST", "PATCH", "OPTIONS"));
+		cors.setAllowedHeaders(List.of("Authorization", "Content-Type", RequestIdFilter.HEADER_NAME,
+				"X-Admin-Purpose"));
+		cors.setExposedHeaders(List.of(RequestIdFilter.HEADER_NAME));
+		cors.setAllowCredentials(false);
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/api/**", cors);
+		return source;
+	}
+
+	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http, JwtService jwtService,
 			CustomUserDetailsService userDetailsService, RestAuthenticationEntryPoint authenticationEntryPoint,
-			RestAccessDeniedHandler accessDeniedHandler)
+			RestAccessDeniedHandler accessDeniedHandler, SecurityAuditLogger securityAuditLogger,
+			CorsConfigurationSource corsConfigurationSource, ObjectMapper objectMapper)
 			throws Exception {
 		JwtAuthenticationFilter jwtFilter = new JwtAuthenticationFilter(jwtService, userDetailsService,
 				authenticationEntryPoint);
+		RequestIdFilter requestIdFilter = new RequestIdFilter(objectMapper, securityAuditLogger);
 		http
+				.cors(cors -> cors.configurationSource(corsConfigurationSource))
 				.csrf(csrf -> csrf.disable())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.formLogin(formLogin -> formLogin.disable())
@@ -75,13 +99,15 @@ public class SecurityConfig {
 							.hasAnyRole("STAFF", "ADMIN")
 						.requestMatchers(HttpMethod.PATCH, "/api/tickets/*/use")
 							.hasAnyRole("STAFF", "ADMIN")
-						.requestMatchers(HttpMethod.POST, "/api/tickets").hasAnyRole("USER", "ADMIN")
+						.requestMatchers(HttpMethod.POST, "/api/tickets").hasRole("USER")
 						.requestMatchers(HttpMethod.PATCH, "/api/tickets/*/cancel").hasAnyRole("USER", "ADMIN")
 						.requestMatchers(HttpMethod.GET, "/api/users/by-email", "/api/users/by-username")
 							.authenticated()
 						.anyRequest().authenticated())
-				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+				.addFilterBefore(requestIdFilter, CorsFilter.class);
 
 		return http.build();
 	}
+
 }

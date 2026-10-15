@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ADMIN') or @authorizationService.isCurrentUserEmail(#p0)")
+    @PreAuthorize("@authorizationService.hasAdminPurpose('CUSTOMER_SUPPORT') or @authorizationService.isCurrentUserEmail(#p0)")
     @Transactional(readOnly = true)
     public UserResponse findByEmail(String email) {
         User user = userRepository.findByEmailIgnoreCase(email)
@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ADMIN') or @authorizationService.isCurrentUserUsername(#p0)")
+    @PreAuthorize("@authorizationService.hasAdminPurpose('CUSTOMER_SUPPORT') or @authorizationService.isCurrentUserUsername(#p0)")
     @Transactional(readOnly = true)
     public UserResponse findByUsername(String username) {
         User user = userRepository.findByUsername(username)
