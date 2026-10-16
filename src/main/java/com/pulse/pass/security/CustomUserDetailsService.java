@@ -30,9 +30,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
-		User user = userRepository.findByUsername(identifier)
-				.or(() -> userRepository.findByEmailIgnoreCase(identifier))
-				.orElseThrow(() -> new UsernameNotFoundException(INVALID_CREDENTIALS_MESSAGE));
+		User user = identifier.contains("@")
+				? userRepository.findByEmailIgnoreCase(identifier).orElseThrow(
+						() -> new UsernameNotFoundException(INVALID_CREDENTIALS_MESSAGE))
+				: userRepository.findByUsername(identifier).orElseThrow(
+						() -> new UsernameNotFoundException(INVALID_CREDENTIALS_MESSAGE));
 		return createPrincipal(user);
 	}
 

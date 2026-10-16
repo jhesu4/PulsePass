@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -35,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(EventController.class)
+@WithMockUser(username = "mvc-test-user", roles = "USER")
 class EventControllerTest {
 
         @Autowired
@@ -48,6 +50,7 @@ class EventControllerTest {
 
     @Test
         @DisplayName("POST /api/events should create an event with an empty description")
+        @WithMockUser(username = "mvc-admin", roles = "ADMIN")
     void shouldCreateEvent() throws Exception {
         EventResponse response = new EventResponse(
                 1L,
@@ -146,6 +149,7 @@ class EventControllerTest {
 
     @Test
     @DisplayName("PATCH /api/events/{eventCode}/publish should publish an event")
+        @WithMockUser(username = "mvc-admin", roles = "ADMIN")
     void shouldPublishEvent() throws Exception {
         given(eventService.publish("EVT-001")).willReturn(eventResponse(EventStatus.PUBLISHED));
 
@@ -159,6 +163,7 @@ class EventControllerTest {
 
     @Test
     @DisplayName("PATCH /api/events/{eventCode}/publish should return 409 for a business conflict")
+        @WithMockUser(username = "mvc-admin", roles = "ADMIN")
     void shouldReturnConflictWhenEventCannotBePublished() throws Exception {
         given(eventService.publish("EVT-001"))
                 .willThrow(new BusinessRuleException("Only DRAFT events can be published: EVT-001"));
@@ -173,6 +178,7 @@ class EventControllerTest {
 
     @Test
     @DisplayName("POST /api/events/{eventCode}/artists/{artistId} should associate an artist")
+        @WithMockUser(username = "mvc-admin", roles = "ADMIN")
     void shouldAssociateArtistWithEvent() throws Exception {
         given(eventService.addArtist("EVT-001", 1L)).willReturn(eventResponse(EventStatus.DRAFT));
 
@@ -200,6 +206,7 @@ class EventControllerTest {
 
     @Test
     @DisplayName("GET /api/events/{eventCode}/tickets/paid should return paid tickets")
+        @WithMockUser(username = "mvc-staff", roles = "STAFF")
     void shouldFindPaidTicketsByEvent() throws Exception {
         given(ticketService.findPaidTicketsByEvent("EVT-001")).willReturn(List.of(
                 new TicketResponse(1L, "TCK-001", TicketType.GENERAL, new BigDecimal("150000.00"),

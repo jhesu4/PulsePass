@@ -1,12 +1,23 @@
 package com.pulse.pass.security;
 
+import com.pulse.pass.domain.UserRole;
+import com.pulse.pass.domain.UserRoleType;
+import com.pulse.pass.exception.ResourceNotFoundException;
+import com.pulse.pass.repository.UserRepository;
+import com.pulse.pass.repository.UserRoleRepository;
 import java.time.Clock;
 import java.util.List;
+import java.util.Locale;
 
 import tools.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -54,6 +65,29 @@ public class SecurityConfig {
 	}
 
 	@Bean
+	@Profile("local")
+	@ConditionalOnProperty(prefix = "pulsepass.security.bootstrap", name = "enabled", havingValue = "true")
+	ApplicationRunner localRoleBootstrapRunner(Environment environment, UserRepository userRepository,
+			UserRoleRepository userRoleRepository) {
+		return args -> {
+			String email = environment.getRequiredProperty("pulsepass.security.bootstrap.email");
+			String roleName = environment.getRequiredProperty("pulsepass.security.bootstrap.role");
+			UserRoleType role = UserRoleType.valueOf(roleName.trim().toUpperCase(Locale.ROOT));
+			if (role != UserRoleType.STAFF && role != UserRoleType.ADMIN) {
+				throw new IllegalArgumentException("Local role bootstrap only supports STAFF or ADMIN");
+			}
+
+			var user = userRepository.findByEmailIgnoreCase(email)
+					.orElseThrow(() -> new ResourceNotFoundException("Bootstrap user not found"));
+			boolean alreadyAssigned = userRoleRepository.findAllByUser_Id(user.getId()).stream()
+					.anyMatch(userRole -> userRole.getRole() == role);
+			if (!alreadyAssigned) {
+				userRoleRepository.save(new UserRole(user, role));
+			}
+		};
+	}
+
+	@Bean
 	CorsConfigurationSource corsConfigurationSource(CorsProperties properties) {
 		CorsConfiguration cors = new CorsConfiguration();
 		cors.setAllowedOrigins(properties.getAllowedOrigins());
@@ -72,11 +106,12 @@ public class SecurityConfig {
 	SecurityFilterChain securityFilterChain(HttpSecurity http, JwtService jwtService,
 			CustomUserDetailsService userDetailsService, RestAuthenticationEntryPoint authenticationEntryPoint,
 			RestAccessDeniedHandler accessDeniedHandler, SecurityAuditLogger securityAuditLogger,
-			CorsConfigurationSource corsConfigurationSource, ObjectMapper objectMapper)
+			CorsConfigurationSource corsConfigurationSource, ObjectMapper objectMapper,
+			@Value("${pulsepass.security.transport.require-https:true}") boolean requireHttps)
 			throws Exception {
 		JwtAuthenticationFilter jwtFilter = new JwtAuthenticationFilter(jwtService, userDetailsService,
 				authenticationEntryPoint);
-		RequestIdFilter requestIdFilter = new RequestIdFilter(objectMapper, securityAuditLogger);
+		RequestIdFilter requestIdFilter = new RequestIdFilter(objectMapper, securityAuditLogger, requireHttps);
 		http
 				.cors(cors -> cors.configurationSource(corsConfigurationSource))
 				.csrf(csrf -> csrf.disable())

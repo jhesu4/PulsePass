@@ -19,6 +19,7 @@ public class JwtService {
 
 	private static final int MINIMUM_SECRET_BYTES = 32;
 	private static final String EXPECTED_ALGORITHM = Jwts.SIG.HS256.getId();
+	private static final String EXPECTED_TYPE = "JWT";
 
 	private final JwtProperties properties;
 	private final Clock clock;
@@ -64,6 +65,7 @@ public class JwtService {
 
 			Claims claims = signedClaims.getPayload();
 			if (!EXPECTED_ALGORITHM.equals(signedClaims.getHeader().getAlgorithm())
+					|| !EXPECTED_TYPE.equals(signedClaims.getHeader().getType())
 					|| claims.getSubject() == null || claims.getSubject().isBlank()
 					|| claims.getIssuedAt() == null
 					|| claims.getIssuedAt().toInstant().isAfter(clock.instant())

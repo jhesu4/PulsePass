@@ -85,7 +85,7 @@ class ScenarioFinalIntegrationTest {
 
 	@Test
 	void shouldCompleteFinalSecurityDemonstrationScenario() throws Exception {
-		Event event = createDraftEvent();
+		createDraftEvent();
 		Artist solarBeat = artistRepository.findByStageName("Solar Beat").orElseThrow();
 
 		User andrea = register("andrea_demo", "andrea.demo@pulse.com");

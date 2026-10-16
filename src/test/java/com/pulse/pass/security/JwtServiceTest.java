@@ -111,6 +111,22 @@ class JwtServiceTest {
 	}
 
 	@Test
+	void shouldRejectTokenWithoutJwtTypeHeader() {
+		JwtService validator = new JwtService(properties("pulsepass-api", SECRET, Duration.ofMinutes(15)), CLOCK);
+		String tokenWithoutType = Jwts.builder()
+				.subject("42")
+				.issuer("pulsepass-api")
+				.issuedAt(java.util.Date.from(NOW))
+				.expiration(java.util.Date.from(NOW.plusSeconds(900)))
+				.id("token-id")
+				.signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET)), Jwts.SIG.HS256)
+				.compact();
+
+		assertThatThrownBy(() -> validator.validateAccessToken(tokenWithoutType))
+				.isInstanceOf(BadCredentialsException.class);
+	}
+
+	@Test
 	void shouldFailFastForMissingOrWeakSecretAndInvalidTtl() {
 		assertThatThrownBy(() -> new JwtService(properties("pulsepass-api", "", Duration.ofMinutes(15)), CLOCK))
 				.isInstanceOf(IllegalStateException.class);

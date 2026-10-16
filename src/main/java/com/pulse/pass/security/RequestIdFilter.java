@@ -19,10 +19,12 @@ public class RequestIdFilter extends OncePerRequestFilter {
 	private static final Pattern VALID_REQUEST_ID = Pattern.compile("[A-Za-z0-9._-]{1,64}");
 	private final ObjectMapper objectMapper;
 	private final SecurityAuditLogger securityAuditLogger;
+	private final boolean requireHttps;
 
-	public RequestIdFilter(ObjectMapper objectMapper, SecurityAuditLogger securityAuditLogger) {
+	public RequestIdFilter(ObjectMapper objectMapper, SecurityAuditLogger securityAuditLogger, boolean requireHttps) {
 		this.objectMapper = objectMapper;
 		this.securityAuditLogger = securityAuditLogger;
+		this.requireHttps = requireHttps;
 	}
 
 	@Override
@@ -32,7 +34,7 @@ public class RequestIdFilter extends OncePerRequestFilter {
 		MDC.put("requestId", requestId);
 		response.setHeader(HEADER_NAME, requestId);
 		try {
-			if (!request.isSecure() && !isLocalRequest(request)) {
+			if (requireHttps && !request.isSecure() && !isLocalRequest(request)) {
 				securityAuditLogger.transportRejected();
 				RestSecurityErrorResponseWriter.write(objectMapper, response, HttpStatus.FORBIDDEN,
 						"HTTPS is required");

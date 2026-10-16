@@ -70,7 +70,6 @@ class CustomUserDetailsServiceTest {
 		when(user.getId()).thenReturn(42L);
 		when(user.getUsername()).thenReturn("andrea");
 		when(user.isActive()).thenReturn(true);
-		when(userRepository.findByUsername("andrea@example.com")).thenReturn(Optional.empty());
 		when(userRepository.findByEmailIgnoreCase("andrea@example.com")).thenReturn(Optional.of(user));
 		when(userCredentialRepository.findByUser_Id(42L)).thenReturn(Optional.of(credential("$2a$12$hash")));
 		UserRole role = new UserRole(user, UserRoleType.USER);
@@ -84,7 +83,6 @@ class CustomUserDetailsServiceTest {
 	@Test
 	void shouldRejectUnknownUser() {
 		when(userRepository.findByUsername("missing")).thenReturn(Optional.empty());
-		when(userRepository.findByEmailIgnoreCase("missing")).thenReturn(Optional.empty());
 
 		assertThatThrownBy(() -> userDetailsService.loadUserByUsername("missing"))
 				.isInstanceOf(UsernameNotFoundException.class);

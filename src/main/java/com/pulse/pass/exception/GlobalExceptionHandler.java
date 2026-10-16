@@ -80,7 +80,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
         Map<String, String> details = new HashMap<>();
-        details.put(ex.getName(), "Invalid value: " + ex.getValue());
+        details.put(ex.getName(), "Invalid value for this parameter");
 
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
@@ -189,7 +189,7 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                ex.getMessage(),
+                "Validation failed",
                 Map.of()
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);

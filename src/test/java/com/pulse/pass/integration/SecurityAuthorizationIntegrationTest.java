@@ -32,9 +32,13 @@ import com.pulse.pass.repository.UserRepository;
 import com.pulse.pass.repository.UserRoleRepository;
 import com.pulse.pass.repository.VenueRepository;
 import com.pulse.pass.security.JwtService;
+import com.pulse.pass.security.JwtProperties;
 import com.pulse.pass.security.RequestIdFilter;
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +83,9 @@ class SecurityAuthorizationIntegrationTest {
 	@Autowired
 	private JwtService jwtService;
 
+	@Autowired
+	private JwtProperties jwtProperties;
+
 	@Test
 	void shouldEchoProvidedRequestIdOnAuthenticationFailure() throws Exception {
 		var response = mockMvc.perform(get("/api/auth/me")
@@ -88,6 +95,47 @@ class SecurityAuthorizationIntegrationTest {
 
 		assertThat(response.getStatus()).isEqualTo(401);
 		assertThat(response.getHeader(RequestIdFilter.HEADER_NAME)).isEqualTo("trace-2026-001");
+	}
+
+	@Test
+	void shouldRejectExpiredJwtOverHttp() throws Exception {
+		JwtService expiredTokenIssuer = new JwtService(jwtProperties,
+				Clock.fixed(Instant.now().minusSeconds(3600), ZoneOffset.UTC));
+		String expiredToken = expiredTokenIssuer.createAccessToken(42L);
+
+		mockMvc.perform(get("/api/auth/me")
+					.header(HttpHeaders.AUTHORIZATION, "Bearer " + expiredToken))
+			.andExpect(status().isUnauthorized())
+			.andExpect(jsonPath("$.message").value("Invalid credentials or access token"));
+	}
+
+	@Test
+	void shouldReturnValidationErrorForAuthenticatedInvalidTicketRequest() throws Exception {
+		User user = createUser("invalid_ticket_request", UserRoleType.USER);
+
+		mockMvc.perform(post("/api/tickets")
+					.header(HttpHeaders.AUTHORIZATION, bearer(user))
+					.contentType(MediaType.APPLICATION_JSON)
+					.content("{\"userEmail\":\"not-an-email\",\"eventCode\":\"\",\"type\":null}"))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.details.userEmail").value("userEmail must be valid"))
+			.andExpect(jsonPath("$.details.eventCode").value("eventCode is required"))
+			.andExpect(jsonPath("$.details.type").value("type is required"));
+	}
+
+	@Test
+	void shouldNotExposeMalformedPathValueOrStackTraceInClientError() throws Exception {
+		User admin = createUser("invalid_path_admin", UserRoleType.ADMIN);
+
+		var response = mockMvc.perform(post("/api/events/EVT-1/artists/not-a-number")
+					.header(HttpHeaders.AUTHORIZATION, bearer(admin)))
+			.andExpect(status().isBadRequest())
+			.andReturn()
+			.getResponse();
+
+		String body = response.getContentAsString();
+		assertThat(body).doesNotContain("not-a-number", "stackTrace", "java.lang");
+		assertThat(body).contains("Invalid value for this parameter");
 	}
 
 	@Test

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -22,6 +23,7 @@ import com.pulse.pass.dto.response.AuthResponse;
 import com.pulse.pass.service.AuthService;
 
 @WebMvcTest(AuthController.class)
+@WithMockUser(username = "mvc-test-user", roles = "USER")
 class AuthControllerTest {
 
 	@Autowired

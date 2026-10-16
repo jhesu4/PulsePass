@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -27,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
+@WithMockUser(username = "mvc-test-user", roles = "USER")
 class UserControllerTest {
 
         @Autowired
@@ -160,6 +162,20 @@ class UserControllerTest {
 
         verify(authService, never()).register(any(RegisterUserRequest.class));
     }
+
+        @Test
+        @DisplayName("POST /api/users should reject usernames containing an email separator")
+        void shouldRejectUsernameContainingAtSign() throws Exception {
+                mockMvc.perform(post("/api/users")
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content("{\"username\":\"owner@example.com\",\"email\":\"new@example.com\","
+                                                                + "\"firstName\":\"New\",\"lastName\":\"User\","
+                                                                + "\"birthDate\":\"1995-08-15\",\"password\":\"UnaFraseSeguraLarga2026!\"}"))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$.details.username").value("username must not contain @"));
+
+                verify(authService, never()).register(any(RegisterUserRequest.class));
+        }
 
         @Test
         @DisplayName("POST /api/users should delegate future birth dates to the service")
