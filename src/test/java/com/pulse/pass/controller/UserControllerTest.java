@@ -5,6 +5,7 @@ import com.pulse.pass.dto.response.UserResponse;
 import com.pulse.pass.exception.BusinessRuleException;
 import com.pulse.pass.exception.DuplicateResourceException;
 import com.pulse.pass.exception.ResourceNotFoundException;
+import com.pulse.pass.service.AuthService;
 import com.pulse.pass.service.UserService;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -26,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
+@WithMockUser(username = "mvc-test-user", roles = "USER")
 class UserControllerTest {
 
         @Autowired
@@ -33,6 +36,9 @@ class UserControllerTest {
 
         @MockitoBean
         private UserService userService;
+
+        @MockitoBean
+        private AuthService authService;
 
     @Test
     @DisplayName("POST /api/users should register a user")
@@ -49,15 +55,15 @@ class UserControllerTest {
                 true
         );
 
-        given(userService.register(any(RegisterUserRequest.class))).willReturn(response);
+        given(authService.register(any(RegisterUserRequest.class))).willReturn(response);
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"johndoe\",\"email\":\"john@pulse.com\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"birthDate\":\"1995-08-15\"}"))
+                        .content("{\"username\":\"johndoe\",\"email\":\"john@pulse.com\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"birthDate\":\"1995-08-15\",\"password\":\"UnaFraseSeguraLarga2026!\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.username").value("johndoe"));
 
-        verify(userService).register(any(RegisterUserRequest.class));
+        verify(authService).register(any(RegisterUserRequest.class));
     }
 
         @Test
@@ -67,7 +73,7 @@ class UserControllerTest {
                                 .andExpect(status().isNotFound())
                                 .andExpect(jsonPath("$.status").value(404));
 
-        verify(userService, never()).register(any(RegisterUserRequest.class));
+        verify(authService, never()).register(any(RegisterUserRequest.class));
     }
 
     @Test
@@ -126,18 +132,18 @@ class UserControllerTest {
     @Test
     @DisplayName("POST /api/users should return 409 for a duplicate user")
     void shouldReturnConflictWhenUserAlreadyExists() throws Exception {
-        given(userService.register(any(RegisterUserRequest.class)))
+        given(authService.register(any(RegisterUserRequest.class)))
                 .willThrow(new DuplicateResourceException("Email already exists: john@pulse.com"));
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"johndoe\",\"email\":\"john@pulse.com\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"phone\":\"3001234567\",\"city\":\"Santa Marta\",\"birthDate\":\"1995-08-15\"}"))
+                        .content("{\"username\":\"johndoe\",\"email\":\"john@pulse.com\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"phone\":\"3001234567\",\"city\":\"Santa Marta\",\"birthDate\":\"1995-08-15\",\"password\":\"UnaFraseSeguraLarga2026!\"}"))
                 .andExpect(status().isConflict())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(409))
                 .andExpect(jsonPath("$.message").value("Email already exists: john@pulse.com"));
 
-        verify(userService).register(any(RegisterUserRequest.class));
+        verify(authService).register(any(RegisterUserRequest.class));
     }
 
     @Test
@@ -151,23 +157,38 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.details.username").value("username is required"))
                 .andExpect(jsonPath("$.details.email").value("email must be valid"))
-                .andExpect(jsonPath("$.details.firstName").value("firstName is required"));
+                .andExpect(jsonPath("$.details.firstName").value("firstName is required"))
+                .andExpect(jsonPath("$.details.password").value("password is required"));
 
-        verify(userService, never()).register(any(RegisterUserRequest.class));
+        verify(authService, never()).register(any(RegisterUserRequest.class));
     }
+
+        @Test
+        @DisplayName("POST /api/users should reject usernames containing an email separator")
+        void shouldRejectUsernameContainingAtSign() throws Exception {
+                mockMvc.perform(post("/api/users")
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content("{\"username\":\"owner@example.com\",\"email\":\"new@example.com\","
+                                                                + "\"firstName\":\"New\",\"lastName\":\"User\","
+                                                                + "\"birthDate\":\"1995-08-15\",\"password\":\"UnaFraseSeguraLarga2026!\"}"))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$.details.username").value("username must not contain @"));
+
+                verify(authService, never()).register(any(RegisterUserRequest.class));
+        }
 
         @Test
         @DisplayName("POST /api/users should delegate future birth dates to the service")
         void shouldDelegateFutureBirthDateToService() throws Exception {
-                given(userService.register(any(RegisterUserRequest.class)))
+                given(authService.register(any(RegisterUserRequest.class)))
                                 .willThrow(new BusinessRuleException("Birth date cannot be in the future."));
 
                 mockMvc.perform(post("/api/users")
                                                 .contentType(MediaType.APPLICATION_JSON)
-                                                .content("{\"username\":\"johndoe\",\"email\":\"john@pulse.com\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"birthDate\":\"" + LocalDate.now().plusDays(1) + "\"}"))
+                                                .content("{\"username\":\"johndoe\",\"email\":\"john@pulse.com\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"birthDate\":\"" + LocalDate.now().plusDays(1) + "\",\"password\":\"UnaFraseSeguraLarga2026!\"}"))
                                 .andExpect(status().isConflict())
                                 .andExpect(jsonPath("$.message").value("Birth date cannot be in the future."));
 
-                verify(userService).register(any(RegisterUserRequest.class));
+                verify(authService).register(any(RegisterUserRequest.class));
         }
 }

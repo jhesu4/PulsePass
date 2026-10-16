@@ -96,7 +96,7 @@ class UserServiceImplTest {
     void shouldRejectFutureBirthDate() {
         RegisterUserRequest request = new RegisterUserRequest(
                 "andrea", "andrea@email.com", "Andrea", "Lopez", "3001234567",
-                "Santa Marta", LocalDate.now().plusDays(1));
+            "Santa Marta", LocalDate.now().plusDays(1), "UnaFraseSeguraLarga2026!");
         when(userRepository.existsByUsername(request.username())).thenReturn(false);
         when(userRepository.existsByEmailIgnoreCase(request.email())).thenReturn(false);
 
@@ -149,7 +149,7 @@ class UserServiceImplTest {
     private RegisterUserRequest validRequest() {
         return new RegisterUserRequest(
                 "andrea", "andrea@email.com", "Andrea", "Lopez", "3001234567",
-                "Santa Marta", LocalDate.of(2001, 5, 10));
+            "Santa Marta", LocalDate.of(2001, 5, 10), "UnaFraseSeguraLarga2026!");
     }
 
     private UserResponse response() {

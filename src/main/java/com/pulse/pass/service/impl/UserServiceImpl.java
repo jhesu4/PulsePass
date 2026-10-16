@@ -12,6 +12,7 @@ import com.pulse.pass.repository.UserProfileRepository;
 import com.pulse.pass.repository.UserRepository;
 import com.pulse.pass.service.UserService;
 import java.time.LocalDate;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,6 +61,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("@authorizationService.hasAdminPurpose('CUSTOMER_SUPPORT') or @authorizationService.isCurrentUserEmail(#p0)")
     @Transactional(readOnly = true)
     public UserResponse findByEmail(String email) {
         User user = userRepository.findByEmailIgnoreCase(email)
@@ -68,6 +70,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("@authorizationService.hasAdminPurpose('CUSTOMER_SUPPORT') or @authorizationService.isCurrentUserUsername(#p0)")
     @Transactional(readOnly = true)
     public UserResponse findByUsername(String username) {
         User user = userRepository.findByUsername(username)

@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +47,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    @PreAuthorize("@authorizationService.canPurchaseForEmail(#p0.userEmail)")
     @Transactional
     public TicketResponse purchase(PurchaseTicketRequest request) {
         User user = userRepository.findByEmailIgnoreCase(request.userEmail())
@@ -89,6 +91,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    @PreAuthorize("@authorizationService.canReadTicket(#p0)")
     @Transactional(readOnly = true)
     public TicketResponse findByCode(String ticketCode) {
         Ticket ticket = ticketRepository.findByTicketCode(ticketCode)
@@ -97,6 +100,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    @PreAuthorize("@authorizationService.canReadTicketsForEmail(#p0)")
     @Transactional(readOnly = true)
     public List<TicketResponse> findByUserEmail(String email) {
         return ticketRepository.findByUserEmailIgnoreCaseOrderByPurchaseDateDesc(email).stream()
@@ -105,6 +109,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
     @Transactional(readOnly = true)
     public List<TicketResponse> findPaidTicketsByEvent(String eventCode) {
         return ticketRepository.findPaidTicketsByEventCode(eventCode).stream()
@@ -113,6 +118,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    @PreAuthorize("@authorizationService.canManageTicket(#p0)")
     @Transactional
     public TicketResponse cancel(String ticketCode) {
         Ticket ticket = ticketRepository.findByTicketCode(ticketCode)
@@ -129,6 +135,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
     @Transactional
     public TicketResponse markAsUsed(String ticketCode) {
         Ticket ticket = ticketRepository.findByTicketCode(ticketCode)

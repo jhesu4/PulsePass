@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -31,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TicketController.class)
+@WithMockUser(username = "mvc-test-user", roles = "USER")
 class TicketControllerTest {
 
         @Autowired
@@ -243,6 +245,7 @@ class TicketControllerTest {
 
     @Test
     @DisplayName("PATCH /api/tickets/{ticketCode}/use should mark a ticket as used")
+        @WithMockUser(username = "mvc-staff", roles = "STAFF")
     void shouldMarkTicketAsUsed() throws Exception {
         given(ticketService.markAsUsed("TCK-001")).willReturn(ticketResponse(TicketStatus.USED));
 
