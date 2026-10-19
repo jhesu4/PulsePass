@@ -2560,6 +2560,550 @@
                                                    ]
                                   }
                               ]
+                 },
+                 {
+                     "name":  "04 - Consulta de usuarios (ownership)",
+                     "description":  "Ownership de /api/users/by-*: solo el dueño, o ADMIN con X-Admin-Purpose: CUSTOMER_SUPPORT.",
+                     "item":  [
+                                  {
+                                      "id":  "db8215f9-be35-f4c4-9ae1-4897888c61c2",
+                                      "name":  "USR-01 · Mi usuario por email",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/users/by-email?email={{runId}}-usera@example.test",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "users",
+                                                                               "by-email"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "email",
+                                                                                    "value":  "{{runId}}-usera@example.test"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** USR-01\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 200\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "84c0c35d-87e5-48a3-5325-d8ba0e0aad5f",
+                                      "name":  "USR-02 · Mi usuario por username",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/users/by-username?username={{runId}}-usera",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "users",
+                                                                               "by-username"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "username",
+                                                                                    "value":  "{{runId}}-usera"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** USR-02\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 200\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "9fe725ee-92f3-903d-2681-0986f36ac8b9",
+                                      "name":  "USR-03 · Usuario ajeno por email (IDOR)",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/users/by-email?email={{runId}}-userb@example.test",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "users",
+                                                                               "by-email"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "email",
+                                                                                    "value":  "{{runId}}-userb@example.test"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** USR-03\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "6534724e-256a-5bc0-493f-a2e2b1126bbf",
+                                      "name":  "USR-04 · Usuario ajeno por username (IDOR)",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/users/by-username?username={{runId}}-userb",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "users",
+                                                                               "by-username"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "username",
+                                                                                    "value":  "{{runId}}-userb"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** USR-04\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "2700b2b9-a710-e187-aba2-a10775e89a51",
+                                      "name":  "USR-05 · Email inexistente como USER",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/users/by-email?email={{runId}}-nadie@example.test",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "users",
+                                                                               "by-email"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "email",
+                                                                                    "value":  "{{runId}}-nadie@example.test"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** USR-05\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nAnti-enumeración: idéntico a USR-03."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "aeed40f4-bcaa-e9a8-987a-210e057c3a28",
+                                      "name":  "USR-06 · Usuario ajeno como STAFF",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/users/by-email?email={{runId}}-usera@example.test",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "users",
+                                                                               "by-email"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "email",
+                                                                                    "value":  "{{runId}}-usera@example.test"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenStaff}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** USR-06\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "65dabbb5-a30e-5ce9-75ad-51b8b2f71f95",
+                                      "name":  "USR-07 · Usuario ajeno como ADMIN sin propósito",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/users/by-email?email={{runId}}-usera@example.test",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "users",
+                                                                               "by-email"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "email",
+                                                                                    "value":  "{{runId}}-usera@example.test"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** USR-07\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "7dd76acb-2903-c61c-2028-f182949d2be5",
+                                      "name":  "USR-08 · Usuario ajeno como ADMIN con propósito CUSTOMER_SUPPORT",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "X-Admin-Purpose",
+                                                                         "value":  "CUSTOMER_SUPPORT"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/users/by-email?email={{runId}}-usera@example.test",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "users",
+                                                                               "by-email"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "email",
+                                                                                    "value":  "{{runId}}-usera@example.test"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** USR-08\n**Rol / token:** ADMIN + X-Admin-Purpose\n**Resultado esperado:** HTTP 200\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "d180f16b-e5fe-4dcf-12d8-d7faa41d1249",
+                                      "name":  "USR-09 · ADMIN con propósito incorrecto (TICKET_SUPPORT)",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "X-Admin-Purpose",
+                                                                         "value":  "TICKET_SUPPORT"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/users/by-username?username={{runId}}-usera",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "users",
+                                                                               "by-username"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "username",
+                                                                                    "value":  "{{runId}}-usera"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** USR-09\n**Rol / token:** ADMIN + propósito inválido\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "ec78186e-e2a1-d451-d0b8-b9f983e61a3d",
+                                      "name":  "USR-10 · USER intenta usar X-Admin-Purpose",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "X-Admin-Purpose",
+                                                                         "value":  "CUSTOMER_SUPPORT"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/users/by-email?email={{runId}}-userb@example.test",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "users",
+                                                                               "by-email"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "email",
+                                                                                    "value":  "{{runId}}-userb@example.test"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** USR-10\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nEl header no otorga privilegios sin rol ADMIN."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "8dfc420d-29b9-e64e-1289-c0bfe7f4bb1f",
+                                      "name":  "USR-11 · ADMIN con propósito, usuario inexistente",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "X-Admin-Purpose",
+                                                                         "value":  "CUSTOMER_SUPPORT"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/users/by-username?username={{runId}}-nadie",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "users",
+                                                                               "by-username"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "username",
+                                                                                    "value":  "{{runId}}-nadie"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** USR-11\n**Rol / token:** ADMIN + X-Admin-Purpose\n**Resultado esperado:** HTTP 404\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "41000522-c78c-8643-8918-ffb86f69ee24",
+                                      "name":  "USR-12 · Consulta de usuario sin token",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/users/by-email?email={{runId}}-usera@example.test",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "users",
+                                                                               "by-email"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "email",
+                                                                                    "value":  "{{runId}}-usera@example.test"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "description":  "**ID:** USR-12\n**Rol / token:** Anónimo\n**Resultado esperado:** HTTP 401\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "65c703e2-c4f5-9f76-ec80-af572c99fe03",
+                                      "name":  "USR-13 · Respuesta no expone credenciales",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/users/by-email?email={{runId}}-usera@example.test",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "users",
+                                                                               "by-email"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "email",
+                                                                                    "value":  "{{runId}}-usera@example.test"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** USR-13\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 200\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nRevisar manualmente: el JSON NO contiene password, hash ni credenciales."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  }
+                              ]
                  }
              ],
     "variable":  [
