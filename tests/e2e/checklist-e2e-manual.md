@@ -98,6 +98,9 @@ Marcar `[x]` al ejecutar cada caso con **Send** en Postman. Comparar HTTP y JSON
 - [ ] **EVT-26** Asociar el mismo artista otra vez — `POST /api/events/{eventCode}/artists/{artistId}` · ADMIN · esperado **409**
 - [ ] **EVT-27** Asociar artista inexistente — `POST /api/events/{eventCode}/artists/{artistId}` · ADMIN · esperado **404**
 - [ ] **EVT-28** Asociar artista a evento inexistente — `POST /api/events/{eventCode}/artists/{artistId}` · ADMIN · esperado **404**
+- [ ] **EVT-30** Asociar artista al borrador sembrado — `POST /api/events/{eventCode}/artists/{artistId}` · ADMIN · esperado **200** (usar `draftEventCode`)
+- [ ] **TC-SEC-005** Eventos por artista no incluye borradores para anónimo — `GET /api/events/by-artist` · Anónimo · esperado **200**, excluye `draftEventCode`
+- [ ] **EVT-31** Eventos por artista incluye borradores para STAFF — `GET /api/events/by-artist` · STAFF · esperado **200**, incluye `draftEventCode`
 - [ ] **TC-BIZ-005 (EVT-29)** Verificar evento creado en eventos por artista — `GET /api/events/by-artist` · Anónimo · esperado **200** e incluye el evento creado
 
 ## 04 Usuarios (ownership)

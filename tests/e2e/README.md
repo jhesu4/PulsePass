@@ -6,7 +6,7 @@ Pruebas manuales de extremo a extremo de la API PulsePass (controladores + segur
 
 | Archivo | Propósito |
 |---|---|
-| `postman/PulsePass-Manual-E2E.postman_collection.json` | Colección v2.1: 148 requests en 9 carpetas por módulo |
+| `postman/PulsePass-Manual-E2E.postman_collection.json` | Colección v2.1: 151 requests en 9 carpetas por módulo |
 | `postman/PulsePass-local.postman_environment.json` | Plantilla de entorno (secretos y tokens vacíos) |
 | `fixtures/seed-e2e.sql`, `fixtures/README.md` | Datos E2E y cómo cargarlos |
 | `checklist-e2e-manual.md` | Lista de verificación por caso |
@@ -32,6 +32,7 @@ Las carpetas están agrupadas por módulo: **Venues, Artists, Auth, Usuarios, Ev
 - **AUTH-22 / TC-AUTH-013**: active temporalmente `e2e-inactive`, guarde el token de AUTH-22 como `inactivePriorToken` y desactive la cuenta antes de TC-AUTH-013. Consulte el SQL en `fixtures/README.md`.
 - **TC-SEC-017**: después de guardar `staffToken`, quite temporalmente el rol `STAFF` a `e2e-staff` y restáurelo inmediatamente después.
 - **Flujo C / TC-BIZ-003/004/005**: use el mismo `runId` para crear y consultar el evento de EVT-04, publicarlo en EVT-19, asociar el artista en EVT-25 y verificarlo en los listados.
+- PUB-11 se ejecuta sobre la semilla limpia antes de asociar artistas y debe devolver `[]`. Después, EVT-30 asocia el artista al borrador sembrado; ejecute TC-SEC-005 como anónimo (no debe ver el borrador) y EVT-31 como STAFF (sí debe verlo).
 - Tras TKT-04/05 copie `ticketCode` a `ticketT1`/`ticketT2`. Ejecute TC-STATE-TKT-06 después de TKT-06, TC-STATE-TRN-01 después de TRN-01, y TC-STATE-TRN-06/12 inmediatamente tras cada transición exitosa; TC-STATE-EVT-02 va después de EVT-02 y antes de EVT-04.
 - T1 y T2 se usan por separado: T1 se cancela y T2 se marca usado; ambas transiciones son irreversibles.
 - Casos de token (carpeta Seguridad):

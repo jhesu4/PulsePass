@@ -94,7 +94,10 @@ Por cada request registre fecha y hora ISO-8601, actor/rol, código HTTP observa
 | EVT-26 | Asociar el mismo artista otra vez |  | 409 |  |  |  | NOT RUN |  |
 | EVT-27 | Asociar artista inexistente |  | 404 |  |  |  | NOT RUN |  |
 | EVT-28 | Asociar artista a evento inexistente |  | 404 |  |  |  | NOT RUN |  |
-| TC-BIZ-005 (EVT-29) | Evento creado por artista tras asociación | Anónimo | 200 |  |  |  | NOT RUN | Debe incluir el código de evento de EVT-04 |
+| EVT-30 | Asociar artista al borrador sembrado | ADMIN | 200 | | | | NOT RUN | Usar `draftEventCode`; ejecutar antes de TC-SEC-005 y EVT-31 |
+| TC-SEC-005 | Eventos por artista no incluye borradores para anónimo | Anónimo | 200 | | | | NOT RUN | No debe incluir `draftEventCode` |
+| EVT-31 | Eventos por artista incluye borradores para STAFF | STAFF | 200 | | | | NOT RUN | Debe incluir `draftEventCode` |
+| TC-BIZ-005 (EVT-29) | Evento creado por artista tras asociación | Anónimo | 200 | | | | NOT RUN | Debe incluir el código de evento de EVT-04 |
 | USR-01 | Mi usuario por email |  | 200 |  |  |  | NOT RUN |  |
 | USR-02 | Mi usuario por username |  | 200 |  |  |  | NOT RUN |  |
 | USR-03 | Usuario ajeno por email (IDOR) |  | 403 |  |  |  | NOT RUN |  |

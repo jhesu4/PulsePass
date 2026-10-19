@@ -1098,7 +1098,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** USR-03\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, AUTH-02 → userBEmail. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** USR-03\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, AUTH-02 → userBEmail. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -1142,7 +1142,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** USR-04\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, AUTH-02 → userBUsername. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** USR-04\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, AUTH-02 → userBUsername. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -1186,7 +1186,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** USR-05\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, runId. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales.\n**Notas de ejecución:** Anti-enumeración: idéntico a USR-03."
+                                                      "description":  "**ID:** USR-05\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, runId. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales.\n**Notas de ejecución:** Anti-enumeración: idéntico a USR-03."
                                                   },
                                       "response":  [
 
@@ -1230,7 +1230,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** USR-06\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-12 → staffToken, baseUrl, AUTH-01 → userAEmail. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** USR-06\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-12 → staffToken, baseUrl, AUTH-01 → userAEmail. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -1274,7 +1274,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** USR-07\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, AUTH-01 → userAEmail. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** USR-07\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, AUTH-01 → userAEmail. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -1370,7 +1370,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** USR-09\n**Rol / token:** ADMIN + propósito inválido\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, AUTH-01 → userAUsername. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** USR-09\n**Rol / token:** ADMIN + propósito inválido\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, AUTH-01 → userAUsername. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -1418,7 +1418,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** USR-10\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, AUTH-02 → userBEmail. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales.\n**Notas de ejecución:** El header no otorga privilegios sin rol ADMIN."
+                                                      "description":  "**ID:** USR-10\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, AUTH-02 → userBEmail. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales.\n**Notas de ejecución:** El header no otorga privilegios sin rol ADMIN."
                                                   },
                                       "response":  [
 
@@ -1683,7 +1683,7 @@
                                                       "auth":  {
                                                                    "type":  "noauth"
                                                                },
-                                                      "description":  "**ID:** PUB-11\n**Rol / token:** Anónimo\n**Resultado esperado:** HTTP 200\n**Precondiciones:** Configurar: baseUrl, PUB-04 → artistStageName. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n[{\"id\":0,\"eventCode\":\"{{publishedEventCode}}\",\"name\":\"\u003cnombre\u003e\",\"category\":\"MUSIC\",\"status\":\"PUBLISHED\",\"eventDate\":\"\u003cISO-8601\u003e\",\"venueCode\":\"{{venueCode}}\",\"venueName\":\"\u003cnombre de sede\u003e\"}]\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar lista JSON, campos del EventSummaryResponse y filtro de estado/artista indicado en el caso."
+                                                      "description":  "**ID:** PUB-11\n**Rol / token:** Anónimo\n**Resultado esperado:** HTTP 200\n**Precondiciones:** Ejecutar antes de EVT-25 y EVT-30 en la base E2E recién recreada. Configurar baseUrl y PUB-04 → artistStageName.\n**JSON esperado:**\r\n```json\r\n[]\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** En la base E2E recién recreada, antes de asociar artistas, la lista debe ser `[]`; la semilla no relaciona artistas con eventos."
                                                   },
                                       "response":  [
 
@@ -1776,7 +1776,7 @@
                                                                                            }
                                                                                }
                                                                },
-                                                      "description":  "**ID:** EVT-02\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, runId, futureDate, venueCode. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** ErrorResponse con status=403; ejecutar TC-STATE-EVT-02 inmediatamente y confirmar 404, antes de EVT-04."
+                                                      "description":  "**ID:** EVT-02\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, runId, futureDate, venueCode. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** ErrorResponse con status=403; ejecutar TC-STATE-EVT-02 inmediatamente y confirmar 404, antes de EVT-04."
                                                   },
                                       "response":  [
 
@@ -1826,7 +1826,7 @@
                                                                                            }
                                                                                }
                                                                },
-                                                      "description":  "**ID:** EVT-03\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-12 → staffToken, baseUrl, runId, futureDate, venueCode. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** EVT-03\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-12 → staffToken, baseUrl, runId, futureDate, venueCode. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -1914,7 +1914,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** EVT-11\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, draftEventCode. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** EVT-11\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, draftEventCode. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -2105,7 +2105,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** EVT-16\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, eventToPublishCode. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** EVT-16\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, eventToPublishCode. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -2144,7 +2144,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** EVT-17\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-12 → staffToken, baseUrl, eventToPublishCode. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** EVT-17\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-12 → staffToken, baseUrl, eventToPublishCode. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -2294,7 +2294,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** EVT-23\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, draftEventCode, PUB-04 → artistId. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** EVT-23\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, draftEventCode, PUB-04 → artistId. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -2334,7 +2334,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** EVT-24\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-12 → staffToken, baseUrl, draftEventCode, PUB-04 → artistId. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** EVT-24\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-12 → staffToken, baseUrl, draftEventCode, PUB-04 → artistId. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -2495,6 +2495,127 @@
                                                                               ]
                                                                },
                                                       "description":  "**ID:** EVT-28\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 404\n**Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, missingEventCode, PUB-04 → artistId. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":404,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 404 y que JSON.status=404; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "5187d665-3bd3-4691-8392-f21e2d46982a",
+                                      "name":  "EVT-30 · Asociar artista al borrador sembrado como ADMIN",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/{{draftEventCode}}/artists/{{artistId}}",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "{{draftEventCode}}",
+                                                                               "artists",
+                                                                               "{{artistId}}"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{adminToken}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** EVT-30\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 200\n**Precondiciones:** Ejecutar después de PUB-04 y antes de TC-SEC-005/EVT-31. Configurar adminToken, draftEventCode, artistId y artistStageName en una base E2E recién recreada.\n**JSON esperado:**\n```json\n{\"id\":0,\"eventCode\":\"{{draftEventCode}}\",\"name\":\"\u003cnombre\u003e\",\"description\":\"\u003cdescripción\u003e\",\"category\":\"MUSIC\",\"status\":\"DRAFT\",\"eventDate\":\"\u003cISO-8601\u003e\",\"minimumAge\":0,\"venueCode\":\"{{venueCode}}\",\"venueName\":\"\u003cnombre de sede\u003e\",\"artists\":[{\"id\":0,\"stageName\":\"{{artistStageName}}\",\"country\":\"\u003cpaís\u003e\",\"genre\":\"\u003cgénero\u003e\",\"active\":true}]}\n```\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 200, `eventCode={{draftEventCode}}`, `status=DRAFT` y que `artists` incluya el `artistId`/`artistStageName` seleccionado."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "51c960e1-68ef-4a7f-b445-e1096cc5ba8f",
+                                      "name":  "TC-SEC-005 · Anónimo no ve borradores por artista",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/by-artist?stageName={{artistStageName}}",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "by-artist"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "stageName",
+                                                                                    "value":  "{{artistStageName}}"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "description":  "**ID:** TC-SEC-005\n**Rol / token:** Anónimo\n**Resultado esperado:** HTTP 200\n**Precondiciones:** Ejecutar después de EVT-25 y EVT-30 con una base E2E recién recreada. Configurar artistStageName, draftEventCode, runId y venueCode.\n**JSON esperado:**\n```json\n[{\"id\":0,\"eventCode\":\"{{runId}}-EVT-1\",\"name\":\"\u003cnombre\u003e\",\"category\":\"MUSIC\",\"status\":\"PUBLISHED\",\"eventDate\":\"\u003cISO-8601\u003e\",\"venueCode\":\"{{venueCode}}\",\"venueName\":\"\u003cnombre de sede\u003e\"}]\n```\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** La lista puede incluir el evento PUBLISHED de EVT-04 asociado en EVT-25, pero no debe incluir ningún evento con `status=DRAFT`, en particular `{{draftEventCode}}`."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "e8715dd4-062f-4aa3-bb10-13b919deceb1",
+                                      "name":  "EVT-31 · STAFF ve borradores por artista",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Accept",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/by-artist?stageName={{artistStageName}}",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "by-artist"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "stageName",
+                                                                                    "value":  "{{artistStageName}}"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{staffToken}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** EVT-31\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 200\n**Precondiciones:** Ejecutar después de EVT-30. Configurar staffToken, artistStageName, draftEventCode, runId y venueCode.\n**JSON esperado:**\n```json\n[{\"id\":0,\"eventCode\":\"{{runId}}-EVT-1\",\"name\":\"\u003cnombre\u003e\",\"category\":\"MUSIC\",\"status\":\"PUBLISHED\",\"eventDate\":\"\u003cISO-8601\u003e\",\"venueCode\":\"{{venueCode}}\",\"venueName\":\"\u003cnombre de sede\u003e\"},{\"id\":0,\"eventCode\":\"{{draftEventCode}}\",\"name\":\"E2E Borrador (artistas)\",\"category\":\"MUSIC\",\"status\":\"DRAFT\",\"eventDate\":\"\u003cISO-8601\u003e\",\"venueCode\":\"{{venueCode}}\",\"venueName\":\"\u003cnombre de sede\u003e\"}]\n```\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** La lista debe incluir `{{draftEventCode}}` con `status=DRAFT`; como STAFF puede ver eventos DRAFT asociados al artista. El orden de los resultados no está garantizado."
                                                   },
                                       "response":  [
 
@@ -2786,7 +2907,7 @@
                                                                                            }
                                                                                }
                                                                },
-                                                      "description":  "**ID:** TKT-02\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-12 → staffToken, baseUrl, publishedEventCode. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** TKT-02\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-12 → staffToken, baseUrl, publishedEventCode. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -2836,7 +2957,7 @@
                                                                                            }
                                                                                }
                                                                },
-                                                      "description":  "**ID:** TKT-03\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, publishedEventCode. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales.\n**Notas de ejecución:** La compra es solo para rol USER."
+                                                      "description":  "**ID:** TKT-03\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, publishedEventCode. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales.\n**Notas de ejecución:** La compra es solo para rol USER."
                                                   },
                                       "response":  [
 
@@ -2986,7 +3107,7 @@
                                                                                            }
                                                                                }
                                                                },
-                                                      "description":  "**ID:** TKT-06\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, AUTH-02 → userBEmail, publishedEventCode. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** ErrorResponse con status=403; ejecutar TC-STATE-TKT-06 inmediatamente y confirmar lista vacía para B."
+                                                      "description":  "**ID:** TKT-06\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, AUTH-02 → userBEmail, publishedEventCode. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** ErrorResponse con status=403; ejecutar TC-STATE-TKT-06 inmediatamente y confirmar lista vacía para B."
                                                   },
                                       "response":  [
 
@@ -3212,7 +3333,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** TKT-17\n**Rol / token:** USER (B)\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-11 → userBToken, baseUrl, TKT-04 → ticketT1. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** TKT-17\n**Rol / token:** USER (B)\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-11 → userBToken, baseUrl, TKT-04 → ticketT1. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -3288,7 +3409,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** TKT-19\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, TKT-04 → ticketT1. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** TKT-19\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, TKT-04 → ticketT1. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -3372,7 +3493,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** TKT-21\n**Rol / token:** ADMIN + propósito inválido\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, TKT-04 → ticketT1. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** TKT-21\n**Rol / token:** ADMIN + propósito inválido\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, TKT-04 → ticketT1. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -3567,7 +3688,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** TKT-26\n**Rol / token:** USER (B)\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-11 → userBToken, baseUrl, AUTH-01 → userAEmail. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** TKT-26\n**Rol / token:** USER (B)\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-11 → userBToken, baseUrl, AUTH-01 → userAEmail. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -3611,7 +3732,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** TKT-27\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-12 → staffToken, baseUrl, AUTH-01 → userAEmail. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** TKT-27\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-12 → staffToken, baseUrl, AUTH-01 → userAEmail. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -3703,7 +3824,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** TKT-29\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, AUTH-01 → userAEmail. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** TKT-29\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, AUTH-01 → userAEmail. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -3779,7 +3900,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** TRN-01\n**Rol / token:** USER (B)\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-11 → userBToken, baseUrl, TKT-04 → ticketT1. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** ErrorResponse con status=403; ejecutar TC-STATE-TRN-01 inmediatamente y confirmar que T1 sigue PAID."
+                                                      "description":  "**ID:** TRN-01\n**Rol / token:** USER (B)\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-11 → userBToken, baseUrl, TKT-04 → ticketT1. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** ErrorResponse con status=403; ejecutar TC-STATE-TRN-01 inmediatamente y confirmar que T1 sigue PAID."
                                                   },
                                       "response":  [
 
@@ -3818,7 +3939,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** TRN-02\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-12 → staffToken, baseUrl, TKT-04 → ticketT1. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales.\n**Notas de ejecución:** STAFF no está autorizado por URL (solo USER/ADMIN)."
+                                                      "description":  "**ID:** TRN-02\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-12 → staffToken, baseUrl, TKT-04 → ticketT1. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales.\n**Notas de ejecución:** STAFF no está autorizado por URL (solo USER/ADMIN)."
                                                   },
                                       "response":  [
 
@@ -3889,7 +4010,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** TRN-04\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, TKT-04 → ticketT1. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** TRN-04\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, TKT-04 → ticketT1. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -4045,7 +4166,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** TRN-09\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, TKT-05 → ticketT2. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** TRN-09\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, TKT-05 → ticketT2. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -4531,7 +4652,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** JWT-08\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP {{expectedForeignResourceStatus}} (403 por defecto)\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, publishedEventCode. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+                                                      "description":  "**ID:** JWT-08\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, publishedEventCode. Usar la base E2E y un runId único.\n**JSON esperado:**\r\n```json\r\n{\"timestamp\":\"\u003cISO-8601\u003e\",\"status\":403,\"error\":\"\u003cHTTP reason\u003e\",\"message\":\"\u003cmensaje del error\u003e\",\"details\":{}}\r\n```\r\nLos IDs `0` y textos entre `\u003c...\u003e` son marcadores de forma; comparar los valores concretos y campos indicados abajo.\n**Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
                                                   },
                                       "response":  [
 
@@ -5883,7 +6004,7 @@
                                   },
                                   {
                                       "id":  "cc42c989-6057-4a8a-5ef9-eb01f2c64d85",
-                                      "name":  "EVT-29 · Verificar TC-BIZ-005: evento creado por artista",
+                                      "name":  "TC-BIZ-005 (EVT-29) · Verificar evento creado por artista",
                                       "request":  {
                                                       "method":  "GET",
                                                       "header":  [
