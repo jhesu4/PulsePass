@@ -6,7 +6,7 @@ Pruebas manuales de extremo a extremo de la API PulsePass (controladores + segur
 
 | Archivo | Propósito |
 |---|---|
-| `postman/PulsePass-Manual-E2E.postman_collection.json` | Colección v2.1: 143 requests en 9 carpetas (00–08) |
+| `postman/PulsePass-Manual-E2E.postman_collection.json` | Colección v2.1: 148 requests en 9 carpetas por módulo |
 | `postman/PulsePass-local.postman_environment.json` | Plantilla de entorno (secretos y tokens vacíos) |
 | `fixtures/seed-e2e.sql`, `fixtures/README.md` | Datos E2E y cómo cargarlos |
 | `checklist-e2e-manual.md` | Lista de verificación por caso |
@@ -23,18 +23,23 @@ Pruebas manuales de extremo a extremo de la API PulsePass (controladores + segur
 
 ## Ejecución
 
-Siga el orden de carpetas **00 → 08**; algunas dependen de pasos previos:
+Las carpetas están agrupadas por módulo: **Venues, Artists, Auth, Usuarios, Events, Tickets, Seguridad, Validaciones y Flujos**. La colección es manual: no use Runner; siga el orden de casos del checklist y ejecute inmediatamente las lecturas `TC-STATE-*` que verifican efectos o ausencia de efectos:
 
-- **01**: tras AUTH-09/11/12/13/17 copie manualmente cada `accessToken` a `tokenUserA`, `tokenUserB`, `tokenStaff`, `tokenAdmin`, `tokenUserC`.
-- **AUTH-22 / TC-AUTH-013**: active temporalmente `e2e-inactive`, obtenga el token de AUTH-22 y guárdelo como `tokenInactivePrior`; antes de la carpeta 02 desactive la cuenta otra vez. Consulte el SQL y la restauración en `fixtures/README.md`.
-- **TC-SEC-017**: después de guardar `tokenStaff`, quite temporalmente el rol `STAFF` a `e2e-staff` antes de enviar el caso y restáurelo inmediatamente después; consulte `fixtures/README.md`.
-- **Flujo C / TC-BIZ-003/004/005**: use el mismo `runId` para crear el evento en EVT-04, leerlo, publicarlo en EVT-19, asociarle el artista en EVT-25 y verificarlo en `/api/events/published` y `/api/events/by-artist`.
-- **05**: tras TKT-04 y TKT-05 copie `ticketCode` a `ticketT1` y `ticketT2`.
-- **06** usa T1 (se cancela) y T2 (se marca usado) por separado, porque las transiciones son irreversibles.
-- Casos de token (carpeta 02):
-  - `tokenTampered`: `tokenUserA` con un carácter cambiado a mano.
-  - `tokenExpired`: arranque la app con un TTL de JWT corto (según `JwtProperties`/`.env`), haga login y espere a que expire.
-  - `tokenWrongKey`: firme un JWT HS256 offline con una clave desechable; nunca use la clave real.
+- Ajuste `userAEmail`/`userAUsername`, `userBEmail`/`userBUsername` y `userCEmail`/`userCUsername` para que compartan el prefijo elegido en `runId`; no se derivan automáticamente.
+- Desde PUB-04 copie el `id` y `stageName` reales a `artistId` y `artistStageName`. Elija `missingArtistId` que no aparezca en esa respuesta. No suponga IDs de artistas.
+- Configure `expectedIssuer` y `expectedTokenTtlSeconds` según la configuración local (por defecto `pulsepass-api` y `900`); mantenga `expectedForeignResourceStatus=403`, que es el resultado esperado del contrato.
+- Tras AUTH-09/11/12/13/17 copie `accessToken` a `userAToken`, `userBToken`, `staffToken`, `adminToken` y `userCToken`.
+- **AUTH-22 / TC-AUTH-013**: active temporalmente `e2e-inactive`, guarde el token de AUTH-22 como `inactivePriorToken` y desactive la cuenta antes de TC-AUTH-013. Consulte el SQL en `fixtures/README.md`.
+- **TC-SEC-017**: después de guardar `staffToken`, quite temporalmente el rol `STAFF` a `e2e-staff` y restáurelo inmediatamente después.
+- **Flujo C / TC-BIZ-003/004/005**: use el mismo `runId` para crear y consultar el evento de EVT-04, publicarlo en EVT-19, asociar el artista en EVT-25 y verificarlo en los listados.
+- Tras TKT-04/05 copie `ticketCode` a `ticketT1`/`ticketT2`. Ejecute TC-STATE-TKT-06 después de TKT-06, TC-STATE-TRN-01 después de TRN-01, y TC-STATE-TRN-06/12 inmediatamente tras cada transición exitosa; TC-STATE-EVT-02 va después de EVT-02 y antes de EVT-04.
+- T1 y T2 se usan por separado: T1 se cancela y T2 se marca usado; ambas transiciones son irreversibles.
+- Casos de token (carpeta Seguridad):
+  - `tamperedToken`: `userAToken` con un carácter cambiado a mano.
+  - `expiredToken`: use un TTL corto solo en el entorno local de pruebas, ajuste `expectedTokenTtlSeconds` al mismo valor, haga login y espere a que expire. Restaure la configuración y el valor esperado después.
+  - `wrongKeyToken`: firme un JWT HS256 offline con una clave desechable; nunca use la clave real.
+
+Cada request incluye `Accept: application/json`. Revise el JSON esperado en su descripción. En login compruebe `tokenType=Bearer`, `expiresIn` y los claims `sub`, `iss`, `iat`, `exp` y `jti`; decodifique localmente y nunca registre el token.
 
 Marque cada caso en `checklist-e2e-manual.md` y complete `registro-ejecucion-manual.md`.
 

@@ -9,9 +9,11 @@ Datos mínimos para las pruebas manuales. **Solo** para la base dedicada `pulsep
 | Venues | `VEN-E2E-01` (aforo 500), `VEN-E2E-CAP` (aforo 1), `VEN-E2E-OFF` (inactivo). La API no permite crear venues |
 | Usuarios | `e2e-staff` (STAFF), `e2e-admin` (ADMIN), `e2e-inactive` (inactivo), todos `@example.test` |
 | Eventos | `E2E-DRAFT-01` (DRAFT, para artistas), `E2E-TOPUBLISH-01` (DRAFT, para publicar), `E2E-PUBLISHED-01`, `E2E-PAST-01` (fecha pasada), `E2E-AGE-01` (edad mínima 120), `E2E-FULL-01` (aforo 1) |
-| Artistas | Ya sembrados por la migración V3 (id 1 = `Solar Beat`) |
+| Artistas | Sembrados por la migración V3 |
 
 Los usuarios A, B y C **no** se siembran: se crean por la API (`POST /api/users`) con el prefijo `runId`; siempre quedan con rol `USER`.
+
+Los códigos de sede y evento del entorno corresponden a estas filas sembradas. Obtenga `artistId` y `artistStageName` de la respuesta de `GET /api/artists/active` (PUB-04); no suponga un identificador numérico fijo.
 
 ## Contraseñas y hashes (nada se versiona)
 
@@ -39,7 +41,7 @@ La semilla crea `e2e-inactive` desactivado. Antes de AUTH-22, actívelo para obt
 UPDATE users SET active = TRUE WHERE username = 'e2e-inactive';
 ```
 
-Envíe AUTH-22, copie el `accessToken` a `tokenInactivePrior` en el entorno local de Postman y vuelva a desactivar la cuenta antes de TC-AUTH-013:
+Envíe AUTH-22, copie el `accessToken` a `inactivePriorToken` en el entorno local de Postman y vuelva a desactivar la cuenta antes de TC-AUTH-013:
 
 ```sql
 UPDATE users SET active = FALSE WHERE username = 'e2e-inactive';
