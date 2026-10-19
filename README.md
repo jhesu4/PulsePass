@@ -217,6 +217,8 @@ Cobertura principal:
 - `ScenarioFinalIntegrationTest`: demostración de registro/login, evento, compra, uso/cancelación de entradas y rechazos de seguridad.
 - `SecurityMigrationUpgradeTest` y pruebas de `repository/`: migraciones y persistencia sobre PostgreSQL/Testcontainers.
 
+Las pruebas E2E manuales de Postman, sus fixtures y el checklist por funcionalidad están en [tests/e2e/README.md](./tests/e2e/README.md). Deben ejecutarse solo contra la base dedicada `pulsepass_e2e`.
+
 ## Decisiones y límites conocidos
 
 - MapStruct transforma entidades a DTOs; los controladores delegan la lógica de negocio a los servicios.
