@@ -1,0 +1,176 @@
+# Checklist E2E manual
+
+Marcar `[x]` al ejecutar cada caso con **Send** en Postman. Comparar HTTP y JSON con la descripción detallada del request. Ejecutar las comprobaciones `TC-STATE-*` inmediatamente después de la operación asociada y anotar desviaciones en `registro-ejecucion-manual.md`.
+
+## Pre-ejecución
+
+- [ ] Base `pulsepass_e2e` creada y distinta de dev/QA/producción
+- [ ] App arrancada contra `pulsepass_e2e` (Flyway V1–V4 aplicado)
+- [ ] Semilla `fixtures/seed-e2e.sql` ejecutada con hashes BCrypt locales
+- [ ] Entorno Postman local importado, `runId` único y contraseñas definidas
+- [ ] Variables de usuario A/B/C sincronizadas con `runId`; `artistId`, `artistStageName` y `missingArtistId` obtenidos/seleccionados tras consultar PUB-04
+- [ ] `expectedIssuer`, `expectedTokenTtlSeconds` y `expectedForeignResourceStatus` verificados contra la configuración local
+- [ ] Colección importada; confirmado que no contiene scripts
+
+## Flujo A — Descubrimiento público
+- [x] **TC-BIZ-001 · Listar venues activos (PUB-01)** — `GET /api/venues/active` · Anónimo · observado **HTTP 200; lista JSON de venues**
+- [x] **TC-BIZ-001 · Venue por código (PUB-02)** — `GET /api/venues/{{venueActiveCode}}` · Anónimo · observado **HTTP 200**
+- [x] **PUB-03 · Venue inexistente** — `GET /api/venues/{{missingVenueCode}}` · Anónimo · observado **HTTP 404**
+- [x] **TC-BIZ-002 · Listar artistas activos (PUB-04)** — `GET /api/artists/active` · Anónimo · observado **HTTP 200; lista JSON de artistas**
+- [x] **TC-BIZ-002 · Artista por id (PUB-05)** — `GET /api/artists/{{artistId}}` · Anónimo · observado **HTTP 200**
+- [x] **TC-BIZ-002 · Artista por nombre artístico (PUB-06)** — `GET /api/artists/by-stage-name?stageName={{artistStageName}}` · Anónimo · observado **HTTP 200**
+- [x] **PUB-07 · Artista inexistente** — `GET /api/artists/{{missingArtistId}}` · Anónimo · observado **HTTP 404**
+- [x] **PUB-08 · Eventos publicados** — `GET /api/events/published` · Anónimo · esperado **HTTP 200**
+- [x] **PUB-09 · Evento PUBLISHED por código (anónimo)** — `GET /api/events/{{publishedEventCode}}` · Anónimo · esperado **HTTP 200**
+- [x] **PUB-11 · Eventos por artista** — `GET /api/events/by-artist?stageName={{artistStageName}}` · Anónimo · esperado **HTTP 200**
+- [x] **TC-SEC-004 · Evento DRAFT por código (anónimo) (PUB-10)** — `GET /api/events/{{draftEventCode}}` · Anónimo · esperado **HTTP 403**
+
+## Flujo B — Registro y JWT
+- [x] **TC-AUTH-002 · Login A por username (AUTH-09)** — `POST /api/auth/login` · Público · esperado **HTTP 200**
+- [x] **TC-AUTH-003 · Login A por email (AUTH-10)** — `POST /api/auth/login` · Público · esperado **HTTP 200**
+- [x] **AUTH-11 · Login B** — `POST /api/auth/login` · Público · esperado **HTTP 200**
+- [x] **AUTH-12 · Login STAFF** — `POST /api/auth/login` · Público · esperado **HTTP 200**
+- [x] **AUTH-13 · Login ADMIN** — `POST /api/auth/login` · Público · esperado **HTTP 200**
+- [x] **TC-AUTH-004 · Login con contraseña incorrecta (AUTH-14)** — `POST /api/auth/login` · Público · esperado **HTTP 401**
+- [x] **TC-AUTH-005 · Login con usuario inexistente (AUTH-15)** — `POST /api/auth/login` · Público · esperado **HTTP 401**
+- [x] **AUTH-16 · Login de usuario inactivo** — `POST /api/auth/login` · Público · esperado **HTTP 401**
+- [x] **AUTH-22 · Preparar TC-AUTH-013: obtener token antes de desactivar** — `POST /api/auth/login` · Público (cuenta e2e-inactive temporalmente activa) · esperado **HTTP 200**
+- [x] **AUTH-17 · Login usuario C (verificación de roles)** — `POST /api/auth/login` · Público · esperado **HTTP 200**
+- [x] **AUTH-18 · Perfil actual usuario C (roles)** — `GET /api/auth/me` · USER (C) · esperado **HTTP 200**
+- [x] **TC-AUTH-006 · Perfil actual A (AUTH-19)** — `GET /api/auth/me` · USER (A) · esperado **HTTP 200**
+- [x] **AUTH-20 · Perfil actual STAFF** — `GET /api/auth/me` · STAFF · esperado **HTTP 200**
+- [x] **AUTH-21 · Perfil actual ADMIN** — `GET /api/auth/me` · ADMIN · esperado **HTTP 200**
+- [x] **TC-AUTH-001 · Registrar usuario A (AUTH-01; TC-BIZ-006)** — `POST /api/users` · Anónimo · esperado **HTTP 201**
+- [x] **TC-BIZ-006 · Registrar USER_B (AUTH-02)** — `POST /api/users` · Anónimo · esperado **HTTP 201**
+- [x] **AUTH-03 · Registro duplicado (mismo email)** — `POST /api/users` · Anónimo · esperado **HTTP 409**
+- [x] **AUTH-04 · Registro con password débil (<12)** — `POST /api/users` · Anónimo · esperado **HTTP 400**
+- [x] **AUTH-05 · Registro sin campos obligatorios** — `POST /api/users` · Anónimo · esperado **HTTP 400**
+- [x] **AUTH-06 · Registro con username con @** — `POST /api/users` · Anónimo · esperado **HTTP 400**
+- [x] **AUTH-07 · Registro con fecha de nacimiento futura** — `POST /api/users` · Anónimo · esperado **HTTP 409**
+- [x] **TC-SEC-016 · Inyección de rol en registro público (AUTH-08)** — `POST /api/users` · Anónimo · esperado **HTTP 201**
+- [x] **TC-AUTH-015 · Bearer inválido en endpoint público** — `GET /api/venues/active` · Token Bearer inválido · esperado **HTTP 401**
+- [x] **TC-AUTH-007 · /me sin token (JWT-01)** — `GET /api/auth/me` · Anónimo · esperado **HTTP 401**
+- [x] **TC-AUTH-008 · /me con token malformado (JWT-02)** — `GET /api/auth/me` · Token inválido · esperado **HTTP 401**
+- [x] **TC-AUTH-009 · /me con token alterado (JWT-03)** — `GET /api/auth/me` · Token inválido · esperado **HTTP 401**
+- [x] **TC-AUTH-010 · /me con token expirado (JWT-04)** — `GET /api/auth/me` · Token inválido · esperado **HTTP 401**
+- [x] **TC-AUTH-011 · /me con token firmado con otra clave (JWT-05)** — `GET /api/auth/me` · Token inválido · esperado **HTTP 401**
+- [x] **JWT-06 · Esquema Authorization distinto de Bearer** — `GET /api/auth/me` · USER_A con esquema distinto de Bearer · esperado **HTTP 401**
+- [x] **TC-AUTH-012 · Token en query string (no soportado) (JWT-07)** — `GET /api/auth/me?access_token={{userAToken}}` · Token en URL · esperado **HTTP 401**
+- [x] **TC-AUTH-014 · Token válido sobre endpoint protegido de otro rol (JWT-08)** — `GET /api/events/{{publishedEventCode}}/tickets/paid` · USER (A) · esperado **HTTP 403**
+- [x] **TC-AUTH-013 · Token previo de usuario inactivo** — `GET /api/auth/me` · Usuario con cuenta desactivada después de emitir el JWT · esperado **HTTP 401**
+
+## Flujo C — Gestión del catálogo (ADMIN)
+- [x] **EVT-03 · Crear evento como STAFF** — `POST /api/events` · STAFF · esperado **HTTP 403**
+- [x] **TC-BIZ-003 · Crear evento como ADMIN (EVT-04)** — `POST /api/events` · ADMIN · esperado **HTTP 201**
+- [x] **EVT-11 · Leer evento DRAFT como USER** — `GET /api/events/{{draftEventCode}}` · USER (A) · esperado **HTTP 403**
+- [x] **EVT-12 · Leer evento DRAFT como STAFF** — `GET /api/events/{{draftEventCode}}` · STAFF · esperado **HTTP 200**
+- [x] **EVT-14 · Leer evento inexistente como USER** — `GET /api/events/{{missingEventCode}}` · USER (A) · esperado **HTTP 403**
+- [x] **EVT-15 · Leer evento inexistente como STAFF** — `GET /api/events/{{missingEventCode}}` · STAFF · esperado **HTTP 404**
+- [x] **EVT-18 · Publicar sin token** — `PATCH /api/events/{{eventToPublishCode}}/publish` · Anónimo · esperado **HTTP 401**
+- [x] **TC-BIZ-004 · Publicar como ADMIN (EVT-19)** — `PATCH /api/events/{{runId}}-EVT-1/publish` · ADMIN · esperado **HTTP 200**
+- [x] **EVT-20 · Publicar de nuevo (ya PUBLISHED)** — `PATCH /api/events/{{runId}}-EVT-1/publish` · ADMIN · esperado **HTTP 409**
+- [x] **TC-BIZ-005 · Asociar artista como ADMIN (EVT-25)** — `POST /api/events/{{runId}}-EVT-1/artists/{{artistId}}` · ADMIN · esperado **HTTP 200**
+- [x] **EVT-26 · Asociar el mismo artista otra vez** — `POST /api/events/{{runId}}-EVT-1/artists/{{artistId}}` · ADMIN · esperado **HTTP 409**
+- [x] **EVT-27 · Asociar artista inexistente** — `POST /api/events/{{runId}}-EVT-1/artists/{{missingArtistId}}` · ADMIN · esperado **HTTP 404**
+- [x] **EVT-28 · Asociar artista a evento inexistente** — `POST /api/events/{{missingEventCode}}/artists/{{artistId}}` · ADMIN · esperado **HTTP 404**
+- [x] **EVT-30 · Asociar artista al borrador sembrado como ADMIN** — `POST /api/events/{{draftEventCode}}/artists/{{artistId}}` · ADMIN · esperado **HTTP 200**
+- [x] **EVT-31 · STAFF ve borradores por artista** — `GET /api/events/by-artist?stageName={{artistStageName}}` · STAFF · esperado **HTTP 200**
+- [x] **TC-SEC-001 · Crear evento sin token (EVT-01)** — `POST /api/events` · Anónimo · esperado **HTTP 401**
+- [x] **TC-SEC-001 · Crear evento como USER (EVT-02)** — `POST /api/events` · USER (A) · esperado **HTTP 403**
+- [x] **TC-SEC-015 · Leer evento DRAFT como ADMIN (EVT-13)** — `GET /api/events/{{draftEventCode}}` · ADMIN · esperado **HTTP 200**
+- [x] **TC-SEC-002 · Publicar como USER (EVT-16)** — `PATCH /api/events/{{eventToPublishCode}}/publish` · USER (A) · esperado **HTTP 403**
+- [x] **TC-SEC-002 · Publicar como STAFF (EVT-17)** — `PATCH /api/events/{{eventToPublishCode}}/publish` · STAFF · esperado **HTTP 403**
+- [x] **TC-SEC-003 · Asociar artista como USER (EVT-23)** — `POST /api/events/{{draftEventCode}}/artists/{{artistId}}` · USER (A) · esperado **HTTP 403**
+- [x] **EVT-24 · Asociar artista como STAFF** — `POST /api/events/{{draftEventCode}}/artists/{{artistId}}` · STAFF · esperado **HTTP 403**
+- [x] **TC-SEC-005 · Anónimo no ve borradores por artista** — `GET /api/events/by-artist?stageName={{artistStageName}}` · Anónimo · esperado **HTTP 200**
+- [x] **EVT-05 · Crear evento con código duplicado** — `POST /api/events` · ADMIN · esperado **HTTP 409**
+- [x] **EVT-07 · Crear evento con fecha pasada** — `POST /api/events` · ADMIN · esperado **HTTP 409**
+- [x] **EVT-08 · Crear evento en venue inactivo** — `POST /api/events` · ADMIN · esperado **HTTP 409**
+- [x] **EVT-21 · Publicar evento con fecha pasada** — `PATCH /api/events/{{pastEventCode}}/publish` · ADMIN · esperado **HTTP 409**
+- [x] **EVT-22 · Publicar evento inexistente** — `PATCH /api/events/{{missingEventCode}}/publish` · ADMIN · esperado **HTTP 404**
+- [x] **TC-STATE-EVT-02 · Confirmar que EVT-02 no creó el evento** — `GET /api/events/{{runId}}-EVT-1` · ADMIN · esperado **HTTP 404**
+- [x] **TC-BIZ-003 · Leer el evento recién creado (TC-BIZ-003)** — `GET /api/events/{{runId}}-EVT-1` · ADMIN · esperado **HTTP 200**
+- [x] **TC-BIZ-004 · Verificar evento creado en eventos publicados (TC-BIZ-004)** — `GET /api/events/published` · Anónimo · esperado **HTTP 200**
+- [x] **TC-BIZ-005 · Verificar evento creado por artista (TC-BIZ-005)** — `GET /api/events/by-artist?stageName={{artistStageName}}` · Anónimo · esperado **HTTP 200**
+
+## Flujo D — Compra, propiedad, cancelación y uso
+- [x] **USR-01 · Mi usuario por email** — `GET /api/users/by-email?email={{userAEmail}}` · USER (A) · esperado **HTTP 200**
+- [x] **USR-02 · Mi usuario por username** — `GET /api/users/by-username?username={{userAUsername}}` · USER (A) · esperado **HTTP 200**
+- [x] **USR-05 · Email inexistente como USER** — `GET /api/users/by-email?email={{runId}}-nadie@example.test` · USER (A) · esperado **HTTP 403**
+- [x] **USR-06 · Usuario ajeno como STAFF** — `GET /api/users/by-email?email={{userAEmail}}` · STAFF · esperado **HTTP 403**
+- [x] **USR-07 · Usuario ajeno como ADMIN sin propósito** — `GET /api/users/by-email?email={{userAEmail}}` · ADMIN · esperado **HTTP 403**
+- [x] **USR-08 · Usuario ajeno como ADMIN con propósito CUSTOMER_SUPPORT** — `GET /api/users/by-email?email={{userAEmail}}` · ADMIN + X-Admin-Purpose · esperado **HTTP 200**
+- [x] **USR-09 · ADMIN con propósito incorrecto (TICKET_SUPPORT)** — `GET /api/users/by-username?username={{userAUsername}}` · ADMIN + propósito inválido · esperado **HTTP 403**
+- [x] **USR-10 · USER intenta usar X-Admin-Purpose** — `GET /api/users/by-email?email={{userBEmail}}` · USER (A) · esperado **HTTP 403**
+- [x] **USR-11 · ADMIN con propósito, usuario inexistente** — `GET /api/users/by-username?username={{runId}}-nadie` · ADMIN + X-Admin-Purpose · esperado **HTTP 404**
+- [x] **USR-12 · Consulta de usuario sin token** — `GET /api/users/by-email?email={{userAEmail}}` · Anónimo · esperado **HTTP 401**
+- [x] **USR-13 · Respuesta no expone credenciales** — `GET /api/users/by-email?email={{userAEmail}}` · USER (A) · esperado **HTTP 200**
+- [x] **PAID-02 · Listar PAID sin token** — `GET /api/events/{{publishedEventCode}}/tickets/paid` · Anónimo · esperado **HTTP 401**
+- [x] **TC-BIZ-009 · Listar PAID como STAFF (PAID-03)** — `GET /api/events/{{publishedEventCode}}/tickets/paid` · STAFF · esperado **HTTP 200**
+- [x] **PAID-04 · Listar PAID como ADMIN** — `GET /api/events/{{publishedEventCode}}/tickets/paid` · ADMIN · esperado **HTTP 200**
+- [x] **PAID-05 · Listar PAID de evento inexistente como STAFF** — `GET /api/events/{{missingEventCode}}/tickets/paid` · STAFF · esperado **HTTP 404**
+- [x] **TKT-01 · Comprar sin token** — `POST /api/tickets` · Anónimo · esperado **HTTP 401**
+- [x] **TKT-02 · Comprar como STAFF** — `POST /api/tickets` · STAFF · esperado **HTTP 403**
+- [x] **TKT-03 · Comprar como ADMIN** — `POST /api/tickets` · ADMIN · esperado **HTTP 403**
+- [x] **TC-BIZ-007 · A compra ticket T1 para sí (TC-BIZ-007; TKT-04)** — `POST /api/tickets` · USER (A) · esperado **HTTP 201**
+- [x] **TC-BIZ-007 · A compra ticket T2 para sí (TC-BIZ-007; TKT-05)** — `POST /api/tickets` · USER (A) · esperado **HTTP 201**
+- [x] **TKT-07 · A compra a nombre de email inexistente** — `POST /api/tickets` · USER (A) · esperado **HTTP 403**
+- [x] **TC-BIZ-008 · A lee su ticket (TC-BIZ-008; TKT-16)** — `GET /api/tickets/{{ticketCancelableCode}}` · USER (A) · esperado **HTTP 200**
+- [x] **TKT-18 · STAFF lee ticket de A** — `GET /api/tickets/{{ticketCancelableCode}}` · STAFF · esperado **HTTP 200**
+- [x] **TKT-19 · ADMIN lee ticket de A sin propósito** — `GET /api/tickets/{{ticketCancelableCode}}` · ADMIN · esperado **HTTP 403**
+- [x] **TKT-20 · ADMIN lee ticket de A con TICKET_SUPPORT** — `GET /api/tickets/{{ticketCancelableCode}}` · ADMIN + X-Admin-Purpose · esperado **HTTP 200**
+- [x] **TKT-21 · ADMIN con propósito incorrecto (CUSTOMER_SUPPORT)** — `GET /api/tickets/{{ticketCancelableCode}}` · ADMIN + propósito inválido · esperado **HTTP 403**
+- [x] **TKT-22 · Ticket inexistente como USER** — `GET /api/tickets/TCK-NO-EXISTE` · USER (A) · esperado **HTTP 403**
+- [x] **TKT-23 · Ticket inexistente como STAFF** — `GET /api/tickets/TCK-NO-EXISTE` · STAFF · esperado **HTTP 404**
+- [x] **TKT-24 · Leer ticket sin token** — `GET /api/tickets/{{ticketCancelableCode}}` · Anónimo · esperado **HTTP 401**
+- [x] **TC-BIZ-008 · A lista sus tickets (TC-BIZ-008; TKT-25)** — `GET /api/tickets/by-user?email={{userAEmail}}` · USER (A) · esperado **HTTP 200**
+- [x] **TKT-27 · STAFF lista tickets de A** — `GET /api/tickets/by-user?email={{userAEmail}}` · STAFF · esperado **HTTP 403**
+- [x] **TKT-28 · ADMIN con TICKET_SUPPORT lista tickets de A** — `GET /api/tickets/by-user?email={{userAEmail}}` · ADMIN + X-Admin-Purpose · esperado **HTTP 200**
+- [x] **TKT-29 · ADMIN sin propósito lista tickets** — `GET /api/tickets/by-user?email={{userAEmail}}` · ADMIN · esperado **HTTP 403**
+- [x] **TKT-30 · Listar tickets sin token** — `GET /api/tickets/by-user?email={{userAEmail}}` · Anónimo · esperado **HTTP 401**
+- [x] **TRN-02 · Cancelar T1 como STAFF** — `PATCH /api/tickets/{{ticketCancelableCode}}/cancel` · STAFF · esperado **HTTP 403**
+- [x] **TRN-03 · Cancelar T1 sin token** — `PATCH /api/tickets/{{ticketCancelableCode}}/cancel` · Anónimo · esperado **HTTP 401**
+- [x] **TRN-04 · Cancelar T1 como ADMIN sin propósito** — `PATCH /api/tickets/{{ticketCancelableCode}}/cancel` · ADMIN · esperado **HTTP 403**
+- [x] **TRN-05 · Cancelar ticket inexistente como USER** — `PATCH /api/tickets/TCK-NO-EXISTE/cancel` · USER (A) · esperado **HTTP 403**
+- [x] **TC-BIZ-010 · A cancela su ticket T1 (TRN-06)** — `PATCH /api/tickets/{{ticketCancelableCode}}/cancel` · USER (A) · esperado **HTTP 200**
+- [x] **TRN-08 · Usar T1 cancelado** — `PATCH /api/tickets/{{ticketCancelableCode}}/use` · STAFF · esperado **HTTP 409**
+- [x] **TRN-09 · Usar T2 como USER** — `PATCH /api/tickets/{{ticketUsableCode}}/use` · USER (A) · esperado **HTTP 403**
+- [x] **TRN-10 · Usar T2 sin token** — `PATCH /api/tickets/{{ticketUsableCode}}/use` · Anónimo · esperado **HTTP 401**
+- [x] **TRN-11 · Usar ticket inexistente como STAFF** — `PATCH /api/tickets/TCK-NO-EXISTE/use` · STAFF · esperado **HTTP 404**
+- [x] **TRN-15 · ADMIN marca ticket como usado (ya USED)** — `PATCH /api/tickets/{{ticketUsableCode}}/use` · ADMIN · esperado **HTTP 409**
+- [x] **TC-SEC-006 · Usuario ajeno por email (IDOR) (USR-03)** — `GET /api/users/by-email?email={{userBEmail}}` · USER (A) · esperado **HTTP 403**
+- [x] **TC-SEC-007 · Usuario ajeno por username (IDOR) (USR-04)** — `GET /api/users/by-username?username={{userBUsername}}` · USER (A) · esperado **HTTP 403**
+- [x] **TC-SEC-013 · Listar PAID como USER (PAID-01)** — `GET /api/events/{{publishedEventCode}}/tickets/paid` · USER (A) · esperado **HTTP 403**
+- [x] **TC-SEC-008 · A compra a nombre de B (IDOR) (TKT-06)** — `POST /api/tickets` · USER (A) · esperado **HTTP 403**
+- [x] **TC-SEC-009 · B lee ticket de A (IDOR) (TKT-17)** — `GET /api/tickets/{{ticketCancelableCode}}` · USER (B) · esperado **HTTP 403**
+- [x] **TC-SEC-010 · B lista tickets de A (IDOR) (TKT-26)** — `GET /api/tickets/by-user?email={{userAEmail}}` · USER (B) · esperado **HTTP 403**
+- [x] **TC-SEC-011 · Cancelar T1 como B (IDOR) (TRN-01)** — `PATCH /api/tickets/{{ticketCancelableCode}}/cancel` · USER (B) · esperado **HTTP 403**
+- [x] **TC-SEC-014 · STAFF marca T2 como usado (TC-BIZ-012; TRN-12)** — `PATCH /api/tickets/{{ticketUsableCode}}/use` · STAFF · esperado **HTTP 200**
+- [x] **TC-SEC-017 · JWT anterior después de revocar el rol STAFF** — `GET /api/events/{{publishedEventCode}}/tickets/paid` · STAFF (JWT emitido antes de revocar el rol) · esperado **HTTP 403**
+- [x] **TC-SEC-012 · USER_B intenta usar el ticket de USER_A (TRN-09)** — `PATCH /api/tickets/{{ticketCancelableCode}}/use` · USER_B con el ticket de USER_A · esperado **HTTP 403**
+- [x] **TKT-13 · Comprar evento inexistente** — `POST /api/tickets` · USER (A) · esperado **HTTP 404**
+- [x] **TKT-14 · Aforo: A compra la última entrada** — `POST /api/tickets` · USER (A) · esperado **HTTP 201**
+- [x] **TKT-08 · Comprar con body inválido** — `POST /api/tickets` · USER (A) · esperado **HTTP 400**
+- [x] **TKT-09 · Comprar tipo inválido** — `POST /api/tickets` · USER (A) · esperado **HTTP 400**
+- [x] **TKT-11 · Comprar evento con fecha pasada** — `POST /api/tickets` · USER (A) · esperado **HTTP 409**
+- [x] **TRN-14 · Cancelar T2 ya usado** — `PATCH /api/tickets/{{ticketUsableCode}}/cancel` · USER (A) · esperado **HTTP 409**
+- [x] **TC-STATE-TKT-06 · Confirmar que TKT-06 no creó un ticket para B** — `GET /api/tickets/by-user?email={{userBEmail}}` · USER (B) · esperado **HTTP 200**
+- [x] **TC-STATE-SEC-012 · Confirmar que el ticket de A sigue pagado** — `GET /api/tickets/{{ticketCancelableCode}}` · USER_A (propietario) · esperado **HTTP 200**
+- [x] **TC-STATE-TRN-01 · Confirmar que el rechazo de TRN-01 no canceló T1** — `GET /api/tickets/{{ticketCancelableCode}}` · USER (A) · esperado **HTTP 200**
+- [x] **TC-STATE-TRN-06 · Confirmar la cancelación persistida de T1 (TC-BIZ-010)** — `GET /api/tickets/{{ticketCancelableCode}}` · USER (A) · esperado **HTTP 200**
+- [x] **TC-STATE-TRN-12 · Confirmar que el uso de T2 quedó persistido (TC-BIZ-012)** — `GET /api/tickets/{{ticketUsableCode}}` · USER (A) · esperado **HTTP 200**
+
+## Flujo E — Regresión de errores
+- [x] **TC-BIZ-015 · Crear evento con body inválido (EVT-06; TC-BIZ-015)** — `POST /api/events` · ADMIN · esperado **HTTP 400**
+- [x] **TC-BIZ-015 · Crear evento en venue inexistente (EVT-09; TC-BIZ-015)** — `POST /api/events` · ADMIN · esperado **HTTP 404**
+- [x] **TC-BIZ-015 · Categoría inválida (EVT-10; TC-BIZ-015)** — `POST /api/events` · ADMIN · esperado **HTTP 400**
+- [x] **TC-BIZ-014 · Comprar evento DRAFT (TC-BIZ-014; TKT-10)** — `POST /api/tickets` · USER (A) · esperado **HTTP 409**
+- [x] **TC-BIZ-014 · Comprar evento con edad mínima no cumplida (TC-BIZ-014; TKT-12)** — `POST /api/tickets` · USER (A) · esperado **HTTP 409**
+- [x] **TC-BIZ-014 · Aforo: B intenta comprar sin cupo (TC-BIZ-014; TKT-15)** — `POST /api/tickets` · USER (B) · esperado **HTTP 409**
+- [x] **TC-BIZ-011 · Cancelar T1 de nuevo (TC-BIZ-011; TRN-07)** — `PATCH /api/tickets/{{ticketCancelableCode}}/cancel` · USER (A) · esperado **HTTP 409**
+- [x] **TC-BIZ-013 · Usar T2 de nuevo (TC-BIZ-013; TRN-13)** — `PATCH /api/tickets/{{ticketUsableCode}}/use` · STAFF · esperado **HTTP 409**
+- [x] **ERR-01 · Método no permitido** — `DELETE /api/events/{{publishedEventCode}}` · ADMIN · esperado **HTTP 405**
+- [x] **ERR-02 · Content-Type no soportado** — `POST /api/auth/login` · Público · esperado **HTTP 415**
+- [x] **ERR-03 · JSON malformado** — `POST /api/auth/login` · Público · esperado **HTTP 400**
+- [x] **ERR-04 · Ruta inexistente autenticada** — `GET /api/no-existe` · USER (A) · esperado **HTTP 404**
+- [x] **ERR-05 · Errores sin trazas internas** — `GET /api/tickets/TCK-NO-EXISTE` · STAFF · esperado **HTTP 404**
