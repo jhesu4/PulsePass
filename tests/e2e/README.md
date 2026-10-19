@@ -6,7 +6,7 @@ Pruebas manuales de extremo a extremo de la API PulsePass (controladores + segur
 
 | Archivo | Propósito |
 |---|---|
-| `postman/PulsePass-Manual-E2E.postman_collection.json` | Colección v2.1: 151 requests en 9 carpetas por módulo |
+| `postman/PulsePass-Manual-E2E.postman_collection.json` | Colección v2.1: 153 requests en 10 carpetas por módulo y flujo |
 | `postman/PulsePass-local.postman_environment.json` | Plantilla de entorno (secretos y tokens vacíos) |
 | `fixtures/seed-e2e.sql`, `fixtures/README.md` | Datos E2E y cómo cargarlos |
 | `checklist-e2e-manual.md` | Lista de verificación por caso |
@@ -18,27 +18,39 @@ Pruebas manuales de extremo a extremo de la API PulsePass (controladores + segur
 1. Cree la base **`pulsepass_e2e`** (distinta de dev/QA/producción).
 2. Arranque la app contra esa base con su `.env` local (Flyway aplica V1–V4). Local: `http://localhost:8080` (HTTP solo se acepta en localhost).
 3. Cargue la semilla (ver `fixtures/README.md`).
-4. En Postman importe la colección y el entorno. **Duplique el entorno**, complételo localmente y no lo exporte ni lo suba: guarda tokens y contraseñas. El `.gitignore` de esta carpeta excluye `*.local.postman_environment.json`.
+4. En Postman importe la colección y el entorno. **Duplique el entorno**, complételo localmente y no lo exporte ni lo suba: guarda tokens y contraseñas. El `.gitignore` excluye `*.postman_environment.json`, excepto la plantilla versionada.
 5. Defina `runId` (p. ej. `e2e-20261019-1`), `futureDate` (fecha futura) y las contraseñas.
 
-## Ejecución
+## Ejecución por flujos
 
-Las carpetas están agrupadas por módulo: **Venues, Artists, Auth, Usuarios, Events, Tickets, Seguridad, Validaciones y Flujos**. La colección es manual: no use Runner; siga el orden de casos del checklist y ejecute inmediatamente las lecturas `TC-STATE-*` que verifican efectos o ausencia de efectos:
+Las carpetas de Postman siguen la sección 10.1: **00 Preparación / conectividad**, **01 Venues**, **02 Artists**, **03 Auth / usuarios**, **04 Usuarios / consulta y propiedad**, **05 Events / administración y visibilidad**, **06 Tickets / compra, consulta y ciclo de vida**, **07 Seguridad / escenarios negativos**, **08 Validaciones y errores HTTP** y **09 Flujos de negocio / secuencia recomendada**. No use Runner; envíe cada request con **Send** y anote los resultados manuales.
 
-- Ajuste `userAEmail`/`userAUsername`, `userBEmail`/`userBUsername` y `userCEmail`/`userCUsername` para que compartan el prefijo elegido en `runId`; no se derivan automáticamente.
-- Desde PUB-04 copie el `id` y `stageName` reales a `artistId` y `artistStageName`. Elija `missingArtistId` que no aparezca en esa respuesta. No suponga IDs de artistas.
-- Configure `expectedIssuer` y `expectedTokenTtlSeconds` según la configuración local (por defecto `pulsepass-api` y `900`); mantenga `expectedForeignResourceStatus=403`, que es el resultado esperado del contrato.
-- Tras AUTH-09/11/12/13/17 copie `accessToken` a `userAToken`, `userBToken`, `staffToken`, `adminToken` y `userCToken`.
-- **AUTH-22 / TC-AUTH-013**: active temporalmente `e2e-inactive`, guarde el token de AUTH-22 como `inactivePriorToken` y desactive la cuenta antes de TC-AUTH-013. Consulte el SQL en `fixtures/README.md`.
-- **TC-SEC-017**: después de guardar `staffToken`, quite temporalmente el rol `STAFF` a `e2e-staff` y restáurelo inmediatamente después.
-- **Flujo C / TC-BIZ-003/004/005**: use el mismo `runId` para crear y consultar el evento de EVT-04, publicarlo en EVT-19, asociar el artista en EVT-25 y verificarlo en los listados.
-- PUB-11 se ejecuta sobre la semilla limpia antes de asociar artistas y debe devolver `[]`. Después, EVT-30 asocia el artista al borrador sembrado; ejecute TC-SEC-005 como anónimo (no debe ver el borrador) y EVT-31 como STAFF (sí debe verlo).
-- Tras TKT-04/05 copie `ticketCode` a `ticketT1`/`ticketT2`. Ejecute TC-STATE-TKT-06 después de TKT-06, TC-STATE-TRN-01 después de TRN-01, y TC-STATE-TRN-06/12 inmediatamente tras cada transición exitosa; TC-STATE-EVT-02 va después de EVT-02 y antes de EVT-04.
-- T1 y T2 se usan por separado: T1 se cancela y T2 se marca usado; ambas transiciones son irreversibles.
-- Casos de token (carpeta Seguridad):
-  - `tamperedToken`: `userAToken` con un carácter cambiado a mano.
-  - `expiredToken`: use un TTL corto solo en el entorno local de pruebas, ajuste `expectedTokenTtlSeconds` al mismo valor, haga login y espere a que expire. Restaure la configuración y el valor esperado después.
-  - `wrongKeyToken`: firme un JWT HS256 offline con una clave desechable; nunca use la clave real.
+### Flujo A — Descubrimiento público
+
+Ejecute 00, 01 y 02; luego PUB-08 a PUB-11 para comprobar publicados, borradores y eventos por artista. `venueActiveCode`, `artistId` y `artistStageName` deben confirmarse con respuestas reales. PUB-11 debe ejecutarse sobre la semilla limpia y devolver `[]`.
+
+### Flujo B — Registro y JWT
+
+Configure `userAEmail`/`userAUsername`, `userBEmail`/`userBUsername`, `userAPassword` y `userBPassword`; los datos deben tener prefijos únicos. Configure también `staffIdentifier`, `adminIdentifier`, `staffPassword` y `adminPassword`. Ejecute registro, login y `/me` para USER_A, USER_B, STAFF y ADMIN; copie los JWT solo a `userAToken`, `userBToken`, `staffToken` y `adminToken`. Para AUTH-22 / TC-AUTH-013, active temporalmente `e2e-inactive`, copie el token a `inactivePriorToken` y desactive la cuenta antes de enviar el caso. Para TC-SEC-017, revoque y restaure el rol STAFF como se indica en `fixtures/README.md`.
+
+### Flujo C — Gestión del catálogo (ADMIN)
+
+Con el mismo `runId`, cree el evento, léalo como ADMIN, asocie el artista, publíquelo y compruebe su aparición en `/api/events/published` y `/api/events/by-artist`. Ejecute las verificaciones de borrador: PUB-11 antes de asociar artistas; después EVT-30 asocia un artista al borrador sembrado, TC-SEC-005 comprueba que el anónimo no lo recibe y EVT-31 que STAFF sí puede verlo.
+
+### Flujo D — Compra, propiedad, cancelación y uso
+
+Compre dos tickets distintos y copie sus códigos a `ticketCancelableCode` (T1) y `ticketUsableCode` (T2). Verifique lecturas y propiedad antes de cualquier transición; después de cada denegación sobre un recurso mutable, ejecute la lectura de estado indicada. Cancele T1 y marque T2 como usado; no reutilice el mismo ticket para ambas transiciones.
+
+### Flujo E — Regresión de errores
+
+Ejecute los escenarios de validación 400, 401, 403, 404 y 409 y compruebe `ErrorResponse`, sin datos internos. Las pruebas de JWT usan `tamperedToken`, `expiredToken` y `wrongKeyToken`; el último debe firmarse offline con una clave desechable, nunca con el secreto real.
+
+### Preparación de variables y registro
+
+- Ajuste los emails/usernames de A y B con el prefijo `runId`; si se ejecutan los casos adicionales de USER_C, configure también `userCEmail`, `userCUsername` y `userCPassword`.
+- Configure `expectedIssuer` y `expectedTokenTtlSeconds` según la API (por defecto `pulsepass-api` y `900`), y mantenga `expectedForeignResourceStatus=403`.
+- Copie los identificadores de respuestas a `venueActiveCode`, `artistId`, `artistStageName`, `publishedEventCode`, `draftEventCode`, `ticketCancelableCode` y `ticketUsableCode`; no suponga IDs de artista.
+- Ejecute las lecturas `TC-STATE-*` inmediatamente después de la operación relacionada.
 
 Cada request incluye `Accept: application/json`. Revise el JSON esperado en su descripción. En login compruebe `tokenType=Bearer`, `expiresIn` y los claims `sub`, `iss`, `iat`, `exp` y `jti`; decodifique localmente y nunca registre el token.
 
@@ -62,7 +74,6 @@ Al registrar resultados, use únicamente `PASS`, `FAIL`, `BLOCKED` o `NOT RUN`. 
 
 - Los códigos esperados salen de la lectura del código y de la validación de la semilla contra el esquema Flyway real (V1–V4) en PostgreSQL 16. **La colección no se ha ejecutado contra la app en marcha**; cualquier diferencia observada debe anotarse como desviación y revisarse (código o expectativa).
 - Los casos TC-AUTH-013 y TC-SEC-017 requieren cambios temporales en la base dedicada; aplique las instrucciones de activación, revocación y restauración de `fixtures/README.md`.
-- El caso ERR-04 (ruta inexistente) puede devolver 403 o 404 según la configuración; anótelo.
 - No se crean endpoints ni se altera el contrato de la API para acomodar la colección.
 
 ## Seguridad
