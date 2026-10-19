@@ -4349,6 +4349,538 @@
                                                    ]
                                   }
                               ]
+                 },
+                 {
+                     "name":  "06 - Transiciones de ticket (irreversibles)",
+                     "description":  "Usar T1 (cancelar) y T2 (usar) por separado: las transiciones son irreversibles.",
+                     "item":  [
+                                  {
+                                      "id":  "999a75e9-3cf5-d89e-0b55-bf15f2368c74",
+                                      "name":  "TRN-01 · Cancelar T1 como B (IDOR)",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/{{ticketT1}}/cancel",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "{{ticketT1}}",
+                                                                               "cancel"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserB}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TRN-01\n**Rol / token:** USER (B)\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "01a91994-5ef7-d501-e110-152ca405fb7c",
+                                      "name":  "TRN-02 · Cancelar T1 como STAFF",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/{{ticketT1}}/cancel",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "{{ticketT1}}",
+                                                                               "cancel"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenStaff}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TRN-02\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nSTAFF no está autorizado por URL (solo USER/ADMIN)."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "de16ca4f-c9c2-3931-66c1-b6d688a18b47",
+                                      "name":  "TRN-03 · Cancelar T1 sin token",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/{{ticketT1}}/cancel",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "{{ticketT1}}",
+                                                                               "cancel"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "description":  "**ID:** TRN-03\n**Rol / token:** Anónimo\n**Resultado esperado:** HTTP 401\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "f3640e7f-961f-4564-779a-f238794d73ff",
+                                      "name":  "TRN-04 · Cancelar T1 como ADMIN sin propósito",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/{{ticketT1}}/cancel",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "{{ticketT1}}",
+                                                                               "cancel"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TRN-04\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "60a0ebb6-c6b1-a75a-b0db-d96f33a3af59",
+                                      "name":  "TRN-05 · Cancelar ticket inexistente como USER",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/TCK-NO-EXISTE/cancel",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "TCK-NO-EXISTE",
+                                                                               "cancel"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TRN-05\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "3ac22816-757a-1b9d-bf91-0f56a5f9289c",
+                                      "name":  "TRN-06 · A cancela su ticket T1",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/{{ticketT1}}/cancel",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "{{ticketT1}}",
+                                                                               "cancel"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TRN-06\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 200\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nPAID→CANCELLED. Irreversible."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "0eaa258d-6a16-9164-13d4-20ad679dab13",
+                                      "name":  "TRN-07 · Cancelar T1 de nuevo",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/{{ticketT1}}/cancel",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "{{ticketT1}}",
+                                                                               "cancel"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TRN-07\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 409\n**Precondición:** TRN-06 ejecutado.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "224d8c8b-d895-08e7-fc85-7a7687191822",
+                                      "name":  "TRN-08 · Usar T1 cancelado",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/{{ticketT1}}/use",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "{{ticketT1}}",
+                                                                               "use"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenStaff}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TRN-08\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 409\n**Precondición:** TRN-06 ejecutado.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "c54b3edf-631f-a6fd-8a6f-025931bcd5b7",
+                                      "name":  "TRN-09 · Usar T2 como USER",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/{{ticketT2}}/use",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "{{ticketT2}}",
+                                                                               "use"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TRN-09\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "5e4b08af-7db6-e9be-0f87-3e32d346527b",
+                                      "name":  "TRN-10 · Usar T2 sin token",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/{{ticketT2}}/use",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "{{ticketT2}}",
+                                                                               "use"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "description":  "**ID:** TRN-10\n**Rol / token:** Anónimo\n**Resultado esperado:** HTTP 401\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "61563b7e-1c6d-c6aa-399c-35ab991a7007",
+                                      "name":  "TRN-11 · Usar ticket inexistente como STAFF",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/TCK-NO-EXISTE/use",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "TCK-NO-EXISTE",
+                                                                               "use"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenStaff}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TRN-11\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 404\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "2188d55e-4cd8-240c-feac-3760fed47a1b",
+                                      "name":  "TRN-12 · STAFF marca T2 como usado",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/{{ticketT2}}/use",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "{{ticketT2}}",
+                                                                               "use"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenStaff}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TRN-12\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 200\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nPAID→USED. Irreversible."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "61bf0f30-e50e-9ac1-04b3-75bc66bb5f9d",
+                                      "name":  "TRN-13 · Usar T2 de nuevo",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/{{ticketT2}}/use",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "{{ticketT2}}",
+                                                                               "use"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenStaff}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TRN-13\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 409\n**Precondición:** TRN-12 ejecutado.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "8d233917-58a6-7273-4c04-065ba25116c3",
+                                      "name":  "TRN-14 · Cancelar T2 ya usado",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/{{ticketT2}}/cancel",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "{{ticketT2}}",
+                                                                               "cancel"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TRN-14\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 409\n**Precondición:** TRN-12 ejecutado.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "19664a19-91ca-c14f-9504-91ab59d69ba7",
+                                      "name":  "TRN-15 · ADMIN marca ticket como usado (ya USED)",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/{{ticketT2}}/use",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "{{ticketT2}}",
+                                                                               "use"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TRN-15\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 409\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nADMIN pasa la regla de URL; el 409 es por estado."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  }
+                              ]
                  }
              ],
     "variable":  [
