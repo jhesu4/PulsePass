@@ -1149,6 +1149,282 @@
                                                    ]
                                   }
                               ]
+                 },
+                 {
+                     "name":  "02 - JWT inválidos",
+                     "description":  "Token ausente/ilegible/alterado/expirado/clave incorrecta. Esperado siempre 401 con ErrorResponse JSON.",
+                     "item":  [
+                                  {
+                                      "id":  "52a4ec0f-edbc-b8a8-8953-699c433c7633",
+                                      "name":  "JWT-01 · /me sin token",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/auth/me",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "auth",
+                                                                               "me"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "description":  "**ID:** JWT-01\n**Rol / token:** Anónimo\n**Resultado esperado:** HTTP 401\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "b762a938-0b82-de29-825e-dd931f5181a8",
+                                      "name":  "JWT-02 · /me con token malformado",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/auth/me",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "auth",
+                                                                               "me"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenMalformed}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** JWT-02\n**Rol / token:** Token inválido\n**Resultado esperado:** HTTP 401\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nValor sugerido de `tokenMalformed`: `no.es.un.jwt`."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "26803b7f-caf1-c683-288f-d14be32137e6",
+                                      "name":  "JWT-03 · /me con token alterado",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/auth/me",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "auth",
+                                                                               "me"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenTampered}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** JWT-03\n**Rol / token:** Token inválido\n**Resultado esperado:** HTTP 401\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nTomar `tokenUserA` y cambiar a mano un carácter del payload o de la firma."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "3bed4758-bcc2-5605-2376-3d50b76385c7",
+                                      "name":  "JWT-04 · /me con token expirado",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/auth/me",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "auth",
+                                                                               "me"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenExpired}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** JWT-04\n**Rol / token:** Token inválido\n**Resultado esperado:** HTTP 401\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nVer README: levantar la app con TTL corto (variable de entorno de la expiración JWT), hacer login, esperar, y enviar."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "97a456ca-d195-a340-e395-e6ab79329b4e",
+                                      "name":  "JWT-05 · /me con token firmado con otra clave",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/auth/me",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "auth",
+                                                                               "me"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenWrongKey}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** JWT-05\n**Rol / token:** Token inválido\n**Resultado esperado:** HTTP 401\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nGenerar offline con una clave desechable (jamás la clave real del entorno)."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "9f58397a-dd03-9dd4-e266-0a441e96bf22",
+                                      "name":  "JWT-06 · Esquema Authorization distinto de Bearer",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Basic {{tokenUserA}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/auth/me",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "auth",
+                                                                               "me"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "description":  "**ID:** JWT-06\n**Rol / token:** Token inválido\n**Resultado esperado:** HTTP 401\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "01b78dd8-30c7-37e0-1163-60b4be1ece25",
+                                      "name":  "JWT-07 · Token en query string (no soportado)",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/auth/me?access_token={{tokenUserA}}",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "auth",
+                                                                               "me"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "access_token",
+                                                                                    "value":  "{{tokenUserA}}"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "description":  "**ID:** JWT-07\n**Rol / token:** Token en URL\n**Resultado esperado:** HTTP 401\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nEl token solo se acepta en el header Authorization. Aquí NO se envía el header."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "0a288f83-cdd9-2667-b996-2c774925f348",
+                                      "name":  "JWT-08 · Token válido sobre endpoint protegido de otro rol",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/E2E-PUBLISHED-01/tickets/paid",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "E2E-PUBLISHED-01",
+                                                                               "tickets",
+                                                                               "paid"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** JWT-08\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  }
+                              ]
                  }
              ],
     "variable":  [
