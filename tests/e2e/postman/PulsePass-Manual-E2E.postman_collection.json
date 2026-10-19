@@ -1,0 +1,14 @@
+{
+    "info":  {
+                 "_postman_id":  "b4825f1a-069f-73ef-c471-043b556e1f04",
+                 "name":  "PulsePass - E2E Manual",
+                 "description":  "Colección Postman v2.1 para pruebas E2E manuales (Fase 5). SIN scripts (sin scripts de Pre-request ni de Tests), sin Runner/Newman. Ejecutar cada request con Send y registrar el resultado en `tests/e2e/registro-ejecucion-manual.md`. Ver `tests/e2e/README.md`.\n\nOrden recomendado: carpetas 00 → 08. Los tokens y códigos de ticket se copian a mano en el entorno LOCAL (no versionado).",
+                 "schema":  "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+             },
+    "item":  [
+
+             ],
+    "variable":  [
+
+                 ]
+}

@@ -1,0 +1,5 @@
+# Nunca versionar entornos con secretos/tokens ni capturas con datos reales
+*.local.postman_environment.json
+*-local-filled*.json
+evidencias/
+*.env
