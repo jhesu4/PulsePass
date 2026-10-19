@@ -3104,6 +3104,1251 @@
                                                    ]
                                   }
                               ]
+                 },
+                 {
+                     "name":  "05 - Tickets (compra, lectura, ownership)",
+                     "description":  "Compra, lectura y listado de tickets. Variables manuales: `ticketT1`, `ticketT2` (copiar de TKT-04/TKT-05).",
+                     "item":  [
+                                  {
+                                      "id":  "065a338d-4136-2282-3898-131da0907e01",
+                                      "name":  "TKT-01 · Comprar sin token",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"userEmail\": \"{{runId}}-usera@example.test\",\n  \"eventCode\": \"E2E-PUBLISHED-01\",\n  \"type\": \"GENERAL\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** TKT-01\n**Rol / token:** Anónimo\n**Resultado esperado:** HTTP 401\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "81db53b5-e1c3-a64e-a2cf-d24aaa40de2d",
+                                      "name":  "TKT-02 · Comprar como STAFF",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenStaff}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"userEmail\": \"e2e-staff@example.test\",\n  \"eventCode\": \"E2E-PUBLISHED-01\",\n  \"type\": \"GENERAL\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** TKT-02\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "b1dd361e-a25e-086c-62f6-fa2a28510034",
+                                      "name":  "TKT-03 · Comprar como ADMIN",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"userEmail\": \"e2e-admin@example.test\",\n  \"eventCode\": \"E2E-PUBLISHED-01\",\n  \"type\": \"GENERAL\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** TKT-03\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nLa compra es solo para rol USER."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "b5ba2e35-2b6a-d258-e5f7-86ff7e1d6698",
+                                      "name":  "TKT-04 · A compra ticket T1 para sí",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"userEmail\": \"{{runId}}-usera@example.test\",\n  \"eventCode\": \"E2E-PUBLISHED-01\",\n  \"type\": \"GENERAL\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** TKT-04\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 201\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nCopiar `ticketCode` de la respuesta a `ticketT1`. Estado esperado PAID."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "ab381939-02df-a8b6-ea1f-f8fff8eb192b",
+                                      "name":  "TKT-05 · A compra ticket T2 para sí",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"userEmail\": \"{{runId}}-usera@example.test\",\n  \"eventCode\": \"E2E-PUBLISHED-01\",\n  \"type\": \"VIP\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** TKT-05\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 201\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nCopiar `ticketCode` a `ticketT2` (se usará para la transición USE, separado de T1 que se cancela)."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "7e66ca2b-c2fd-f55e-7b11-f9f6b68c2beb",
+                                      "name":  "TKT-06 · A compra a nombre de B (IDOR)",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"userEmail\": \"{{runId}}-userb@example.test\",\n  \"eventCode\": \"E2E-PUBLISHED-01\",\n  \"type\": \"GENERAL\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** TKT-06\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "82c04c6a-6811-1117-f772-3b9160bf8764",
+                                      "name":  "TKT-07 · A compra a nombre de email inexistente",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"userEmail\": \"{{runId}}-nadie@example.test\",\n  \"eventCode\": \"E2E-PUBLISHED-01\",\n  \"type\": \"GENERAL\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** TKT-07\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nAnti-enumeración: igual que TKT-06."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "d12014a9-4a2c-2de8-cd4c-75861b209e38",
+                                      "name":  "TKT-08 · Comprar con body inválido",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"userEmail\": \"no-es-email\",\n  \"eventCode\": \"\",\n  \"type\": \"X\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** TKT-08\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 400\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "a42605b5-fa4f-b92e-46fc-ff8ac6498907",
+                                      "name":  "TKT-09 · Comprar tipo inválido",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"userEmail\": \"{{runId}}-usera@example.test\",\n  \"eventCode\": \"E2E-PUBLISHED-01\",\n  \"type\": \"PLATINUM\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** TKT-09\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 400\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "fa3ddd91-3b44-41d9-5508-f8d2ef35c074",
+                                      "name":  "TKT-10 · Comprar evento DRAFT",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"userEmail\": \"{{runId}}-usera@example.test\",\n  \"eventCode\": \"E2E-DRAFT-01\",\n  \"type\": \"GENERAL\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** TKT-10\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 409\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "d518c66a-dcf6-f858-c7d9-df10b72cd3b9",
+                                      "name":  "TKT-11 · Comprar evento con fecha pasada",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"userEmail\": \"{{runId}}-usera@example.test\",\n  \"eventCode\": \"E2E-PAST-01\",\n  \"type\": \"GENERAL\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** TKT-11\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 409\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "59994ad6-82a1-c347-c18f-999c8ffdbedb",
+                                      "name":  "TKT-12 · Comprar evento con edad mínima no cumplida",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"userEmail\": \"{{runId}}-usera@example.test\",\n  \"eventCode\": \"E2E-AGE-01\",\n  \"type\": \"GENERAL\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** TKT-12\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 409\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "e17a5fe7-a6f9-73ae-0627-662978034f0e",
+                                      "name":  "TKT-13 · Comprar evento inexistente",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"userEmail\": \"{{runId}}-usera@example.test\",\n  \"eventCode\": \"NO-EXISTE\",\n  \"type\": \"GENERAL\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** TKT-13\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 404\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "4f282098-1d4c-0cd9-e08d-ca06d1ede617",
+                                      "name":  "TKT-14 · Aforo: A compra la última entrada",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"userEmail\": \"{{runId}}-usera@example.test\",\n  \"eventCode\": \"E2E-FULL-01\",\n  \"type\": \"GENERAL\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** TKT-14\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 201\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nAforo = 1: el evento pasa a SOLD_OUT. Irreversible sin re-sembrar."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "1ad87a53-ed8a-f2ae-d4b5-a465c003a3ae",
+                                      "name":  "TKT-15 · Aforo: B intenta comprar sin cupo",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserB}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"userEmail\": \"{{runId}}-userb@example.test\",\n  \"eventCode\": \"E2E-FULL-01\",\n  \"type\": \"GENERAL\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** TKT-15\n**Rol / token:** USER (B)\n**Resultado esperado:** HTTP 409\n**Precondición:** TKT-14 ejecutado.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "e4237ffe-4e63-d5a8-7c84-78c596623716",
+                                      "name":  "TKT-16 · A lee su ticket",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/{{ticketT1}}",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "{{ticketT1}}"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TKT-16\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 200\n**Precondición:** TKT-04 (ticketT1 definido).\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "b0701c90-5d16-cf15-d0dd-0a7def612083",
+                                      "name":  "TKT-17 · B lee ticket de A (IDOR)",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/{{ticketT1}}",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "{{ticketT1}}"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserB}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TKT-17\n**Rol / token:** USER (B)\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "065da725-df07-43f7-6f2b-f66621f506e8",
+                                      "name":  "TKT-18 · STAFF lee ticket de A",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/{{ticketT1}}",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "{{ticketT1}}"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenStaff}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TKT-18\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 200\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "b1380eb1-8b7e-cfd1-6bda-08affe6349be",
+                                      "name":  "TKT-19 · ADMIN lee ticket de A sin propósito",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/{{ticketT1}}",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "{{ticketT1}}"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TKT-19\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "a13d159a-2bd0-661b-a252-3ba0a2655304",
+                                      "name":  "TKT-20 · ADMIN lee ticket de A con TICKET_SUPPORT",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "X-Admin-Purpose",
+                                                                         "value":  "TICKET_SUPPORT"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/{{ticketT1}}",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "{{ticketT1}}"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TKT-20\n**Rol / token:** ADMIN + X-Admin-Purpose\n**Resultado esperado:** HTTP 200\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "a6710ff0-d5f7-6497-5c87-7d4a619ccef3",
+                                      "name":  "TKT-21 · ADMIN con propósito incorrecto (CUSTOMER_SUPPORT)",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "X-Admin-Purpose",
+                                                                         "value":  "CUSTOMER_SUPPORT"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/{{ticketT1}}",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "{{ticketT1}}"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TKT-21\n**Rol / token:** ADMIN + propósito inválido\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "db05a3e8-eb9a-7ab6-a8e8-c33dabca6c0e",
+                                      "name":  "TKT-22 · Ticket inexistente como USER",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/TCK-NO-EXISTE",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "TCK-NO-EXISTE"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TKT-22\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nAnti-enumeración: igual que TKT-17."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "df80f0d6-a040-217b-b401-f92d61e55585",
+                                      "name":  "TKT-23 · Ticket inexistente como STAFF",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/TCK-NO-EXISTE",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "TCK-NO-EXISTE"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenStaff}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TKT-23\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 404\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "116d5edf-e410-6ea5-72ed-e2c85e446f32",
+                                      "name":  "TKT-24 · Leer ticket sin token",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/{{ticketT1}}",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "{{ticketT1}}"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "description":  "**ID:** TKT-24\n**Rol / token:** Anónimo\n**Resultado esperado:** HTTP 401\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "d4f5e7e5-fa8a-1a3e-a53e-e2dc82e69777",
+                                      "name":  "TKT-25 · A lista sus tickets",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/by-user?email={{runId}}-usera@example.test",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "by-user"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "email",
+                                                                                    "value":  "{{runId}}-usera@example.test"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TKT-25\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 200\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "43614070-0c45-3d59-4a7b-7b91a63a3ec4",
+                                      "name":  "TKT-26 · B lista tickets de A (IDOR)",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/by-user?email={{runId}}-usera@example.test",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "by-user"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "email",
+                                                                                    "value":  "{{runId}}-usera@example.test"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserB}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TKT-26\n**Rol / token:** USER (B)\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "80e1c58c-d168-4d91-884d-56f5ecf1dde7",
+                                      "name":  "TKT-27 · STAFF lista tickets de A",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/by-user?email={{runId}}-usera@example.test",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "by-user"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "email",
+                                                                                    "value":  "{{runId}}-usera@example.test"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenStaff}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TKT-27\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "9131e5fb-41e3-e33c-468d-b7fb7f6e6c39",
+                                      "name":  "TKT-28 · ADMIN con TICKET_SUPPORT lista tickets de A",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "X-Admin-Purpose",
+                                                                         "value":  "TICKET_SUPPORT"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/by-user?email={{runId}}-usera@example.test",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "by-user"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "email",
+                                                                                    "value":  "{{runId}}-usera@example.test"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TKT-28\n**Rol / token:** ADMIN + X-Admin-Purpose\n**Resultado esperado:** HTTP 200\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "c8c4e770-a06a-31a2-2583-985cc345221a",
+                                      "name":  "TKT-29 · ADMIN sin propósito lista tickets",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/by-user?email={{runId}}-usera@example.test",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "by-user"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "email",
+                                                                                    "value":  "{{runId}}-usera@example.test"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TKT-29\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "48bcedfc-94c8-61cd-a0ad-acd502293347",
+                                      "name":  "TKT-30 · Listar tickets sin token",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/tickets/by-user?email={{runId}}-usera@example.test",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "tickets",
+                                                                               "by-user"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "email",
+                                                                                    "value":  "{{runId}}-usera@example.test"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "description":  "**ID:** TKT-30\n**Rol / token:** Anónimo\n**Resultado esperado:** HTTP 401\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  }
+                              ]
                  }
              ],
     "variable":  [
