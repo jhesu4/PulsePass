@@ -10,7 +10,7 @@
 | `GET /api/artists/{id}` | 2 (PUB-05…) | Anónimo | 200, 404 |
 | `GET /api/artists/by-stage-name` | 1 (PUB-06…) | Anónimo | 200 |
 | `GET /api/events/published` | 2 (PUB-08, TC-BIZ-004) | Anónimo | 200 |
-| `GET /api/events/{eventCode}` | 8 (PUB-09/10, EVT-11…15, TC-BIZ-003) | ADMIN, Anónimo, STAFF, USER (A) | 200, 403, 404 |
+| `GET /api/events/{eventCode}` | 9 (PUB-09/10, EVT-11…15, TC-BIZ-003, TC-STATE-EVT-02) | ADMIN, Anónimo, STAFF, USER (A) | 200, 403, 404 |
 | `GET /api/events/by-artist` | 2 (PUB-11, TC-BIZ-005) | Anónimo | 200 |
 | `POST /api/users` | 8 (AUTH-01…) | Anónimo | 201, 400, 409 |
 | `POST /api/auth/login` | 12 (AUTH-09…) | Público | 200, 400, 401, 415 |
@@ -22,8 +22,8 @@
 | `GET /api/users/by-email` | 9 (USR-01…) | ADMIN, ADMIN + X-Admin-Purpose, Anónimo, STAFF, USER (A) | 200, 401, 403 |
 | `GET /api/users/by-username` | 4 (USR-02…) | ADMIN + X-Admin-Purpose, ADMIN + propósito inválido, USER (A) | 200, 403, 404 |
 | `POST /api/tickets` | 15 (TKT-01…) | ADMIN, Anónimo, STAFF, USER (A), USER (B) | 201, 400, 401, 403, 404, 409 |
-| `GET /api/tickets/{ticketCode}` | 10 (TKT-16…) | ADMIN, ADMIN + X-Admin-Purpose, ADMIN + propósito inválido, Anónimo, STAFF, USER (A), USER (B) | 200, 401, 403, 404 |
-| `GET /api/tickets/by-user` | 6 (TKT-25…) | ADMIN, ADMIN + X-Admin-Purpose, Anónimo, STAFF, USER (A), USER (B) | 200, 401, 403 |
+| `GET /api/tickets/{ticketCode}` | 13 (TKT-16…, TC-STATE-TRN-01/06/12) | ADMIN, ADMIN + X-Admin-Purpose, ADMIN + propósito inválido, Anónimo, STAFF, USER (A), USER (B) | 200, 401, 403, 404 |
+| `GET /api/tickets/by-user` | 7 (TKT-25…, TC-STATE-TKT-06) | ADMIN, ADMIN + X-Admin-Purpose, Anónimo, STAFF, USER (A), USER (B) | 200, 401, 403 |
 | `PATCH /api/tickets/{ticketCode}/cancel` | 8 (TRN-01…) | ADMIN, Anónimo, STAFF, USER (A), USER (B) | 200, 401, 403, 409 |
 | `PATCH /api/tickets/{ticketCode}/use` | 7 (TRN-08…) | ADMIN, Anónimo, STAFF, USER (A) | 200, 401, 403, 404, 409 |
 | `(transversal) método no soportado` | 1 (ERR-01…) | ADMIN | 405 |
@@ -46,5 +46,6 @@
 | Validación (400) | AUTH-04…06, EVT-06/10, TKT-08/09 |
 | Transiciones irreversibles (T1 cancela, T2 usa) | TRN-06, TRN-12 |
 | Sin fuga de información | USR-13, ERR-05 |
+| Persistencia / ausencia de efectos | TC-STATE-EVT-02, TC-STATE-TKT-06, TC-STATE-TRN-01/06/12 |
 
-**Total: 143 casos; 22/22 endpoints de la API cubiertos.**
+**Total: 148 casos; 22/22 endpoints de la API cubiertos.**
