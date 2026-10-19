@@ -1425,6 +1425,1141 @@
                                                    ]
                                   }
                               ]
+                 },
+                 {
+                     "name":  "03 - Eventos (ADMIN) y RBAC",
+                     "description":  "Alta/publicación/asociación de artistas solo ADMIN; lectura de eventos según visibilidad.",
+                     "item":  [
+                                  {
+                                      "id":  "3fb601d9-cfc0-d65e-fae0-4ac5df5c08a8",
+                                      "name":  "EVT-01 · Crear evento sin token",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"eventCode\": \"{{runId}}-EVT-1\",\n  \"name\": \"E2E\",\n  \"category\": \"MUSIC\",\n  \"eventDate\": \"{{futureDate}}\",\n  \"minimumAge\": 0,\n  \"venueCode\": \"VEN-E2E-01\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** EVT-01\n**Rol / token:** Anónimo\n**Resultado esperado:** HTTP 401\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "53e11ec9-9cdf-5b3f-940d-041a4195bc4d",
+                                      "name":  "EVT-02 · Crear evento como USER",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"eventCode\": \"{{runId}}-EVT-1\",\n  \"name\": \"E2E\",\n  \"category\": \"MUSIC\",\n  \"eventDate\": \"{{futureDate}}\",\n  \"minimumAge\": 0,\n  \"venueCode\": \"VEN-E2E-01\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** EVT-02\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "f148143a-4f36-f9f5-9804-2531fc309bf4",
+                                      "name":  "EVT-03 · Crear evento como STAFF",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenStaff}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"eventCode\": \"{{runId}}-EVT-1\",\n  \"name\": \"E2E\",\n  \"category\": \"MUSIC\",\n  \"eventDate\": \"{{futureDate}}\",\n  \"minimumAge\": 0,\n  \"venueCode\": \"VEN-E2E-01\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** EVT-03\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "d1eb296c-ab2e-1625-aab7-7d9cabf9d851",
+                                      "name":  "EVT-04 · Crear evento como ADMIN",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"eventCode\": \"{{runId}}-EVT-1\",\n  \"name\": \"E2E Evento creado\",\n  \"description\": \"Creado en E2E\",\n  \"category\": \"MUSIC\",\n  \"eventDate\": \"{{futureDate}}\",\n  \"minimumAge\": 0,\n  \"venueCode\": \"VEN-E2E-01\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** EVT-04\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 201\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nEl evento queda en DRAFT."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "0d8679c5-a87f-2af4-11d3-ff691b0b56fd",
+                                      "name":  "EVT-05 · Crear evento con código duplicado",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"eventCode\": \"{{runId}}-EVT-1\",\n  \"name\": \"E2E dup\",\n  \"category\": \"MUSIC\",\n  \"eventDate\": \"{{futureDate}}\",\n  \"minimumAge\": 0,\n  \"venueCode\": \"VEN-E2E-01\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** EVT-05\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 409\n**Precondición:** EVT-04 ejecutado.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "b787fdb6-8df5-ec68-9da0-241efa9c1676",
+                                      "name":  "EVT-06 · Crear evento con body inválido",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"eventCode\": \"\",\n  \"name\": \"\",\n  \"minimumAge\": -1\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** EVT-06\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 400\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "5207a108-0bf4-60a0-1143-59d64ba4d92f",
+                                      "name":  "EVT-07 · Crear evento con fecha pasada",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"eventCode\": \"{{runId}}-EVT-PAST\",\n  \"name\": \"E2E pasado\",\n  \"category\": \"MUSIC\",\n  \"eventDate\": \"2020-01-01T20:00:00\",\n  \"minimumAge\": 0,\n  \"venueCode\": \"VEN-E2E-01\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** EVT-07\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 409\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "a6fd962b-3814-c19e-d433-75cedc446e17",
+                                      "name":  "EVT-08 · Crear evento en venue inactivo",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"eventCode\": \"{{runId}}-EVT-OFF\",\n  \"name\": \"E2E venue off\",\n  \"category\": \"MUSIC\",\n  \"eventDate\": \"{{futureDate}}\",\n  \"minimumAge\": 0,\n  \"venueCode\": \"VEN-E2E-OFF\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** EVT-08\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 409\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "7772bc75-31da-69e1-2bfe-7cf9ec5ff17a",
+                                      "name":  "EVT-09 · Crear evento en venue inexistente",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"eventCode\": \"{{runId}}-EVT-NV\",\n  \"name\": \"E2E sin venue\",\n  \"category\": \"MUSIC\",\n  \"eventDate\": \"{{futureDate}}\",\n  \"minimumAge\": 0,\n  \"venueCode\": \"NO-EXISTE\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** EVT-09\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 404\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "12e08e26-af47-0ee8-2fca-b820decb4269",
+                                      "name":  "EVT-10 · Categoría inválida",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"eventCode\": \"{{runId}}-EVT-CAT\",\n  \"name\": \"E2E cat\",\n  \"category\": \"INVALIDA\",\n  \"eventDate\": \"{{futureDate}}\",\n  \"minimumAge\": 0,\n  \"venueCode\": \"VEN-E2E-01\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** EVT-10\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 400\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "fd53c32c-da04-0493-ee5a-9a850f285f53",
+                                      "name":  "EVT-11 · Leer evento DRAFT como USER",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/E2E-DRAFT-01",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "E2E-DRAFT-01"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** EVT-11\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "0df36572-4873-7965-5d5a-3b5ddccbcde5",
+                                      "name":  "EVT-12 · Leer evento DRAFT como STAFF",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/E2E-DRAFT-01",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "E2E-DRAFT-01"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenStaff}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** EVT-12\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 200\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "adb6d1b4-1406-1c50-e101-cf2b21b917e2",
+                                      "name":  "EVT-13 · Leer evento DRAFT como ADMIN",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/E2E-DRAFT-01",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "E2E-DRAFT-01"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** EVT-13\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 200\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "e4303deb-da91-4fdc-8392-8bd00d458034",
+                                      "name":  "EVT-14 · Leer evento inexistente como USER",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/NO-EXISTE",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "NO-EXISTE"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** EVT-14\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nPolítica anti-enumeración: no distingue inexistente de no visible."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "a9b8ad40-0aa5-0432-bce0-b7a902dec688",
+                                      "name":  "EVT-15 · Leer evento inexistente como STAFF",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/NO-EXISTE",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "NO-EXISTE"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenStaff}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** EVT-15\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 404\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "f355d194-df40-178f-924c-11ce18722b78",
+                                      "name":  "EVT-16 · Publicar como USER",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/E2E-TOPUBLISH-01/publish",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "E2E-TOPUBLISH-01",
+                                                                               "publish"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** EVT-16\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "72d0e7e2-c31f-0668-7d43-b0473a64d434",
+                                      "name":  "EVT-17 · Publicar como STAFF",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/E2E-TOPUBLISH-01/publish",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "E2E-TOPUBLISH-01",
+                                                                               "publish"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenStaff}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** EVT-17\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "8e85a75c-9d57-930a-76bd-b34f272ae277",
+                                      "name":  "EVT-18 · Publicar sin token",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/E2E-TOPUBLISH-01/publish",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "E2E-TOPUBLISH-01",
+                                                                               "publish"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "description":  "**ID:** EVT-18\n**Rol / token:** Anónimo\n**Resultado esperado:** HTTP 401\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "2195a6c1-f9d1-2bf5-82f3-c4c94aa1411f",
+                                      "name":  "EVT-19 · Publicar como ADMIN",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/E2E-TOPUBLISH-01/publish",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "E2E-TOPUBLISH-01",
+                                                                               "publish"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** EVT-19\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 200\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nTransición irreversible DRAFT→PUBLISHED: solo ejecutable una vez por base (re-sembrar para repetir)."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "9ede1451-f68c-0133-8562-db9649f17da7",
+                                      "name":  "EVT-20 · Publicar de nuevo (ya PUBLISHED)",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/E2E-TOPUBLISH-01/publish",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "E2E-TOPUBLISH-01",
+                                                                               "publish"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** EVT-20\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 409\n**Precondición:** EVT-19 ejecutado.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "7a8446b6-474b-06ac-1ef4-cb993f887826",
+                                      "name":  "EVT-21 · Publicar evento con fecha pasada",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/E2E-PAST-01/publish",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "E2E-PAST-01",
+                                                                               "publish"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** EVT-21\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 409\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nE2E-PAST-01 ya está PUBLISHED en la semilla, por lo que el 409 es por estado (solo DRAFT)."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "7683a013-9ee6-06bc-b975-8cb00f0d73fb",
+                                      "name":  "EVT-22 · Publicar evento inexistente",
+                                      "request":  {
+                                                      "method":  "PATCH",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/NO-EXISTE/publish",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "NO-EXISTE",
+                                                                               "publish"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** EVT-22\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 404\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "bbe9e986-4e0d-220c-ddb1-f6659dc2c6ef",
+                                      "name":  "EVT-23 · Asociar artista como USER",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/E2E-DRAFT-01/artists/1",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "E2E-DRAFT-01",
+                                                                               "artists",
+                                                                               "1"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenUserA}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** EVT-23\n**Rol / token:** USER (A)\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "6ec90222-e99e-c779-3894-de8ddaa4eb1d",
+                                      "name":  "EVT-24 · Asociar artista como STAFF",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/E2E-DRAFT-01/artists/1",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "E2E-DRAFT-01",
+                                                                               "artists",
+                                                                               "1"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenStaff}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** EVT-24\n**Rol / token:** STAFF\n**Resultado esperado:** HTTP 403\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "6cde2da3-182e-a982-2322-2f762d48b648",
+                                      "name":  "EVT-25 · Asociar artista como ADMIN",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/E2E-DRAFT-01/artists/1",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "E2E-DRAFT-01",
+                                                                               "artists",
+                                                                               "1"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** EVT-25\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 200\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "4ec2ccfb-1c48-a064-8815-b8c026a28d12",
+                                      "name":  "EVT-26 · Asociar el mismo artista otra vez",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/E2E-DRAFT-01/artists/1",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "E2E-DRAFT-01",
+                                                                               "artists",
+                                                                               "1"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** EVT-26\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 409\n**Precondición:** EVT-25 ejecutado.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "92a547ed-6b1b-a271-efac-71fe7506f12d",
+                                      "name":  "EVT-27 · Asociar artista inexistente",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/E2E-DRAFT-01/artists/999999",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "E2E-DRAFT-01",
+                                                                               "artists",
+                                                                               "999999"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** EVT-27\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 404\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "8c72af49-df25-7404-d527-6013ccfb78bf",
+                                      "name":  "EVT-28 · Asociar artista a evento inexistente",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/NO-EXISTE/artists/1",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "NO-EXISTE",
+                                                                               "artists",
+                                                                               "1"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** EVT-28\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 404\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "cc42c989-6057-4a8a-5ef9-eb01f2c64d85",
+                                      "name":  "EVT-29 · Eventos por artista tras asociación",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/by-artist?stageName=Solar Beat",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "by-artist"
+                                                                           ],
+                                                                  "query":  [
+                                                                                {
+                                                                                    "key":  "stageName",
+                                                                                    "value":  "Solar Beat"
+                                                                                }
+                                                                            ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "description":  "**ID:** EVT-29\n**Rol / token:** Anónimo\n**Resultado esperado:** HTTP 200\n**Precondición:** EVT-25 ejecutado.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nE2E-DRAFT-01 NO debe aparecer (solo se listan PUBLISHED)."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  }
+                              ]
                  }
              ],
     "variable":  [
