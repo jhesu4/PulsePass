@@ -65,6 +65,7 @@ Por cada request registre fecha y hora ISO-8601, actor/rol, código HTTP observa
 | TC-SEC-017 | Rol STAFF revocado con JWT previo | STAFF con token previo | 403 | | | | NOT RUN | |
 | EVT-01 | Crear evento sin token |  | 401 |  |  |  | NOT RUN |  |
 | EVT-02 | Crear evento como USER |  | 403 |  |  |  | NOT RUN |  |
+| TC-STATE-EVT-02 | Confirmar que EVT-02 no creó el evento | ADMIN | 404 |  |  |  | NOT RUN | Ejecutar antes de EVT-04 |
 | EVT-03 | Crear evento como STAFF |  | 403 |  |  |  | NOT RUN |  |
 | EVT-04 | Crear evento como ADMIN |  | 201 |  |  |  | NOT RUN |  |
 | TC-BIZ-003 | Leer el evento recién creado | ADMIN | 200 | | | | NOT RUN | Estado esperado: DRAFT |
@@ -113,6 +114,7 @@ Por cada request registre fecha y hora ISO-8601, actor/rol, código HTTP observa
 | TKT-04 | A compra ticket T1 para sí |  | 201 |  |  |  | NOT RUN |  |
 | TKT-05 | A compra ticket T2 para sí |  | 201 |  |  |  | NOT RUN |  |
 | TKT-06 | A compra a nombre de B (IDOR) |  | 403 |  |  |  | NOT RUN |  |
+| TC-STATE-TKT-06 | Confirmar que TKT-06 no creó ticket para B | USER (B) | 200 |  |  |  | NOT RUN | Respuesta esperada: [] |
 | TKT-07 | A compra a nombre de email inexistente |  | 403 |  |  |  | NOT RUN |  |
 | TKT-08 | Comprar con body inválido |  | 400 |  |  |  | NOT RUN |  |
 | TKT-09 | Comprar tipo inválido |  | 400 |  |  |  | NOT RUN |  |
@@ -138,17 +140,20 @@ Por cada request registre fecha y hora ISO-8601, actor/rol, código HTTP observa
 | TKT-29 | ADMIN sin propósito lista tickets |  | 403 |  |  |  | NOT RUN |  |
 | TKT-30 | Listar tickets sin token |  | 401 |  |  |  | NOT RUN |  |
 | TRN-01 | Cancelar T1 como B (IDOR) |  | 403 |  |  |  | NOT RUN |  |
+| TC-STATE-TRN-01 | Confirmar que TRN-01 no canceló T1 | USER (A) | 200 |  |  |  | NOT RUN | T1 debe seguir PAID |
 | TRN-02 | Cancelar T1 como STAFF |  | 403 |  |  |  | NOT RUN |  |
 | TRN-03 | Cancelar T1 sin token |  | 401 |  |  |  | NOT RUN |  |
 | TRN-04 | Cancelar T1 como ADMIN sin propósito |  | 403 |  |  |  | NOT RUN |  |
 | TRN-05 | Cancelar ticket inexistente como USER |  | 403 |  |  |  | NOT RUN |  |
 | TRN-06 | A cancela su ticket T1 |  | 200 |  |  |  | NOT RUN |  |
+| TC-STATE-TRN-06 | Confirmar cancelación persistida de T1 | USER (A) | 200 |  |  |  | NOT RUN | Estado esperado CANCELLED |
 | TRN-07 | Cancelar T1 de nuevo |  | 409 |  |  |  | NOT RUN |  |
 | TRN-08 | Usar T1 cancelado |  | 409 |  |  |  | NOT RUN |  |
 | TRN-09 | Usar T2 como USER |  | 403 |  |  |  | NOT RUN |  |
 | TRN-10 | Usar T2 sin token |  | 401 |  |  |  | NOT RUN |  |
 | TRN-11 | Usar ticket inexistente como STAFF |  | 404 |  |  |  | NOT RUN |  |
 | TRN-12 | STAFF marca T2 como usado |  | 200 |  |  |  | NOT RUN |  |
+| TC-STATE-TRN-12 | Confirmar estado persistido de T2 | USER (A) | 200 |  |  |  | NOT RUN | Estado esperado USED |
 | TRN-13 | Usar T2 de nuevo |  | 409 |  |  |  | NOT RUN |  |
 | TRN-14 | Cancelar T2 ya usado |  | 409 |  |  |  | NOT RUN |  |
 | TRN-15 | ADMIN marca ticket como usado (ya USED) |  | 409 |  |  |  | NOT RUN |  |

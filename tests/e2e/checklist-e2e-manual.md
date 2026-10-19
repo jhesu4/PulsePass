@@ -1,6 +1,6 @@
 # Checklist E2E manual
 
-Marcar `[x]` al ejecutar cada caso con **Send** en Postman. Resultado esperado = código HTTP indicado. Anotar desviaciones en `registro-ejecucion-manual.md`.
+Marcar `[x]` al ejecutar cada caso con **Send** en Postman. Comparar HTTP y JSON con la descripción detallada del request. Ejecutar las comprobaciones `TC-STATE-*` inmediatamente después de la operación asociada y anotar desviaciones en `registro-ejecucion-manual.md`.
 
 ## Pre-ejecución
 
@@ -8,6 +8,8 @@ Marcar `[x]` al ejecutar cada caso con **Send** en Postman. Resultado esperado =
 - [ ] App arrancada contra `pulsepass_e2e` (Flyway V1–V4 aplicado)
 - [ ] Semilla `fixtures/seed-e2e.sql` ejecutada con hashes BCrypt locales
 - [ ] Entorno Postman local importado, `runId` único y contraseñas definidas
+- [ ] Variables de usuario A/B/C sincronizadas con `runId`; `artistId`, `artistStageName` y `missingArtistId` obtenidos/seleccionados tras consultar PUB-04
+- [ ] `expectedIssuer`, `expectedTokenTtlSeconds` y `expectedForeignResourceStatus` verificados contra la configuración local
 - [ ] Colección importada; confirmado que no contiene scripts
 
 ## 00 Público
@@ -67,6 +69,7 @@ Marcar `[x]` al ejecutar cada caso con **Send** en Postman. Resultado esperado =
 
 - [ ] **EVT-01** Crear evento sin token — `POST /api/events` · Anónimo · esperado **401**
 - [ ] **EVT-02** Crear evento como USER — `POST /api/events` · USER (A) · esperado **403**
+- [ ] **TC-STATE-EVT-02** Confirmar que EVT-02 no creó el evento — `GET /api/events/{runId}-EVT-1` · ADMIN · esperado **404** (antes de EVT-04)
 - [ ] **EVT-03** Crear evento como STAFF — `POST /api/events` · STAFF · esperado **403**
 - [ ] **EVT-04** Crear evento como ADMIN — `POST /api/events` · ADMIN · esperado **201**
 - [ ] **TC-BIZ-003** Leer el evento recién creado — `GET /api/events/{eventCode}` · ADMIN · esperado **200** (estado `DRAFT`)
@@ -121,6 +124,7 @@ Marcar `[x]` al ejecutar cada caso con **Send** en Postman. Resultado esperado =
 - [ ] **TKT-04** A compra ticket T1 para sí — `POST /api/tickets` · USER (A) · esperado **201**
 - [ ] **TKT-05** A compra ticket T2 para sí — `POST /api/tickets` · USER (A) · esperado **201**
 - [ ] **TKT-06** A compra a nombre de B (IDOR) — `POST /api/tickets` · USER (A) · esperado **403**
+- [ ] **TC-STATE-TKT-06** Confirmar que TKT-06 no creó un ticket para B — `GET /api/tickets/by-user?email={userBEmail}` · USER (B) · esperado **200** y `[]`
 - [ ] **TKT-07** A compra a nombre de email inexistente — `POST /api/tickets` · USER (A) · esperado **403**
 - [ ] **TKT-08** Comprar con body inválido — `POST /api/tickets` · USER (A) · esperado **400**
 - [ ] **TKT-09** Comprar tipo inválido — `POST /api/tickets` · USER (A) · esperado **400**
@@ -149,17 +153,20 @@ Marcar `[x]` al ejecutar cada caso con **Send** en Postman. Resultado esperado =
 ## 06 Transiciones
 
 - [ ] **TRN-01** Cancelar T1 como B (IDOR) — `PATCH /api/tickets/{ticketCode}/cancel` · USER (B) · esperado **403**
+- [ ] **TC-STATE-TRN-01** Confirmar que TRN-01 no canceló T1 — `GET /api/tickets/{ticketT1}` · USER (A) · esperado **200** y estado `PAID`
 - [ ] **TRN-02** Cancelar T1 como STAFF — `PATCH /api/tickets/{ticketCode}/cancel` · STAFF · esperado **403**
 - [ ] **TRN-03** Cancelar T1 sin token — `PATCH /api/tickets/{ticketCode}/cancel` · Anónimo · esperado **401**
 - [ ] **TRN-04** Cancelar T1 como ADMIN sin propósito — `PATCH /api/tickets/{ticketCode}/cancel` · ADMIN · esperado **403**
 - [ ] **TRN-05** Cancelar ticket inexistente como USER — `PATCH /api/tickets/{ticketCode}/cancel` · USER (A) · esperado **403**
 - [ ] **TRN-06** A cancela su ticket T1 — `PATCH /api/tickets/{ticketCode}/cancel` · USER (A) · esperado **200**
+- [ ] **TC-STATE-TRN-06** Confirmar cancelación persistida de T1 — `GET /api/tickets/{ticketT1}` · USER (A) · esperado **200** y estado `CANCELLED`
 - [ ] **TRN-07** Cancelar T1 de nuevo — `PATCH /api/tickets/{ticketCode}/cancel` · USER (A) · esperado **409**
 - [ ] **TRN-08** Usar T1 cancelado — `PATCH /api/tickets/{ticketCode}/use` · STAFF · esperado **409**
 - [ ] **TRN-09** Usar T2 como USER — `PATCH /api/tickets/{ticketCode}/use` · USER (A) · esperado **403**
 - [ ] **TRN-10** Usar T2 sin token — `PATCH /api/tickets/{ticketCode}/use` · Anónimo · esperado **401**
 - [ ] **TRN-11** Usar ticket inexistente como STAFF — `PATCH /api/tickets/{ticketCode}/use` · STAFF · esperado **404**
 - [ ] **TRN-12** STAFF marca T2 como usado — `PATCH /api/tickets/{ticketCode}/use` · STAFF · esperado **200**
+- [ ] **TC-STATE-TRN-12** Confirmar estado persistido de T2 — `GET /api/tickets/{ticketT2}` · USER (A) · esperado **200** y estado `USED`
 - [ ] **TRN-13** Usar T2 de nuevo — `PATCH /api/tickets/{ticketCode}/use` · STAFF · esperado **409**
 - [ ] **TRN-14** Cancelar T2 ya usado — `PATCH /api/tickets/{ticketCode}/cancel` · USER (A) · esperado **409**
 - [ ] **TRN-15** ADMIN marca ticket como usado (ya USED) — `PATCH /api/tickets/{ticketCode}/use` · ADMIN · esperado **409**
