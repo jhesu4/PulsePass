@@ -6,7 +6,7 @@ Pruebas manuales de extremo a extremo de la API PulsePass (controladores + segur
 
 | Archivo | Propósito |
 |---|---|
-| `postman/PulsePass-Manual-E2E.postman_collection.json` | Colección v2.1: 137 requests en 9 carpetas (00–08) |
+| `postman/PulsePass-Manual-E2E.postman_collection.json` | Colección v2.1: 143 requests en 9 carpetas (00–08) |
 | `postman/PulsePass-local.postman_environment.json` | Plantilla de entorno (secretos y tokens vacíos) |
 | `fixtures/seed-e2e.sql`, `fixtures/README.md` | Datos E2E y cómo cargarlos |
 | `checklist-e2e-manual.md` | Lista de verificación por caso |
@@ -26,6 +26,9 @@ Pruebas manuales de extremo a extremo de la API PulsePass (controladores + segur
 Siga el orden de carpetas **00 → 08**; algunas dependen de pasos previos:
 
 - **01**: tras AUTH-09/11/12/13/17 copie manualmente cada `accessToken` a `tokenUserA`, `tokenUserB`, `tokenStaff`, `tokenAdmin`, `tokenUserC`.
+- **AUTH-22 / TC-AUTH-013**: active temporalmente `e2e-inactive`, obtenga el token de AUTH-22 y guárdelo como `tokenInactivePrior`; antes de la carpeta 02 desactive la cuenta otra vez. Consulte el SQL y la restauración en `fixtures/README.md`.
+- **TC-SEC-017**: después de guardar `tokenStaff`, quite temporalmente el rol `STAFF` a `e2e-staff` antes de enviar el caso y restáurelo inmediatamente después; consulte `fixtures/README.md`.
+- **Flujo C / TC-BIZ-003/004/005**: use el mismo `runId` para crear el evento en EVT-04, leerlo, publicarlo en EVT-19, asociarle el artista en EVT-25 y verificarlo en `/api/events/published` y `/api/events/by-artist`.
 - **05**: tras TKT-04 y TKT-05 copie `ticketCode` a `ticketT1` y `ticketT2`.
 - **06** usa T1 (se cancela) y T2 (se marca usado) por separado, porque las transiciones son irreversibles.
 - Casos de token (carpeta 02):
@@ -34,6 +37,8 @@ Siga el orden de carpetas **00 → 08**; algunas dependen de pasos previos:
   - `tokenWrongKey`: firme un JWT HS256 offline con una clave desechable; nunca use la clave real.
 
 Marque cada caso en `checklist-e2e-manual.md` y complete `registro-ejecucion-manual.md`.
+
+Al registrar resultados, use únicamente `PASS`, `FAIL`, `BLOCKED` o `NOT RUN`. Para cada request anote fecha/hora, actor, HTTP observado y un resumen del JSON/estado, sin incluir credenciales ni tokens.
 
 ## Política de respuestas verificada contra el código
 
@@ -50,6 +55,7 @@ Marque cada caso en `checklist-e2e-manual.md` y complete `registro-ejecucion-man
 ## Limitaciones
 
 - Los códigos esperados salen de la lectura del código y de la validación de la semilla contra el esquema Flyway real (V1–V4) en PostgreSQL 16. **La colección no se ha ejecutado contra la app en marcha**; cualquier diferencia observada debe anotarse como desviación y revisarse (código o expectativa).
+- Los casos TC-AUTH-013 y TC-SEC-017 requieren cambios temporales en la base dedicada; aplique las instrucciones de activación, revocación y restauración de `fixtures/README.md`.
 - El caso ERR-04 (ruta inexistente) puede devolver 403 o 404 según la configuración; anótelo.
 - No se crean endpoints ni se altera el contrato de la API para acomodar la colección.
 

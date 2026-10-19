@@ -27,6 +27,46 @@ psql -h localhost -U <usuario> -d pulsepass_e2e \
 
 El script aborta si la base no se llama `pulsepass_e2e` o si falta algún hash. Es idempotente.
 
+## Casos que modifican cuentas o roles
+
+Ejecute estas sentencias únicamente en `pulsepass_e2e`. Mantenga abierta la sesión de Postman y no copie tokens en archivos versionados.
+
+### TC-AUTH-013: emitir un JWT y luego desactivar la cuenta
+
+La semilla crea `e2e-inactive` desactivado. Antes de AUTH-22, actívelo para obtener un JWT:
+
+```sql
+UPDATE users SET active = TRUE WHERE username = 'e2e-inactive';
+```
+
+Envíe AUTH-22, copie el `accessToken` a `tokenInactivePrior` en el entorno local de Postman y vuelva a desactivar la cuenta antes de TC-AUTH-013:
+
+```sql
+UPDATE users SET active = FALSE WHERE username = 'e2e-inactive';
+```
+
+TC-AUTH-013 debe rechazar con 401 el JWT que se emitió antes de desactivar la cuenta. Mantenga la cuenta desactivada para AUTH-16.
+
+### TC-SEC-017: revocar y restaurar el rol STAFF
+
+Después de AUTH-12, quite el rol STAFF de `e2e-staff` y envíe TC-SEC-017 con el token STAFF que obtuvo antes del cambio:
+
+```sql
+DELETE FROM user_roles ur
+USING users u
+WHERE ur.user_id = u.id
+  AND u.username = 'e2e-staff'
+  AND ur.role = 'STAFF';
+```
+
+El endpoint protegido debe responder 403 con el JWT antiguo. Restaure el rol inmediatamente después:
+
+```sql
+INSERT INTO user_roles (user_id, role)
+SELECT id, 'STAFF' FROM users WHERE username = 'e2e-staff'
+ON CONFLICT DO NOTHING;
+```
+
 ## Re-sembrar
 
 Las pruebas modifican estado de forma irreversible (publicar, cancelar, usar, agotar aforo). Para repetir una ejecución completa: recrear la base `pulsepass_e2e`, arrancar la app (Flyway) y volver a sembrar. Además use un `runId` nuevo.

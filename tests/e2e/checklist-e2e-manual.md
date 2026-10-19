@@ -23,6 +23,7 @@ Marcar `[x]` al ejecutar cada caso con **Send** en Postman. Resultado esperado =
 - [ ] **PUB-09** Evento PUBLISHED por código (anónimo) — `GET /api/events/{eventCode}` · Anónimo · esperado **200**
 - [ ] **PUB-10** Evento DRAFT por código (anónimo) — `GET /api/events/{eventCode}` · Anónimo · esperado **403**
 - [ ] **PUB-11** Eventos por artista — `GET /api/events/by-artist` · Anónimo · esperado **200**
+- [ ] **TC-AUTH-015** Bearer inválido en endpoint público — `GET /api/venues/active` · Bearer inválido · esperado **401**
 
 ## 01 Registro y autenticación
 
@@ -42,6 +43,7 @@ Marcar `[x]` al ejecutar cada caso con **Send** en Postman. Resultado esperado =
 - [ ] **AUTH-14** Login con contraseña incorrecta — `POST /api/auth/login` · Público · esperado **401**
 - [ ] **AUTH-15** Login con usuario inexistente — `POST /api/auth/login` · Público · esperado **401**
 - [ ] **AUTH-16** Login de usuario inactivo — `POST /api/auth/login` · Público · esperado **401**
+- [ ] **AUTH-22** Preparar TC-AUTH-013: obtener token antes de desactivar — `POST /api/auth/login` · Cuenta E2E temporalmente activa · esperado **200**
 - [ ] **AUTH-17** Login usuario C (verificación de roles) — `POST /api/auth/login` · Público · esperado **200**
 - [ ] **AUTH-18** Perfil actual usuario C (roles) — `GET /api/auth/me` · USER (C) · esperado **200**
 - [ ] **AUTH-19** Perfil actual A — `GET /api/auth/me` · USER (A) · esperado **200**
@@ -58,6 +60,8 @@ Marcar `[x]` al ejecutar cada caso con **Send** en Postman. Resultado esperado =
 - [ ] **JWT-06** Esquema Authorization distinto de Bearer — `GET /api/auth/me` · Token inválido · esperado **401**
 - [ ] **JWT-07** Token en query string (no soportado) — `GET /api/auth/me` · Token en URL · esperado **401**
 - [ ] **JWT-08** Token válido sobre endpoint protegido de otro rol — `GET /api/events/{eventCode}/tickets/paid` · USER (A) · esperado **403**
+- [ ] **TC-AUTH-013** Usuario desactivado con JWT previo — `GET /api/auth/me` · Token emitido antes de desactivar la cuenta · esperado **401**
+- [ ] **TC-SEC-017** Rol STAFF revocado con JWT previo — `GET /api/events/{eventCode}/tickets/paid` · JWT emitido antes de revocar STAFF · esperado **403**
 
 ## 03 Eventos y RBAC
 
@@ -65,6 +69,7 @@ Marcar `[x]` al ejecutar cada caso con **Send** en Postman. Resultado esperado =
 - [ ] **EVT-02** Crear evento como USER — `POST /api/events` · USER (A) · esperado **403**
 - [ ] **EVT-03** Crear evento como STAFF — `POST /api/events` · STAFF · esperado **403**
 - [ ] **EVT-04** Crear evento como ADMIN — `POST /api/events` · ADMIN · esperado **201**
+- [ ] **TC-BIZ-003** Leer el evento recién creado — `GET /api/events/{eventCode}` · ADMIN · esperado **200** (estado `DRAFT`)
 - [ ] **EVT-05** Crear evento con código duplicado — `POST /api/events` · ADMIN · esperado **409**
 - [ ] **EVT-06** Crear evento con body inválido — `POST /api/events` · ADMIN · esperado **400**
 - [ ] **EVT-07** Crear evento con fecha pasada — `POST /api/events` · ADMIN · esperado **409**
@@ -79,17 +84,18 @@ Marcar `[x]` al ejecutar cada caso con **Send** en Postman. Resultado esperado =
 - [ ] **EVT-16** Publicar como USER — `PATCH /api/events/{eventCode}/publish` · USER (A) · esperado **403**
 - [ ] **EVT-17** Publicar como STAFF — `PATCH /api/events/{eventCode}/publish` · STAFF · esperado **403**
 - [ ] **EVT-18** Publicar sin token — `PATCH /api/events/{eventCode}/publish` · Anónimo · esperado **401**
-- [ ] **EVT-19** Publicar como ADMIN — `PATCH /api/events/{eventCode}/publish` · ADMIN · esperado **200**
+- [ ] **EVT-19** Publicar como ADMIN el evento creado en EVT-04 — `PATCH /api/events/{eventCode}/publish` · ADMIN · esperado **200**
+- [ ] **TC-BIZ-004** Verificar evento creado en eventos publicados — `GET /api/events/published` · Anónimo · esperado **200** e incluye el evento creado
 - [ ] **EVT-20** Publicar de nuevo (ya PUBLISHED) — `PATCH /api/events/{eventCode}/publish` · ADMIN · esperado **409**
 - [ ] **EVT-21** Publicar evento con fecha pasada — `PATCH /api/events/{eventCode}/publish` · ADMIN · esperado **409**
 - [ ] **EVT-22** Publicar evento inexistente — `PATCH /api/events/{eventCode}/publish` · ADMIN · esperado **404**
 - [ ] **EVT-23** Asociar artista como USER — `POST /api/events/{eventCode}/artists/{artistId}` · USER (A) · esperado **403**
 - [ ] **EVT-24** Asociar artista como STAFF — `POST /api/events/{eventCode}/artists/{artistId}` · STAFF · esperado **403**
-- [ ] **EVT-25** Asociar artista como ADMIN — `POST /api/events/{eventCode}/artists/{artistId}` · ADMIN · esperado **200**
+- [ ] **EVT-25** Asociar artista al evento creado y publicado — `POST /api/events/{eventCode}/artists/{artistId}` · ADMIN · esperado **200**
 - [ ] **EVT-26** Asociar el mismo artista otra vez — `POST /api/events/{eventCode}/artists/{artistId}` · ADMIN · esperado **409**
 - [ ] **EVT-27** Asociar artista inexistente — `POST /api/events/{eventCode}/artists/{artistId}` · ADMIN · esperado **404**
 - [ ] **EVT-28** Asociar artista a evento inexistente — `POST /api/events/{eventCode}/artists/{artistId}` · ADMIN · esperado **404**
-- [ ] **EVT-29** Eventos por artista tras asociación — `GET /api/events/by-artist` · Anónimo · esperado **200**
+- [ ] **TC-BIZ-005 (EVT-29)** Verificar evento creado en eventos por artista — `GET /api/events/by-artist` · Anónimo · esperado **200** e incluye el evento creado
 
 ## 04 Usuarios (ownership)
 

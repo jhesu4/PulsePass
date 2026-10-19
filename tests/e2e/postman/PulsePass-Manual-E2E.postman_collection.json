@@ -329,6 +329,38 @@
                                       "response":  [
 
                                                    ]
+                                  },
+                                  {
+                                      "id":  "53bba9fa-0ccd-49f3-94a2-109ece13eaa9",
+                                      "name":  "TC-AUTH-015 · Bearer inválido en endpoint público",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "type":  "text",
+                                                                         "value":  "Bearer {{tokenMalformed}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/venues/active",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "venues",
+                                                                               "active"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "description":  "**ID:** TC-AUTH-015\n**Rol / token:** Token Bearer inválido\n**Resultado esperado:** HTTP 401\n**Precondición:** Usar tokenMalformed=no.es.un.jwt.\n**Verificar:** La petición a un endpoint público también se rechaza con HTTP 401 al incluir un Bearer inválido.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
                                   }
                               ]
                  },
@@ -969,6 +1001,46 @@
                                                    ]
                                   },
                                   {
+                                      "id":  "d86cb82b-9b7e-46e2-906b-dd0c6853d7c7",
+                                      "name":  "AUTH-22 · Preparar TC-AUTH-013: obtener token antes de desactivar",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/auth/login",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "auth",
+                                                                               "login"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\"identifier\":\"e2e-inactive\",\"password\":\"{{inactivePassword}}\"}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               },
+                                                      "description":  "**ID:** AUTH-22\n**Rol / token:** Público (cuenta e2e-inactive temporalmente activa)\n**Resultado esperado:** HTTP 200\n**Precondición:** Activar e2e-inactive en la base con el SQL de fixtures/README.md antes de enviar. Guardar accessToken como tokenInactivePrior; desactivar la cuenta de nuevo antes de ejecutar la carpeta 02.\n**Verificar:** El login devuelve 200 y un accessToken para la cuenta que luego será desactivada.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
                                       "id":  "3b525c19-86a6-4698-c79f-52a41765018d",
                                       "name":  "AUTH-17 · Login usuario C (verificación de roles)",
                                       "request":  {
@@ -1423,6 +1495,72 @@
                                       "response":  [
 
                                                    ]
+                                  },
+                                  {
+                                      "id":  "dd10549e-656c-4a61-8e30-e7457ae260f6",
+                                      "name":  "TC-AUTH-013 · Token previo de usuario inactivo",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "type":  "text",
+                                                                         "value":  "Bearer {{tokenInactivePrior}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/auth/me",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "auth",
+                                                                               "me"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "description":  "**ID:** TC-AUTH-013\n**Rol / token:** Usuario con cuenta desactivada después de emitir el JWT\n**Resultado esperado:** HTTP 401\n**Precondición:** Completar AUTH-22, copiar el accessToken a tokenInactivePrior y desactivar e2e-inactive en la base.\n**Verificar:** El JWT emitido antes de desactivar la cuenta ya no autentica; GET /api/auth/me responde HTTP 401.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "572197e0-8c37-437b-9028-227fe5e0fff6",
+                                      "name":  "TC-SEC-017 · JWT anterior después de revocar el rol STAFF",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "type":  "text",
+                                                                         "value":  "Bearer {{tokenStaff}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/E2E-PUBLISHED-01/tickets/paid",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "E2E-PUBLISHED-01",
+                                                                               "tickets",
+                                                                               "paid"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "description":  "**ID:** TC-SEC-017\n**Rol / token:** STAFF (JWT emitido antes de revocar el rol)\n**Resultado esperado:** HTTP 403\n**Precondición:** Usar el tokenStaff obtenido en AUTH-12; eliminar temporalmente el rol STAFF de e2e-staff con el SQL documentado en fixtures/README.md.\n**Verificar:** GET /api/events/E2E-PUBLISHED-01/tickets/paid responde HTTP 403; restaurar el rol STAFF inmediatamente después.\n"
+                                                  },
+                                      "response":  [
+
+                                                   ]
                                   }
                               ]
                  },
@@ -1602,6 +1740,41 @@
                                                                                }
                                                                },
                                                       "description":  "**ID:** EVT-04\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 201\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nEl evento queda en DRAFT."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "695d0948-9dd4-49e1-b6b8-4a79d11e7227",
+                                      "name":  "TC-BIZ-003 · Leer el evento recién creado",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/{{runId}}-EVT-1",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "{{runId}}-EVT-1"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "bearer",
+                                                                   "bearer":  [
+                                                                                  {
+                                                                                      "key":  "token",
+                                                                                      "value":  "{{tokenAdmin}}",
+                                                                                      "type":  "string"
+                                                                                  }
+                                                                              ]
+                                                               },
+                                                      "description":  "**ID:** TC-BIZ-003\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 200\n**Precondición:** Ejecutar EVT-04 y usar el mismo runId.\n**Verificar:** La respuesta contiene el código {{runId}}-EVT-1, el nombre E2E Evento creado y estado DRAFT.\n"
                                                   },
                                       "response":  [
 
@@ -2168,14 +2341,14 @@
 
                                                                  ],
                                                       "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/events/E2E-TOPUBLISH-01/publish",
+                                                                  "raw":  "{{baseUrl}}/api/events/{{runId}}-EVT-1/publish",
                                                                   "host":  [
                                                                                "{{baseUrl}}"
                                                                            ],
                                                                   "path":  [
                                                                                "api",
                                                                                "events",
-                                                                               "E2E-TOPUBLISH-01",
+                                                                               "{{runId}}-EVT-1",
                                                                                "publish"
                                                                            ]
                                                               },
@@ -2189,7 +2362,35 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** EVT-19\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 200\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nTransición irreversible DRAFT→PUBLISHED: solo ejecutable una vez por base (re-sembrar para repetir)."
+                                                      "description":  "**ID:** EVT-19\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 200\n**Precondición:** Ejecutar EVT-04; publicar el evento creado con código {{runId}}-EVT-1.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nTransición irreversible DRAFT→PUBLISHED: solo ejecutable una vez por base (re-sembrar para repetir)."
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "id":  "08d284bb-4c11-4658-a815-e9ca5fe50b34",
+                                      "name":  "TC-BIZ-004 · Verificar evento creado en eventos publicados",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/events/published",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "events",
+                                                                               "published"
+                                                                           ]
+                                                              },
+                                                      "auth":  {
+                                                                   "type":  "noauth"
+                                                               },
+                                                      "description":  "**ID:** TC-BIZ-004\n**Rol / token:** Anónimo\n**Resultado esperado:** HTTP 200\n**Precondición:** Ejecutar EVT-04 y EVT-19 sobre el mismo evento.\n**Verificar:** La lista incluye {{runId}}-EVT-1 con estado PUBLISHED.\n"
                                                   },
                                       "response":  [
 
@@ -2204,14 +2405,14 @@
 
                                                                  ],
                                                       "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/events/E2E-TOPUBLISH-01/publish",
+                                                                  "raw":  "{{baseUrl}}/api/events/{{runId}}-EVT-1/publish",
                                                                   "host":  [
                                                                                "{{baseUrl}}"
                                                                            ],
                                                                   "path":  [
                                                                                "api",
                                                                                "events",
-                                                                               "E2E-TOPUBLISH-01",
+                                                                               "{{runId}}-EVT-1",
                                                                                "publish"
                                                                            ]
                                                               },
@@ -2225,7 +2426,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** EVT-20\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 409\n**Precondición:** EVT-19 ejecutado.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                      "description":  "**ID:** EVT-20\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 409\n                                                      **Precondición:** EVT-19 ejecutado sobre el evento creado en EVT-04.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
                                                   },
                                       "response":  [
 
@@ -2386,14 +2587,14 @@
 
                                                                  ],
                                                       "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/events/E2E-DRAFT-01/artists/1",
+                                                                  "raw":  "{{baseUrl}}/api/events/{{runId}}-EVT-1/artists/1",
                                                                   "host":  [
                                                                                "{{baseUrl}}"
                                                                            ],
                                                                   "path":  [
                                                                                "api",
                                                                                "events",
-                                                                               "E2E-DRAFT-01",
+                                                                               "{{runId}}-EVT-1",
                                                                                "artists",
                                                                                "1"
                                                                            ]
@@ -2408,7 +2609,7 @@
                                                                                   }
                                                                               ]
                                                                },
-                                                      "description":  "**ID:** EVT-25\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 200\n**Precondición:** Ninguna adicional.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
+                                                      "description":  "**ID:** EVT-25\n**Rol / token:** ADMIN\n**Resultado esperado:** HTTP 200\n**Precondición:** Ejecutar EVT-04 y EVT-19; se asocia el artista al evento creado y publicado en este flujo.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n"
                                                   },
                                       "response":  [
 
@@ -2423,14 +2624,14 @@
 
                                                                  ],
                                                       "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/events/E2E-DRAFT-01/artists/1",
+                                                                  "raw":  "{{baseUrl}}/api/events/{{runId}}-EVT-1/artists/1",
                                                                   "host":  [
                                                                                "{{baseUrl}}"
                                                                            ],
                                                                   "path":  [
                                                                                "api",
                                                                                "events",
-                                                                               "E2E-DRAFT-01",
+                                                                               "{{runId}}-EVT-1",
                                                                                "artists",
                                                                                "1"
                                                                            ]
@@ -2460,16 +2661,16 @@
 
                                                                  ],
                                                       "url":  {
-                                                                  "raw":  "{{baseUrl}}/api/events/E2E-DRAFT-01/artists/999999",
+                                                                  "raw":  "{{baseUrl}}/api/events/{{runId}}-EVT-1/artists/99999",
                                                                   "host":  [
                                                                                "{{baseUrl}}"
                                                                            ],
                                                                   "path":  [
                                                                                "api",
                                                                                "events",
-                                                                               "E2E-DRAFT-01",
+                                                                               "{{runId}}-EVT-1",
                                                                                "artists",
-                                                                               "999999"
+                                                                               "99999"
                                                                            ]
                                                               },
                                                       "auth":  {
@@ -2527,7 +2728,7 @@
                                   },
                                   {
                                       "id":  "cc42c989-6057-4a8a-5ef9-eb01f2c64d85",
-                                      "name":  "EVT-29 · Eventos por artista tras asociación",
+                                      "name":  "EVT-29 · Verificar TC-BIZ-005: evento creado por artista",
                                       "request":  {
                                                       "method":  "GET",
                                                       "header":  [
@@ -2553,7 +2754,7 @@
                                                       "auth":  {
                                                                    "type":  "noauth"
                                                                },
-                                                      "description":  "**ID:** EVT-29\n**Rol / token:** Anónimo\n**Resultado esperado:** HTTP 200\n**Precondición:** EVT-25 ejecutado.\n**Verificar:** código HTTP y cuerpo (ErrorResponse con `timestamp,status,error,message,details` en errores). No se usan scripts: revisar la respuesta manualmente y anotar el resultado en `registro-ejecucion-manual.md`.\n\nE2E-DRAFT-01 NO debe aparecer (solo se listan PUBLISHED)."
+                                                      "description":  "**ID:** TC-BIZ-005\n**Rol / token:** Anónimo\n**Resultado esperado:** HTTP 200\n**Precondición:** Ejecutar EVT-04, EVT-19 y EVT-25 usando el mismo runId.\n**Verificar:** La respuesta de /api/events/by-artist?stageName=Solar Beat incluye {{runId}}-EVT-1 en estado PUBLISHED y no incluye eventos DRAFT.\n"
                                                   },
                                       "response":  [
 
