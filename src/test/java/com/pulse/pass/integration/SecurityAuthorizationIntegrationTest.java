@@ -192,6 +192,16 @@ class SecurityAuthorizationIntegrationTest {
 		assertThat(allowedResponse.getHeader("Access-Control-Expose-Headers")).contains(RequestIdFilter.HEADER_NAME);
 		assertThat(allowedResponse.getHeader(RequestIdFilter.HEADER_NAME)).isNotBlank();
 
+		var viteResponse = mockMvc.perform(options("/api/users")
+					.header("Origin", "http://localhost:5173")
+					.header("Access-Control-Request-Method", "POST")
+					.header("Access-Control-Request-Headers", "content-type"))
+				.andReturn()
+				.getResponse();
+
+		assertThat(viteResponse.getStatus()).isEqualTo(200);
+		assertThat(viteResponse.getHeader("Access-Control-Allow-Origin")).isEqualTo("http://localhost:5173");
+
 		var adminPurposeResponse = mockMvc.perform(options("/api/tickets/TCK-1/cancel")
 					.header("Origin", "http://localhost:3000")
 					.header("Access-Control-Request-Method", "PATCH")
