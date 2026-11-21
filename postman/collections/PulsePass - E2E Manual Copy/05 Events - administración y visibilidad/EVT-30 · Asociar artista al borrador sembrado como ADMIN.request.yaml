@@ -1,0 +1,21 @@
+$kind: http-request
+description: |-
+  **ID:** EVT-30
+  **Rol / token:** ADMIN
+  **Resultado esperado:** HTTP 200
+  **Precondiciones:** Ejecutar después de PUB-04 y antes de TC-SEC-005/EVT-31. Configurar adminToken, draftEventCode, artistId y artistStageName en una base E2E recién recreada.
+  **JSON esperado:**
+  ```json
+  {"id":0,"eventCode":"{{draftEventCode}}","name":"<nombre>","description":"<descripción>","category":"MUSIC","status":"DRAFT","eventDate":"<ISO-8601>","minimumAge":0,"venueCode":"{{venueActiveCode}}","venueName":"<nombre de sede>","artists":[{"id":0,"stageName":"{{artistStageName}}","country":"<país>","genre":"<género>","active":true}]}
+  ```
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+  **Comprobaciones específicas:** Confirmar HTTP 200, `eventCode={{draftEventCode}}`, `status=DRAFT` y que `artists` incluya el `artistId`/`artistStageName` seleccionado.
+url: "{{baseUrl}}/api/events/{{draftEventCode}}/artists/{{artistId}}"
+method: POST
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{adminToken}}"
+order: 17000

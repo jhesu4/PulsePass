@@ -1,0 +1,33 @@
+$kind: http-request
+description: "**Flujo PRD:** C — Gestión del catálogo, paso 6.
+
+  **ID:** TC-BIZ-005
+
+  **ID heredado:** EVT-25\r
+
+  **Rol / token:** ADMIN
+
+  **Resultado esperado:** HTTP 200
+
+  **Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, runId, PUB-04 → artistId. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"id\":0,\"eventCode\":\"{{runId}}-EVT-1\",\"name\":\"<nombre>\",\"description\":\"<descripción>\",\"category\":\"MUSIC\",\"status\":\"PUBLISHED\",\"eventDate\":\"<ISO-8601>\",\"minimumAge\":0,\"venueCode\":\"{{venueActiveCode}}\",\"venueName\":\"<nombre de sede>\",\"artists\":[]}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar eventCode, status, venueCode y datos esperados para el caso."
+url: "{{baseUrl}}/api/events/{{runId}}-EVT-1/artists/{{artistId}}"
+method: POST
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{adminToken}}"
+order: 13000

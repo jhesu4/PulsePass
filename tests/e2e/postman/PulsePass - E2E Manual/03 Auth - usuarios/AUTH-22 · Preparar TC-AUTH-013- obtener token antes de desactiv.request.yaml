@@ -1,0 +1,32 @@
+$kind: http-request
+name: "AUTH-22 · Preparar TC-AUTH-013: obtener token antes de desactivar"
+description: "**ID:** AUTH-22
+
+  **Rol / token:** Público (cuenta e2e-inactive temporalmente activa)
+
+  **Resultado esperado:** HTTP 200
+
+  **Precondiciones:** Configurar: baseUrl, inactivePassword. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"accessToken\":\"<JWT; no guardar>\",\"tokenType\":\"Bearer\",\"expiresIn\":900}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Verificar tokenType=Bearer y expiresIn={{expectedTokenTtlSeconds}}; decodificar payload sin registrar el JWT y revisar sub, iss={{expectedIssuer}}, iat, exp (TTL exacto) y jti UUID único."
+url: "{{baseUrl}}/api/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: '{"identifier":"e2e-inactive","password":"{{inactivePassword}}"}'
+auth:
+  type: noauth
+order: 9000

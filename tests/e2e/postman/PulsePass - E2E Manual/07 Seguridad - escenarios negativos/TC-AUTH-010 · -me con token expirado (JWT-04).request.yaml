@@ -1,0 +1,34 @@
+$kind: http-request
+name: TC-AUTH-010 · /me con token expirado (JWT-04)
+description: "**ID:** TC-AUTH-010
+
+  **ID heredado:** JWT-04\r
+
+  **Rol / token:** Token inválido
+
+  **Resultado esperado:** HTTP 401
+
+  **Precondiciones:** Configurar: expiredToken, baseUrl. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":401,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar HTTP 401 y que JSON.status=401; revisar message/details para el motivo esperado y que el error no exponga credenciales.
+
+  **Notas de ejecución:** Ver README: levantar la app con TTL corto (variable de entorno de la expiración JWT), hacer login, esperar, y enviar."
+url: "{{baseUrl}}/api/auth/me"
+method: GET
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{expiredToken}}"
+order: 23000

@@ -1,0 +1,32 @@
+$kind: http-request
+name: TC-STATE-TRN-01 · Confirmar que el rechazo de TRN-01 no canceló T1
+description: "**Flujo PRD:** D — Compra y propiedad; lectura tras cancelación ajena denegada\r
+
+  **ID:** TC-STATE-TRN-01
+
+  **Rol / token:** USER (A)
+
+  **Resultado esperado:** HTTP 200
+
+  **Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, TKT-04 → ticketT1. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"id\":0,\"ticketCode\":\"{{ticketCancelableCode}}\",\"type\":\"GENERAL\",\"price\":0.00,\"status\":\"PAID\",\"purchaseDate\":\"<ISO-8601>\",\"userEmail\":\"{{userAEmail}}\",\"eventCode\":\"{{publishedEventCode}}\",\"eventName\":\"<nombre>\"}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** ticketCode={{ticketCancelableCode}} conserva status=PAID tras el 403 de TRN-01."
+url: "{{baseUrl}}/api/tickets/{{ticketCancelableCode}}"
+method: GET
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{userAToken}}"
+order: 7000

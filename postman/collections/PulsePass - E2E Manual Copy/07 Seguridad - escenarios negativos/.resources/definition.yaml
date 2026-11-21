@@ -1,0 +1,4 @@
+$kind: collection
+name: 07 Seguridad / escenarios negativos
+description: JWT inválidos, estado de cuentas y control de acceso.
+order: 8000

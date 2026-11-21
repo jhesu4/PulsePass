@@ -1,0 +1,136 @@
+name: PulsePass - Local E2E (plantilla)
+values:
+  - key: baseUrl
+    value: 'http://localhost:8080'
+    description: HTTP solo permitido en localhost; fuera de localhost la app exige HTTPS.
+  - key: runId
+    value: e2e-REEMPLAZAR
+    description: 'Prefijo único por ejecución, p. ej. e2e-20261019-1. Solo minúsculas, dígitos y guiones.'
+  - key: futureDate
+    value: '2027-12-31T20:00:00'
+    description: Fecha futura ISO-8601 sin zona horaria. Actualizar si ya pasó.
+  - key: staffPassword
+    value: ''
+    description: La usada para generar el hash STAFF de la semilla.
+  - key: adminPassword
+    value: ''
+    description: La usada para generar el hash ADMIN de la semilla.
+  - key: inactivePassword
+    value: ''
+    description: La usada para el hash del usuario inactivo.
+  - key: userAToken
+    value: ''
+    description: Copiar de AUTH-09.
+  - key: userBToken
+    value: ''
+    description: Copiar de AUTH-11.
+  - key: userCToken
+    value: ''
+    description: Copiar de AUTH-17.
+  - key: staffToken
+    value: ''
+    description: Copiar de AUTH-12.
+  - key: adminToken
+    value: ''
+    description: Copiar de AUTH-13.
+  - key: malformedToken
+    value: no.es.un.jwt
+  - key: tamperedToken
+    value: ''
+    description: userAToken con un carácter alterado.
+  - key: expiredToken
+    value: ''
+    description: Token obtenido con TTL corto y esperado a que expire.
+  - key: wrongKeyToken
+    value: ''
+    description: Token firmado offline con una clave desechable.
+  - key: ticketCancelableCode
+    value: ''
+    description: Código del ticket T1 comprado por USER_A; se cancela en el Flujo D.
+  - key: ticketUsableCode
+    value: ''
+    description: Código del ticket T2 comprado por USER_A; STAFF lo marca como usado en el Flujo D.
+  - key: inactivePriorToken
+    value: ''
+    description: Access token temporal de e2e-inactive para TC-AUTH-013; no versionar.
+  - key: userAEmail
+    value: e2e-REEMPLAZAR-usera@example.test
+    description: Correo del usuario A; actualizar con el mismo prefijo runId.
+  - key: userAUsername
+    value: e2e-REEMPLAZAR-usera
+    description: Username del usuario A; actualizar con el mismo prefijo runId.
+  - key: userBEmail
+    value: e2e-REEMPLAZAR-userb@example.test
+    description: Correo del usuario B; actualizar con el mismo prefijo runId.
+  - key: userBUsername
+    value: e2e-REEMPLAZAR-userb
+    description: Username del usuario B; actualizar con el mismo prefijo runId.
+  - key: userCEmail
+    value: e2e-REEMPLAZAR-userc@example.test
+    description: Correo del usuario C; actualizar con el mismo prefijo runId.
+  - key: userCUsername
+    value: e2e-REEMPLAZAR-userc
+    description: Username del usuario C; actualizar con el mismo prefijo runId.
+  - key: expectedIssuer
+    value: pulsepass-api
+    description: Issuer esperado; debe coincidir con PULSEPASS_JWT_ISSUER.
+  - key: expectedTokenTtlSeconds
+    value: '900'
+    description: TTL esperado en segundos; debe coincidir con PULSEPASS_JWT_ACCESS_TOKEN_TTL.
+  - key: expectedForeignResourceStatus
+    value: '403'
+    description: HTTP esperado al consultar o modificar un recurso ajeno.
+  - key: venueActiveCode
+    value: VEN-E2E-01
+    description: Código de venue activo confirmado en el Flujo A.
+  - key: inactiveVenueCode
+    value: VEN-E2E-OFF
+    description: Código de sede inactiva sembrada.
+  - key: missingVenueCode
+    value: NO-EXISTE
+    description: Código de sede ausente de la semilla.
+  - key: draftEventCode
+    value: E2E-DRAFT-01
+    description: Código de evento borrador sembrado.
+  - key: eventToPublishCode
+    value: E2E-TOPUBLISH-01
+    description: Código de evento para publicar sembrado.
+  - key: publishedEventCode
+    value: E2E-PUBLISHED-01
+    description: Código de evento publicado sembrado.
+  - key: pastEventCode
+    value: E2E-PAST-01
+    description: Código de evento pasado sembrado.
+  - key: ageEventCode
+    value: E2E-AGE-01
+    description: Código de evento con edad mínima imposible.
+  - key: fullEventCode
+    value: E2E-FULL-01
+    description: Código de evento de aforo agotado.
+  - key: missingEventCode
+    value: NO-EXISTE
+    description: Código de evento ausente de la semilla.
+  - key: artistId
+    value: ''
+    description: Copiar el id real desde PUB-04; no asumir un id fijo.
+  - key: artistStageName
+    value: ''
+    description: Copiar el nombre artístico real desde PUB-04.
+  - key: missingArtistId
+    value: ''
+    description: Elegir un id inexistente tras consultar PUB-04.
+  - key: userAPassword
+    value: ''
+    description: Contraseña local de USER_A; mínimo 12 y máximo 72 bytes.
+  - key: userBPassword
+    value: ''
+    description: Contraseña local de USER_B; mínimo 12 y máximo 72 bytes.
+  - key: userCPassword
+    value: ''
+    description: Contraseña local de USER_C; mínimo 12 y máximo 72 bytes.
+  - key: adminIdentifier
+    value: ''
+    description: Identificador local del fixture ADMIN (p. ej. e2e-admin).
+  - key: staffIdentifier
+    value: ''
+    description: Identificador local del fixture STAFF (p. ej. e2e-staff).

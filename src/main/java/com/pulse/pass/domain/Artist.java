@@ -28,6 +28,9 @@ public class Artist {
 	@Column(nullable = false, length = 100)
 	private String genre;
 
+	@Column(name = "image_url", length = 1000)
+	private String imageUrl;
+
 	@Column(nullable = false)
 	private boolean active = true;
 
@@ -51,6 +54,8 @@ public class Artist {
     public void setCountry(String country) { this.country = country; }
     public String getGenre() { return genre; }
     public void setGenre(String genre) { this.genre = genre; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
     public Set<Event> getEvents() { return events; }

@@ -109,7 +109,7 @@ class TicketServiceImplTest {
     void shouldRejectPurchaseWhenEventDoesNotExist() {
         PurchaseTicketRequest request = request(TicketType.GENERAL);
         when(userRepository.findByEmailIgnoreCase(request.userEmail())).thenReturn(Optional.of(user(true, null)));
-        when(eventRepository.findByEventCode(request.eventCode())).thenReturn(Optional.empty());
+        when(eventRepository.findByEventCodeForUpdate(request.eventCode())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> ticketService.purchase(request))
                 .isInstanceOf(ResourceNotFoundException.class)
@@ -122,7 +122,7 @@ class TicketServiceImplTest {
     void shouldRejectPurchaseWhenEventIsNotPublished() {
         PurchaseTicketRequest request = request(TicketType.GENERAL);
         when(userRepository.findByEmailIgnoreCase(request.userEmail())).thenReturn(Optional.of(user(true, null)));
-        when(eventRepository.findByEventCode(request.eventCode()))
+        when(eventRepository.findByEventCodeForUpdate(request.eventCode()))
                 .thenReturn(Optional.of(event(EventStatus.DRAFT, 3, 0, LocalDateTime.now().plusDays(30))));
 
         assertThatThrownBy(() -> ticketService.purchase(request))
@@ -136,7 +136,7 @@ class TicketServiceImplTest {
     void shouldRejectPurchaseForPastEvent() {
         PurchaseTicketRequest request = request(TicketType.GENERAL);
         when(userRepository.findByEmailIgnoreCase(request.userEmail())).thenReturn(Optional.of(user(true, null)));
-        when(eventRepository.findByEventCode(request.eventCode()))
+        when(eventRepository.findByEventCodeForUpdate(request.eventCode()))
                 .thenReturn(Optional.of(event(EventStatus.PUBLISHED, 3, 0, LocalDateTime.now().minusDays(1))));
 
         assertThatThrownBy(() -> ticketService.purchase(request))
@@ -152,7 +152,7 @@ class TicketServiceImplTest {
         Event event = event(EventStatus.PUBLISHED, 3, 18, LocalDateTime.now().plusDays(30));
         PurchaseTicketRequest request = request(TicketType.GENERAL);
         when(userRepository.findByEmailIgnoreCase(request.userEmail())).thenReturn(Optional.of(user));
-        when(eventRepository.findByEventCode(request.eventCode())).thenReturn(Optional.of(event));
+        when(eventRepository.findByEventCodeForUpdate(request.eventCode())).thenReturn(Optional.of(event));
 
         assertThatThrownBy(() -> ticketService.purchase(request))
                 .isInstanceOf(BusinessRuleException.class)
@@ -196,7 +196,7 @@ class TicketServiceImplTest {
     @Test
     void shouldCancelPaidTicketBeforeEvent() {
         Ticket ticket = ticket(TicketStatus.PAID, event(EventStatus.PUBLISHED, 10, 0, LocalDateTime.now().plusDays(1)));
-        when(ticketRepository.findByTicketCode("TCK-1")).thenReturn(Optional.of(ticket));
+        whenTicketForUpdate("TCK-1").thenReturn(Optional.of(ticket));
         when(ticketRepository.save(ticket)).thenReturn(ticket);
         when(ticketMapper.toResponse(ticket)).thenReturn(response(TicketStatus.CANCELLED));
 
@@ -206,7 +206,7 @@ class TicketServiceImplTest {
 
     @Test
     void shouldRejectCancellingUsedTicket() {
-        when(ticketRepository.findByTicketCode("TCK-1"))
+        whenTicketForUpdate("TCK-1")
                 .thenReturn(Optional.of(ticket(TicketStatus.USED, event(EventStatus.PUBLISHED, 10, 0, LocalDateTime.now().plusDays(1)))));
 
         assertThatThrownBy(() -> ticketService.cancel("TCK-1"))
@@ -218,7 +218,7 @@ class TicketServiceImplTest {
 
     @Test
     void shouldRejectCancellingTicketAfterEventDate() {
-        when(ticketRepository.findByTicketCode("TCK-1"))
+        whenTicketForUpdate("TCK-1")
                 .thenReturn(Optional.of(ticket(TicketStatus.PAID, event(EventStatus.FINISHED, 10, 0, LocalDateTime.now().minusDays(1)))));
 
         assertThatThrownBy(() -> ticketService.cancel("TCK-1"))
@@ -231,7 +231,7 @@ class TicketServiceImplTest {
     @Test
     void shouldMarkPaidTicketAsUsed() {
         Ticket ticket = ticket(TicketStatus.PAID, event(EventStatus.PUBLISHED, 10, 0, LocalDateTime.now().plusDays(1)));
-        when(ticketRepository.findByTicketCode("TCK-1")).thenReturn(Optional.of(ticket));
+        whenTicketForUpdate("TCK-1").thenReturn(Optional.of(ticket));
         when(ticketRepository.save(ticket)).thenReturn(ticket);
         when(ticketMapper.toResponse(ticket)).thenReturn(response(TicketStatus.USED));
 
@@ -241,7 +241,7 @@ class TicketServiceImplTest {
 
     @Test
     void shouldRejectUsingCancelledTicket() {
-        when(ticketRepository.findByTicketCode("TCK-1"))
+        whenTicketForUpdate("TCK-1")
                 .thenReturn(Optional.of(ticket(TicketStatus.CANCELLED, event(EventStatus.PUBLISHED, 10, 0, LocalDateTime.now().plusDays(1)))));
 
         assertThatThrownBy(() -> ticketService.markAsUsed("TCK-1"))
@@ -260,9 +260,29 @@ class TicketServiceImplTest {
                 .hasMessage("Ticket not found: MISSING");
     }
 
+    @Test
+    void shouldReopenSoldOutEventWhenCancellingFreesASeat() {
+        Event event = event(EventStatus.SOLD_OUT, 2, 0, LocalDateTime.now().plusDays(1));
+        Ticket ticket = ticket(TicketStatus.PAID, event);
+        whenTicketForUpdate("TCK-1").thenReturn(Optional.of(ticket));
+        when(ticketRepository.countByEventCodeAndStatus(event.getEventCode(), TicketStatus.PAID)).thenReturn(1L);
+        when(ticketRepository.countByEventCodeAndStatus(event.getEventCode(), TicketStatus.USED)).thenReturn(1L);
+        when(ticketRepository.save(ticket)).thenReturn(ticket);
+        when(ticketMapper.toResponse(ticket)).thenReturn(response(TicketStatus.CANCELLED));
+
+        assertThat(ticketService.cancel("TCK-1").status()).isEqualTo(TicketStatus.CANCELLED);
+        assertThat(event.getStatus()).isEqualTo(EventStatus.PUBLISHED);
+    }
+
+    private org.mockito.stubbing.OngoingStubbing<Optional<Ticket>> whenTicketForUpdate(String code) {
+        when(eventRepository.findByTicketCodeForUpdate(code)).thenAnswer(invocation ->
+                ticketRepository.findByTicketCode(code).map(Ticket::getEvent));
+        return when(ticketRepository.findByTicketCode(code));
+    }
+
     private void stubPurchase(User user, Event event, long paidCount, PurchaseTicketRequest request) {
         when(userRepository.findByEmailIgnoreCase(request.userEmail())).thenReturn(Optional.of(user));
-        when(eventRepository.findByEventCode(request.eventCode())).thenReturn(Optional.of(event));
+        when(eventRepository.findByEventCodeForUpdate(request.eventCode())).thenReturn(Optional.of(event));
         when(ticketRepository.countByEventCodeAndStatus(event.getEventCode(), TicketStatus.PAID)).thenReturn(paidCount);
     }
 

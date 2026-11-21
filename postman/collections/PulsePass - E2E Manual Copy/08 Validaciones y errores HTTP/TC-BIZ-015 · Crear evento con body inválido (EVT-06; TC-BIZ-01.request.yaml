@@ -1,0 +1,41 @@
+$kind: http-request
+name: TC-BIZ-015 · Crear evento con body inválido (EVT-06; TC-BIZ-015)
+description: "**ID:** TC-BIZ-015
+
+  **ID heredado:** EVT-06\r
+
+  **Rol / token:** ADMIN
+
+  **Resultado esperado:** HTTP 400
+
+  **Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":400,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar HTTP 400 y que JSON.status=400; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+url: "{{baseUrl}}/api/events"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "eventCode": "",
+      "name": "",
+      "minimumAge": -1
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{adminToken}}"
+order: 4000

@@ -1,0 +1,35 @@
+$kind: http-request
+description: "**Flujo PRD:** C — Gestión del catálogo, paso 6.
+
+  **ID:** TC-BIZ-004
+
+  **ID heredado:** EVT-19\r
+
+  **Rol / token:** ADMIN
+
+  **Resultado esperado:** HTTP 200
+
+  **Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, runId. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"id\":0,\"eventCode\":\"{{runId}}-EVT-1\",\"name\":\"<nombre>\",\"description\":\"<descripción>\",\"category\":\"MUSIC\",\"status\":\"PUBLISHED\",\"eventDate\":\"<ISO-8601>\",\"minimumAge\":0,\"venueCode\":\"{{venueActiveCode}}\",\"venueName\":\"<nombre de sede>\",\"artists\":[]}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** La respuesta del evento tiene eventCode={{runId}}-EVT-1 y status=PUBLISHED.
+
+  **Notas de ejecución:** Transición irreversible DRAFT→PUBLISHED: solo ejecutable una vez por base (re-sembrar para repetir)."
+url: "{{baseUrl}}/api/events/{{runId}}-EVT-1/publish"
+method: PATCH
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{adminToken}}"
+order: 11000

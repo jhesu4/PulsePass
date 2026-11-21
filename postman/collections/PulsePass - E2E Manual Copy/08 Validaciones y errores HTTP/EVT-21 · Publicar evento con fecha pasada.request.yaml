@@ -1,0 +1,31 @@
+$kind: http-request
+description: "**ID:** EVT-21
+
+  **Rol / token:** ADMIN
+
+  **Resultado esperado:** HTTP 409
+
+  **Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, pastEventCode. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":409,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar HTTP 409 y que JSON.status=409; revisar message/details para el motivo esperado y que el error no exponga credenciales.
+
+  **Notas de ejecución:** {{pastEventCode}} ya está PUBLISHED en la semilla, por lo que el 409 es por estado (solo DRAFT)."
+url: "{{baseUrl}}/api/events/{{pastEventCode}}/publish"
+method: PATCH
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{adminToken}}"
+order: 9000

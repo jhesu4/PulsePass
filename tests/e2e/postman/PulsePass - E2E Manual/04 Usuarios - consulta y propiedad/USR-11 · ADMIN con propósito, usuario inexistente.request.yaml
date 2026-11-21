@@ -1,0 +1,32 @@
+$kind: http-request
+description: "**ID:** USR-11
+
+  **Rol / token:** ADMIN + X-Admin-Purpose
+
+  **Resultado esperado:** HTTP 404
+
+  **Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, runId. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":404,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar HTTP 404 y que JSON.status=404; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+url: "{{baseUrl}}/api/users/by-username?username={{runId}}-nadie"
+method: GET
+headers:
+  X-Admin-Purpose: CUSTOMER_SUPPORT
+  Accept: application/json
+queryParams:
+  username: "{{runId}}-nadie"
+auth:
+  type: bearer
+  credentials:
+    token: "{{adminToken}}"
+order: 9000

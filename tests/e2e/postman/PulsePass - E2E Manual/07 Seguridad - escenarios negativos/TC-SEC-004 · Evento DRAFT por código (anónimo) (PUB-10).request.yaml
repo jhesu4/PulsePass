@@ -1,0 +1,31 @@
+$kind: http-request
+description: "**ID:** TC-SEC-004
+
+  **ID heredado:** PUB-10\r
+
+  **Rol / token:** Anónimo
+
+  **Resultado esperado:** HTTP 403
+
+  **Precondiciones:** Configurar: baseUrl, draftEventCode. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":403,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales.
+
+  **Notas de ejecución:** La ruta es pública por URL, pero la regla de método (canViewEvent) deniega DRAFT; el GlobalExceptionHandler responde 403 también a anónimos. Si observa 401, anótelo como desviación."
+url: "{{baseUrl}}/api/events/{{draftEventCode}}"
+method: GET
+headers:
+  Accept: application/json
+auth:
+  type: noauth
+order: 4000

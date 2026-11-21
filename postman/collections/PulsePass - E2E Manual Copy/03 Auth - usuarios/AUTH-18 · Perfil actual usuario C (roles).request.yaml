@@ -1,0 +1,31 @@
+$kind: http-request
+description: "**ID:** AUTH-18
+
+  **Rol / token:** USER (C)
+
+  **Resultado esperado:** HTTP 200
+
+  **Precondiciones:** Configurar: AUTH-17 → userCToken, baseUrl. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"userId\":0,\"username\":\"<username autenticado>\",\"roles\":[\"USER\"]}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar id, username y roles actuales de la identidad autenticada.
+
+  **Notas de ejecución:** `roles` debe ser exactamente [\"USER\"]."
+url: "{{baseUrl}}/api/auth/me"
+method: GET
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{userCToken}}"
+order: 11000

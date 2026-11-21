@@ -72,6 +72,7 @@ public class EventServiceImpl implements EventService {
         event.setCategory(request.category());
         event.setEventDate(request.eventDate());
         event.setMinimumAge(request.minimumAge());
+        event.setImageUrl(request.imageUrl());
         event.setVenue(venue);
         event.setStatus(EventStatus.DRAFT);
 

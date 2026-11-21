@@ -91,6 +91,6 @@ class ArtistServiceImplTest {
     }
 
     private ArtistResponse response(String stageName) {
-        return new ArtistResponse(7L, stageName, "Colombia", "Pop", true);
+        return new ArtistResponse(7L, stageName, "Colombia", "Pop", true, null);
     }
 }

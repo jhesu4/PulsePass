@@ -1,0 +1,14 @@
+# Use this workspace to collaborate
+workspace:
+  id: db8b1340-1805-4eb9-8712-acade2dad3ab
+
+localResources:
+  collections:
+    - ../tests/e2e/postman/PulsePass-Manual-E2E.postman_collection.json
+    - ../tests/e2e/postman/PulsePass - E2E Manual
+  environments:
+    - ../tests/e2e/postman/PulsePass - Local E2E (plantilla).environment.yaml
+
+cloudResources:
+  collections:
+    ../postman/collections/PulsePass - E2E Manual Copy: f901abbc-5bfb-4288-a541-d75768725142

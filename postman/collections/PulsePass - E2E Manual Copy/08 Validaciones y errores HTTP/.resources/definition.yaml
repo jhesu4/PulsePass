@@ -1,0 +1,3 @@
+$kind: collection
+description: Validación de entradas y respuestas de error.
+order: 9000

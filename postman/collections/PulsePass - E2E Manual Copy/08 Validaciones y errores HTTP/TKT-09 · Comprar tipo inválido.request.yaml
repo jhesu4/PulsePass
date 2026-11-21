@@ -1,0 +1,38 @@
+$kind: http-request
+description: "**ID:** TKT-09
+
+  **Rol / token:** USER (A)
+
+  **Resultado esperado:** HTTP 400
+
+  **Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, AUTH-01 → userAEmail, publishedEventCode. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":400,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar HTTP 400 y que JSON.status=400; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+url: "{{baseUrl}}/api/tickets"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "userEmail": "{{userAEmail}}",
+      "eventCode": "{{publishedEventCode}}",
+      "type": "PLATINUM"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{userAToken}}"
+order: 12000

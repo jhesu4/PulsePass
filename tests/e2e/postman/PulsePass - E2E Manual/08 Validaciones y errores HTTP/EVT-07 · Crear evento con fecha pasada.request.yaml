@@ -1,0 +1,41 @@
+$kind: http-request
+description: "**ID:** EVT-07
+
+  **Rol / token:** ADMIN
+
+  **Resultado esperado:** HTTP 409
+
+  **Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, runId, venueCode. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":409,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar HTTP 409 y que JSON.status=409; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+url: "{{baseUrl}}/api/events"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "eventCode": "{{runId}}-EVT-PAST",
+      "name": "E2E pasado",
+      "category": "MUSIC",
+      "eventDate": "2020-01-01T20:00:00",
+      "minimumAge": 0,
+      "venueCode": "{{venueActiveCode}}"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{adminToken}}"
+order: 5000

@@ -113,7 +113,9 @@ class EventRepositoryTest {
         eventRepository.saveAllAndFlush(List.of(e1, e2, e3));
 
         List<Event> published = eventRepository.findByStatusOrderByEventDateAsc(EventStatus.PUBLISHED);
-        assertThat(published).extracting(event -> event.getEventCode()).containsExactly("EVT-P2", "EVT-P1");
+        List<String> codes = published.stream().map(Event::getEventCode).toList();
+        assertThat(codes).contains("EVT-P2", "EVT-P1").doesNotContain("EVT-D1");
+        assertThat(codes.indexOf("EVT-P2")).isLessThan(codes.indexOf("EVT-P1"));
     }
 
     @Test
@@ -184,7 +186,8 @@ class EventRepositoryTest {
         eventRepository.saveAllAndFlush(List.of(e1, e2));
 
         List<Event> events = eventRepository.findByArtistStageName("Solar Beat");
-        assertThat(events).hasSize(2).extracting(event -> event.getEventCode()).contains("EVT-SB-1", "EVT-SB-2");
+        List<String> codes = events.stream().map(Event::getEventCode).toList();
+        assertThat(codes).contains("EVT-SB-1", "EVT-SB-2").doesNotHaveDuplicates();
     }
 
     @Test

@@ -1,0 +1,31 @@
+$kind: http-request
+description: "**Flujo PRD:** C — Gestión del catálogo; paso 7: confirmar rechazo sin mutación\r
+
+  **ID:** TC-STATE-EVT-02
+
+  **Rol / token:** ADMIN
+
+  **Resultado esperado:** HTTP 404
+
+  **Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, runId. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":404,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** El GET da 404 con ErrorResponse; EVT-02 no persistió el evento antes de EVT-04."
+url: "{{baseUrl}}/api/events/{{runId}}-EVT-1"
+method: GET
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{adminToken}}"
+order: 1000

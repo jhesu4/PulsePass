@@ -1,0 +1,44 @@
+$kind: http-request
+name: TC-BIZ-015 · Crear evento en venue inexistente (EVT-09; TC-BIZ-015)
+description: "**ID:** TC-BIZ-015
+
+  **ID heredado:** EVT-09\r
+
+  **Rol / token:** ADMIN
+
+  **Resultado esperado:** HTTP 404
+
+  **Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, runId, futureDate. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":404,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar HTTP 404 y que JSON.status=404; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+url: "{{baseUrl}}/api/events"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "eventCode": "{{runId}}-EVT-NV",
+      "name": "E2E sin venue",
+      "category": "MUSIC",
+      "eventDate": "{{futureDate}}",
+      "minimumAge": 0,
+      "venueCode": "NO-EXISTE"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{adminToken}}"
+order: 7000

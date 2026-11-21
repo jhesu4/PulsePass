@@ -1,0 +1,27 @@
+$kind: http-request
+description: "**ID:** PUB-07
+
+  **Rol / token:** Anónimo
+
+  **Resultado esperado:** HTTP 404
+
+  **Precondiciones:** Configurar: baseUrl, missingArtistId. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":404,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar HTTP 404 y que JSON.status=404; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+url: "{{baseUrl}}/api/artists/{{missingArtistId}}"
+method: GET
+headers:
+  Accept: application/json
+auth:
+  type: noauth
+order: 4000

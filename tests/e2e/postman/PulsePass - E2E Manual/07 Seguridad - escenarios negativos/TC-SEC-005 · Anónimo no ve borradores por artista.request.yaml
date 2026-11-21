@@ -1,0 +1,21 @@
+$kind: http-request
+description: |-
+  **ID:** TC-SEC-005
+  **Rol / token:** Anónimo
+  **Resultado esperado:** HTTP 200
+  **Precondiciones:** Ejecutar después de EVT-25 y EVT-30 con una base E2E recién recreada. Configurar artistStageName, draftEventCode, runId y venueCode.
+  **JSON esperado:**
+  ```json
+  [{"id":0,"eventCode":"{{runId}}-EVT-1","name":"<nombre>","category":"MUSIC","status":"PUBLISHED","eventDate":"<ISO-8601>","venueCode":"{{venueActiveCode}}","venueName":"<nombre de sede>"}]
+  ```
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+  **Comprobaciones específicas:** La lista puede incluir el evento PUBLISHED de EVT-04 asociado en EVT-25, pero no debe incluir ningún evento con `status=DRAFT`, en particular `{{draftEventCode}}`.
+url: "{{baseUrl}}/api/events/by-artist?stageName={{artistStageName}}"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  stageName: "{{artistStageName}}"
+auth:
+  type: noauth
+order: 12000

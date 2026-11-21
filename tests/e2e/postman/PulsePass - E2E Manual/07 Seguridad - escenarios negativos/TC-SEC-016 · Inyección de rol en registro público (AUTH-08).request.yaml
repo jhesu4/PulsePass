@@ -1,0 +1,49 @@
+$kind: http-request
+description: "**ID:** TC-SEC-016
+
+  **ID heredado:** AUTH-08\r
+
+  **Rol / token:** Anónimo
+
+  **Resultado esperado:** HTTP 201
+
+  **Precondiciones:** Configurar: baseUrl, AUTH-08 → userCUsername, AUTH-08 → userCEmail, userCPassword. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"id\":0,\"username\":\"{{userCUsername}}\",\"email\":\"{{userCEmail}}\",\"firstName\":\"E2E\",\"lastName\":\"Tester\",\"phone\":\"3000000000\",\"city\":\"Bogota\",\"birthDate\":\"1995-05-20\",\"active\":true}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar los campos funcionales del JSON de este endpoint y que corresponden al recurso/rol indicado.
+
+  **Notas de ejecución:** Los campos extra deben ser ignorados. Tras AUTH-17 (login de C) y AUTH-18 (/me) los roles deben ser SOLO `USER`. Si aparece ADMIN: defecto crítico."
+url: "{{baseUrl}}/api/users"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "{{userCUsername}}",
+      "email": "{{userCEmail}}",
+      "firstName": "E2E",
+      "lastName": "Tester",
+      "phone": "3000000000",
+      "city": "Bogota",
+      "birthDate": "1995-05-20",
+      "password": "{{userCPassword}}",
+      "roles": [
+        "ADMIN"
+      ],
+      "role": "ADMIN"
+    }
+auth:
+  type: noauth
+order: 1000

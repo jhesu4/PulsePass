@@ -28,5 +28,8 @@ public record CreateEventRequest(
         Integer minimumAge,
 
         @NotBlank(message = "venueCode is required")
-        String venueCode) {
+        String venueCode,
+
+        @Size(max = 1000, message = "imageUrl must be at most 1000 characters")
+        String imageUrl) {
 }

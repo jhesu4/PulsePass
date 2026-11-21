@@ -1,0 +1,29 @@
+$kind: http-request
+description: "**ID:** ERR-03
+
+  **Rol / token:** Público
+
+  **Resultado esperado:** HTTP 400
+
+  **Precondiciones:** Configurar: baseUrl. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":400,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar HTTP 400 y que JSON.status=400; revisar message/details para el motivo esperado y que el error no exponga credenciales.
+
+  **Notas de ejecución:** En Postman, escribir en el body `{ \"identifier\": ` (JSON roto) con Content-Type application/json."
+url: "{{baseUrl}}/api/auth/login"
+method: POST
+headers:
+  Accept: application/json
+auth:
+  type: noauth
+order: 22000

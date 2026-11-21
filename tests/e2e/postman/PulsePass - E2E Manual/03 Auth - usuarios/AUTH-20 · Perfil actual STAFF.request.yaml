@@ -1,0 +1,29 @@
+$kind: http-request
+description: "**ID:** AUTH-20
+
+  **Rol / token:** STAFF
+
+  **Resultado esperado:** HTTP 200
+
+  **Precondiciones:** Configurar: AUTH-12 → staffToken, baseUrl. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"userId\":0,\"username\":\"<username autenticado>\",\"roles\":[\"STAFF\"]}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar id, username y roles actuales de la identidad autenticada."
+url: "{{baseUrl}}/api/auth/me"
+method: GET
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{staffToken}}"
+order: 13000

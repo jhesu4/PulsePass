@@ -1,0 +1,4 @@
+$kind: collection
+name: 05 Events / administración y visibilidad
+description: Consulta y operaciones sobre eventos.
+order: 6000

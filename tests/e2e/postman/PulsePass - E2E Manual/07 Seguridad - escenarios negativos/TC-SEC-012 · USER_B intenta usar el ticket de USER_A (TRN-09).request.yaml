@@ -1,0 +1,24 @@
+$kind: http-request
+description: |-
+  **Flujo PRD:** D — Propiedad, denegar uso ajeno antes de cambiar el estado.
+  **ID:** TC-SEC-012
+  **ID relacionado:** TC-BIZ-014
+  **ID heredado:** TRN-09
+  **Rol / token:** USER_B con el ticket de USER_A
+  **Resultado esperado:** HTTP 403
+  **Precondiciones:** TKT-04 creó `{{ticketCancelableCode}}` para USER_A. Ejecutar antes de cancelar o usar el ticket.
+  **JSON esperado:**
+  ```json
+  {"timestamp":"<ISO-8601>","status":403,"error":"<HTTP reason>","message":"<mensaje del error>","details":{}}
+  ```
+  **Comprobaciones específicas:** USER_B no puede marcar como usado el ticket de USER_A. Ejecutar inmediatamente `TC-STATE-SEC-012` y comprobar que el ticket sigue `PAID`.
+  **Flujo PRD:** D — Compra, propiedad, cancelación y uso; comprobar la denegación antes de cambiar el estado.
+url: "{{baseUrl}}/api/tickets/{{ticketCancelableCode}}/use"
+method: PATCH
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{userBToken}}"
+order: 30000

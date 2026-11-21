@@ -1,0 +1,31 @@
+$kind: http-request
+description: "**ID:** TRN-15
+
+  **Rol / token:** ADMIN
+
+  **Resultado esperado:** HTTP 409
+
+  **Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, TKT-05 → ticketT2. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":409,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar HTTP 409 y que JSON.status=409; revisar message/details para el motivo esperado y que el error no exponga credenciales.
+
+  **Notas de ejecución:** ADMIN pasa la regla de URL; el 409 es por estado."
+url: "{{baseUrl}}/api/tickets/{{ticketUsableCode}}/use"
+method: PATCH
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{adminToken}}"
+order: 29000

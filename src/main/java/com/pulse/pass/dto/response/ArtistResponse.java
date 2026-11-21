@@ -5,5 +5,6 @@ public record ArtistResponse(
 	String stageName,
 	String country,
 	String genre,
-	boolean active) {
+	boolean active,
+	String imageUrl) {
 }

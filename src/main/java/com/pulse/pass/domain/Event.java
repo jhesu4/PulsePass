@@ -52,6 +52,9 @@ public class Event {
     @Column(name = "streaming_url", length = 500)
     private String streamingUrl;
 
+    @Column(name = "image_url", length = 1000)
+    private String imageUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "venue_id", nullable = false)
     private Venue venue;
@@ -84,6 +87,8 @@ public class Event {
     public void setMinimumAge(int minimumAge) { this.minimumAge = minimumAge; }
     public String getStreamingUrl() { return streamingUrl; }
     public void setStreamingUrl(String streamingUrl) { this.streamingUrl = streamingUrl; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     public Venue getVenue() { return venue; }
     public void setVenue(Venue venue) { this.venue = venue; }
     public Set<Artist> getArtists() { return artists; }

@@ -1,0 +1,33 @@
+$kind: http-request
+name: USR-08 · Usuario ajeno como ADMIN con propósito CUSTOMER_SUPPORT
+description: "**ID:** USR-08
+
+  **Rol / token:** ADMIN + X-Admin-Purpose
+
+  **Resultado esperado:** HTTP 200
+
+  **Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, AUTH-01 → userAEmail. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"id\":0,\"username\":\"{{userAUsername}}\",\"email\":\"{{userAEmail}}\",\"firstName\":\"E2E\",\"lastName\":\"Tester\",\"phone\":\"3000000000\",\"city\":\"Bogota\",\"birthDate\":\"1995-05-20\",\"active\":true}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar identidad consultada, propiedad/rol permitido y ausencia de contraseña/hash."
+url: "{{baseUrl}}/api/users/by-email?email={{userAEmail}}"
+method: GET
+headers:
+  X-Admin-Purpose: CUSTOMER_SUPPORT
+  Accept: application/json
+queryParams:
+  email: "{{userAEmail}}"
+auth:
+  type: bearer
+  credentials:
+    token: "{{adminToken}}"
+order: 6000

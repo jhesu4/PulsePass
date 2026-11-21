@@ -1,0 +1,33 @@
+$kind: http-request
+description: "**ID:** TC-AUTH-012
+
+  **ID heredado:** JWT-07\r
+
+  **Rol / token:** Token en URL
+
+  **Resultado esperado:** HTTP 401
+
+  **Precondiciones:** Configurar: baseUrl, AUTH-09 → userAToken. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":401,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar HTTP 401 y que JSON.status=401; revisar message/details para el motivo esperado y que el error no exponga credenciales.
+
+  **Notas de ejecución:** El token solo se acepta en el header Authorization. Aquí NO se envía el header."
+url: "{{baseUrl}}/api/auth/me?access_token={{userAToken}}"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  access_token: "{{userAToken}}"
+auth:
+  type: noauth
+order: 26000
