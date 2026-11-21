@@ -1,0 +1,31 @@
+$kind: http-request
+description: "**ID:** ERR-04
+
+  **Rol / token:** USER (A)
+
+  **Resultado esperado:** HTTP 404
+
+  **Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":404,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar HTTP 404 y que JSON.status=404; revisar message/details para el motivo esperado y que el error no exponga credenciales.
+
+  **Notas de ejecución:** Si la respuesta es 403 en lugar de 404, anotarlo en el registro: la política `anyRequest().authenticated()` aplica a rutas no mapeadas."
+url: "{{baseUrl}}/api/no-existe"
+method: GET
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{userAToken}}"
+order: 23000

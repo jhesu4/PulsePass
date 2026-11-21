@@ -1,0 +1,31 @@
+$kind: http-request
+description: "**Flujo PRD:** D — Propiedad; lectura posterior a denegación de uso ajeno\r
+
+  **ID:** TC-STATE-SEC-012
+
+  **Rol / token:** USER_A (propietario)
+
+  **Resultado esperado:** HTTP 200
+
+  **Precondiciones:** Ejecutar inmediatamente después de TC-SEC-012.
+
+  **JSON esperado:**
+
+  ```json
+
+  {\"id\":0,\"ticketCode\":\"{{ticketCancelableCode}}\",\"type\":\"GENERAL\",\"price\":0.00,\"status\":\"PAID\",\"purchaseDate\":\"<ISO-8601>\",\"userEmail\":\"{{userAEmail}}\",\"eventCode\":\"{{publishedEventCode}}\",\"eventName\":\"<nombre>\"}
+
+  ```
+
+  **Comprobaciones específicas:** Confirmar que la denegación a USER_B no cambió propietario ni estado; `status` sigue `PAID`.
+
+  **Flujo PRD:** D — Compra, propiedad, cancelación y uso; lectura posterior a la denegación."
+url: "{{baseUrl}}/api/tickets/{{ticketCancelableCode}}"
+method: GET
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{userAToken}}"
+order: 6000

@@ -1,0 +1,43 @@
+$kind: http-request
+description: "**ID:** TC-SEC-001
+
+  **ID heredado:** EVT-02\r
+
+  **Rol / token:** USER (A)
+
+  **Resultado esperado:** HTTP 403
+
+  **Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, runId, futureDate, venueCode. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":403,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** ErrorResponse con status=403; ejecutar TC-STATE-EVT-02 inmediatamente y confirmar 404, antes de EVT-04."
+url: "{{baseUrl}}/api/events"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "eventCode": "{{runId}}-EVT-1",
+      "name": "E2E",
+      "category": "MUSIC",
+      "eventDate": "{{futureDate}}",
+      "minimumAge": 0,
+      "venueCode": "{{venueActiveCode}}"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{userAToken}}"
+order: 6000

@@ -1,0 +1,27 @@
+$kind: http-request
+description: "**ID:** TRN-10
+
+  **Rol / token:** Anónimo
+
+  **Resultado esperado:** HTTP 401
+
+  **Precondiciones:** Configurar: baseUrl, TKT-05 → ticketT2. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":401,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar HTTP 401 y que JSON.status=401; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+url: "{{baseUrl}}/api/tickets/{{ticketUsableCode}}/use"
+method: PATCH
+headers:
+  Accept: application/json
+auth:
+  type: noauth
+order: 27000

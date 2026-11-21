@@ -1,0 +1,29 @@
+$kind: http-request
+description: "**ID:** PUB-11
+
+  **Rol / token:** Anónimo
+
+  **Resultado esperado:** HTTP 200
+
+  **Precondiciones:** Ejecutar antes de EVT-25 y EVT-30 en la base E2E recién recreada. Configurar baseUrl y PUB-04 → artistStageName.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  []\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** En la base E2E recién recreada, antes de asociar artistas, la lista debe ser `[]`; la semilla no relaciona artistas con eventos."
+url: "{{baseUrl}}/api/events/by-artist?stageName={{artistStageName}}"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  stageName: "{{artistStageName}}"
+auth:
+  type: noauth
+order: 3000

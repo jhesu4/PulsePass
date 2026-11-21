@@ -1,0 +1,32 @@
+$kind: http-request
+description: "**ID:** USR-09
+
+  **Rol / token:** ADMIN + propósito inválido
+
+  **Resultado esperado:** HTTP 403
+
+  **Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, AUTH-01 → userAUsername. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":403,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+url: "{{baseUrl}}/api/users/by-username?username={{userAUsername}}"
+method: GET
+headers:
+  X-Admin-Purpose: TICKET_SUPPORT
+  Accept: application/json
+queryParams:
+  username: "{{userAUsername}}"
+auth:
+  type: bearer
+  credentials:
+    token: "{{adminToken}}"
+order: 7000

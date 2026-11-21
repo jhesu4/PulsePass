@@ -1,0 +1,33 @@
+$kind: http-request
+description: "**ID:** TC-BIZ-008
+
+  **ID heredado:** TKT-25\r
+
+  **Rol / token:** USER (A)
+
+  **Resultado esperado:** HTTP 200
+
+  **Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, AUTH-01 → userAEmail. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  [{\"id\":0,\"ticketCode\":\"<ticketCode>\",\"type\":\"GENERAL\",\"price\":0.00,\"status\":\"PAID\",\"purchaseDate\":\"<ISO-8601>\",\"userEmail\":\"{{userAEmail}}\",\"eventCode\":\"{{publishedEventCode}}\",\"eventName\":\"<nombre>\"}]\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar ticketCode, estado y titular esperados; no exponer datos ajenos."
+url: "{{baseUrl}}/api/tickets/by-user?email={{userAEmail}}"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  email: "{{userAEmail}}"
+auth:
+  type: bearer
+  credentials:
+    token: "{{userAToken}}"
+order: 15000

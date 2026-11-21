@@ -1,0 +1,31 @@
+$kind: http-request
+description: "**ID:** TC-SEC-009
+
+  **ID heredado:** TKT-17\r
+
+  **Rol / token:** USER (B)
+
+  **Resultado esperado:** HTTP 403
+
+  **Precondiciones:** Configurar: AUTH-11 → userBToken, baseUrl, TKT-04 → ticketT1. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":403,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+url: "{{baseUrl}}/api/tickets/{{ticketCancelableCode}}"
+method: GET
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{userBToken}}"
+order: 15000

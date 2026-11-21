@@ -1,0 +1,4 @@
+$kind: collection
+name: 06 Tickets / compra, consulta y ciclo de vida
+description: Compra, consulta y transiciones de tickets.
+order: 7000

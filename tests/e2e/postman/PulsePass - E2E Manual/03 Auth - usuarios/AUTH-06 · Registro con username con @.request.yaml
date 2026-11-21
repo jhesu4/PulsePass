@@ -1,0 +1,41 @@
+$kind: http-request
+description: "**ID:** AUTH-06
+
+  **Rol / token:** Anónimo
+
+  **Resultado esperado:** HTTP 400
+
+  **Precondiciones:** Configurar: baseUrl, AUTH-08 → userCEmail, userCPassword. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":400,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar HTTP 400 y que JSON.status=400; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+url: "{{baseUrl}}/api/users"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "a@b",
+      "email": "{{userCEmail}}",
+      "firstName": "E2E",
+      "lastName": "Tester",
+      "phone": "3000000000",
+      "city": "Bogota",
+      "birthDate": "1995-05-20",
+      "password": "{{userCPassword}}"
+    }
+auth:
+  type: noauth
+order: 20000

@@ -1,0 +1,32 @@
+$kind: http-request
+description: "**ID:** TKT-28
+
+  **Rol / token:** ADMIN + X-Admin-Purpose
+
+  **Resultado esperado:** HTTP 200
+
+  **Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, AUTH-01 → userAEmail. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  [{\"id\":0,\"ticketCode\":\"<ticketCode>\",\"type\":\"GENERAL\",\"price\":0.00,\"status\":\"PAID\",\"purchaseDate\":\"<ISO-8601>\",\"userEmail\":\"{{userAEmail}}\",\"eventCode\":\"{{publishedEventCode}}\",\"eventName\":\"<nombre>\"}]\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar ticketCode, estado y titular esperados; no exponer datos ajenos."
+url: "{{baseUrl}}/api/tickets/by-user?email={{userAEmail}}"
+method: GET
+headers:
+  X-Admin-Purpose: TICKET_SUPPORT
+  Accept: application/json
+queryParams:
+  email: "{{userAEmail}}"
+auth:
+  type: bearer
+  credentials:
+    token: "{{adminToken}}"
+order: 17000

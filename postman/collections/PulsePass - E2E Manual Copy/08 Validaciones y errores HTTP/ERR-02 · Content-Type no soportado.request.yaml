@@ -1,0 +1,30 @@
+$kind: http-request
+description: "**ID:** ERR-02
+
+  **Rol / token:** Público
+
+  **Resultado esperado:** HTTP 415
+
+  **Precondiciones:** Configurar: baseUrl. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":415,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar HTTP 415 y que JSON.status=415; revisar message/details para el motivo esperado y que el error no exponga credenciales.
+
+  **Notas de ejecución:** Enviar body en modo raw/Text: `identifier=x`. Ajustar el body manualmente en Postman."
+url: "{{baseUrl}}/api/auth/login"
+method: POST
+headers:
+  Content-Type: text/plain
+  Accept: application/json
+auth:
+  type: noauth
+order: 21000

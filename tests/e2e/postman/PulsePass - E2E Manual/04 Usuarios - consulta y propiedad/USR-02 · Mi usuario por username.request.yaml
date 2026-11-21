@@ -1,0 +1,31 @@
+$kind: http-request
+description: "**ID:** USR-02
+
+  **Rol / token:** USER (A)
+
+  **Resultado esperado:** HTTP 200
+
+  **Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, AUTH-01 → userAUsername. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"id\":0,\"username\":\"{{userAUsername}}\",\"email\":\"{{userAEmail}}\",\"firstName\":\"E2E\",\"lastName\":\"Tester\",\"phone\":\"3000000000\",\"city\":\"Bogota\",\"birthDate\":\"1995-05-20\",\"active\":true}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar identidad consultada, propiedad/rol permitido y ausencia de contraseña/hash."
+url: "{{baseUrl}}/api/users/by-username?username={{userAUsername}}"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  username: "{{userAUsername}}"
+auth:
+  type: bearer
+  credentials:
+    token: "{{userAToken}}"
+order: 2000

@@ -1,0 +1,4 @@
+$kind: collection
+name: 09 Flujos de negocio / secuencia recomendada
+description: Verificaciones posteriores de persistencia y procesos de negocio.
+order: 10000

@@ -1,0 +1,34 @@
+$kind: http-request
+name: TC-STATE-TKT-06 · Confirmar que TKT-06 no creó un ticket para B
+description: "**Flujo PRD:** D — Compra y propiedad; verificar compra ajena antes de transiciones\r
+
+  **ID:** TC-STATE-TKT-06
+
+  **Rol / token:** USER (B)
+
+  **Resultado esperado:** HTTP 200
+
+  **Precondiciones:** Configurar: AUTH-11 → userBToken, baseUrl. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  []\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** La respuesta debe ser []: TKT-06 fue rechazado y no persistió ticket para B."
+url: "{{baseUrl}}/api/tickets/by-user?email={{userBEmail}}"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  email: "{{userBEmail}}"
+auth:
+  type: bearer
+  credentials:
+    token: "{{userBToken}}"
+order: 5000

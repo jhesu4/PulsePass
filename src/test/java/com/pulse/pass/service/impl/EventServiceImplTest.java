@@ -91,6 +91,7 @@ class EventServiceImplTest {
         verify(eventRepository)
                 .save(org.mockito.ArgumentMatchers.argThat(event -> event.getStatus() == EventStatus.DRAFT
                         && event.getVenue() == venue
+                        && event.getImageUrl().equals(request.imageUrl())
                         && event.getMinimumAge() == 18));
     }
 
@@ -136,7 +137,7 @@ class EventServiceImplTest {
     void shouldRejectCreationWhenEventDateIsInThePast() {
         CreateEventRequest request = new CreateEventRequest(
                 "EVT-1", "Event", "Description", EventCategory.MUSIC,
-                LocalDateTime.now().minusDays(1), 18, "VEN-1");
+                LocalDateTime.now().minusDays(1), 18, "VEN-1", null);
         when(eventRepository.existsByEventCode(request.eventCode())).thenReturn(false);
         when(venueRepository.findByCode(request.venueCode())).thenReturn(Optional.of(activeVenue(true)));
 
@@ -237,7 +238,8 @@ class EventServiceImplTest {
     private CreateEventRequest validRequest() {
         return new CreateEventRequest(
                 "EVT-1", "Event", "Description", EventCategory.MUSIC,
-                LocalDateTime.now().plusDays(5), 18, "VEN-1");
+                LocalDateTime.now().plusDays(5), 18, "VEN-1",
+                "https://images.unsplash.com/photo-1492684223066-81342ee5ff30");
     }
 
     private Venue activeVenue(boolean active) {
@@ -260,6 +262,6 @@ class EventServiceImplTest {
         return new EventResponse(
                 1L, "EVT-1", "Event", "Description", EventCategory.MUSIC,
                 status, LocalDateTime.now().plusDays(5), 18,
-                "VEN-1", "Venue", List.of());
+                "VEN-1", "Venue", List.of(), null);
     }
 }

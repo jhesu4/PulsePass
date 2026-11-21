@@ -1,0 +1,29 @@
+$kind: http-request
+description: "**ID:** EVT-20
+
+  **Rol / token:** ADMIN
+
+  **Resultado esperado:** HTTP 409
+
+  **Precondiciones:** Configurar: AUTH-13 → adminToken, baseUrl, runId. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":409,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** ErrorResponse 409; el evento ya estaba PUBLISHED y el estado persistido sigue PUBLISHED."
+url: "{{baseUrl}}/api/events/{{runId}}-EVT-1/publish"
+method: PATCH
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{adminToken}}"
+order: 12000

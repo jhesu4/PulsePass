@@ -1,0 +1,4 @@
+$kind: collection
+name: 04 Usuarios / consulta y propiedad
+description: Registro y consultas de usuarios.
+order: 5000

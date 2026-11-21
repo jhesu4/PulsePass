@@ -63,18 +63,21 @@ class EventControllerTest {
                 18,
                 "VEN-001",
                 "Main Venue",
-                List.of()
+                List.of(),
+                "https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
         );
 
         given(eventService.create(any(CreateEventRequest.class))).willReturn(response);
 
         mockMvc.perform(post("/api/events")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"eventCode\":\"EVT-001\",\"name\":\"Music Festival\",\"description\":\"\",\"category\":\"MUSIC\",\"eventDate\":\"2099-12-31T20:00:00\",\"minimumAge\":18,\"venueCode\":\"VEN-001\"}"))
+                        .content("{\"eventCode\":\"EVT-001\",\"name\":\"Music Festival\",\"description\":\"\",\"category\":\"MUSIC\",\"eventDate\":\"2099-12-31T20:00:00\",\"minimumAge\":18,\"venueCode\":\"VEN-001\",\"imageUrl\":\"https://images.unsplash.com/photo-1492684223066-81342ee5ff30\"}"))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.eventCode").value("EVT-001"));
+                .andExpect(jsonPath("$.eventCode").value("EVT-001"))
+                .andExpect(jsonPath("$.imageUrl").value("https://images.unsplash.com/photo-1492684223066-81342ee5ff30"));
 
-        verify(eventService).create(argThat(request -> request.description().isEmpty()));
+        verify(eventService).create(argThat(request -> request.description().isEmpty()
+                && request.imageUrl().equals("https://images.unsplash.com/photo-1492684223066-81342ee5ff30")));
     }
 
     @Test
@@ -194,7 +197,7 @@ class EventControllerTest {
     void shouldFindEventsByArtist() throws Exception {
         given(eventService.findByArtist("Solar Beat")).willReturn(List.of(
                 new EventSummaryResponse(1L, "EVT-001", "Music Festival", EventCategory.MUSIC,
-                        EventStatus.PUBLISHED, LocalDateTime.now().plusDays(10), "VEN-001", "Main Venue")
+                        EventStatus.PUBLISHED, LocalDateTime.now().plusDays(10), "VEN-001", "Main Venue", null)
         ));
 
         mockMvc.perform(get("/api/events/by-artist").param("stageName", "Solar Beat"))
@@ -242,7 +245,8 @@ class EventControllerTest {
                 18,
                 "VEN-001",
                 "Main Venue",
-                List.of()
+                List.of(),
+                null
         );
     }
 }

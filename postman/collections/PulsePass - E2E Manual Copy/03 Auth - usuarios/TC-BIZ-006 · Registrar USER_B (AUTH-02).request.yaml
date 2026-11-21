@@ -1,0 +1,43 @@
+$kind: http-request
+description: "**ID heredado:** AUTH-02
+
+  **ID:** TC-BIZ-006
+
+  **Rol / token:** Anónimo
+
+  **Resultado esperado:** HTTP 201
+
+  **Precondiciones:** Configurar: baseUrl, AUTH-02 → userBUsername, AUTH-02 → userBEmail, userBPassword. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"id\":0,\"username\":\"{{userBUsername}}\",\"email\":\"{{userBEmail}}\",\"firstName\":\"E2E\",\"lastName\":\"Tester\",\"phone\":\"3000000000\",\"city\":\"Bogota\",\"birthDate\":\"1995-05-20\",\"active\":true}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Comparar username con userBUsername y email con userBEmail; id asignado, active=true y sin campos de contraseña."
+url: "{{baseUrl}}/api/users"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "{{userBUsername}}",
+      "email": "{{userBEmail}}",
+      "firstName": "E2E",
+      "lastName": "Tester",
+      "phone": "3000000000",
+      "city": "Bogota",
+      "birthDate": "1995-05-20",
+      "password": "{{userBPassword}}"
+    }
+auth:
+  type: noauth
+order: 16000

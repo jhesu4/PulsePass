@@ -1,0 +1,29 @@
+$kind: http-request
+description: "**ID:** TC-BIZ-001
+
+  **ID heredado:** PUB-01\r
+
+  **Rol / token:** Anónimo
+
+  **Resultado esperado:** HTTP 200
+
+  **Precondiciones:** Configurar: baseUrl. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  [{\"id\":0,\"code\":\"{{venueActiveCode}}\",\"name\":\"<venue activo>\",\"city\":\"<ciudad>\",\"address\":\"<dirección>\",\"capacity\":500,\"active\":true}]\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar los campos funcionales del JSON de este endpoint y que corresponden al recurso/rol indicado."
+url: "{{baseUrl}}/api/venues/active"
+method: GET
+headers:
+  Accept: application/json
+auth:
+  type: noauth
+order: 1000

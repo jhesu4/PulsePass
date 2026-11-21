@@ -1,0 +1,47 @@
+$kind: http-request
+description: "**ID:** TC-AUTH-001
+
+  **ID heredado:** AUTH-01\r
+
+  **ID relacionado:** TC-BIZ-006\r
+
+  **Rol / token:** Anónimo
+
+  **Resultado esperado:** HTTP 201
+
+  **Precondiciones:** Configurar: baseUrl, AUTH-01 → userAUsername, AUTH-01 → userAEmail, userAPassword. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"id\":0,\"username\":\"{{userAUsername}}\",\"email\":\"{{userAEmail}}\",\"firstName\":\"E2E\",\"lastName\":\"Tester\",\"phone\":\"3000000000\",\"city\":\"Bogota\",\"birthDate\":\"1995-05-20\",\"active\":true}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Comparar username con userAUsername y email con userAEmail; id asignado, active=true y sin campos de contraseña.
+
+  **Notas de ejecución:** Mantener `userAEmail` y `userAUsername` sincronizados manualmente con `runId` antes de enviar AUTH-01."
+url: "{{baseUrl}}/api/users"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "{{userAUsername}}",
+      "email": "{{userAEmail}}",
+      "firstName": "E2E",
+      "lastName": "Tester",
+      "phone": "3000000000",
+      "city": "Bogota",
+      "birthDate": "1995-05-20",
+      "password": "{{userAPassword}}"
+    }
+auth:
+  type: noauth
+order: 15000

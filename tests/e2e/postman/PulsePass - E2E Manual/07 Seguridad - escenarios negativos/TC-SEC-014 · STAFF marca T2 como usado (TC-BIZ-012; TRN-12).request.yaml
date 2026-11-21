@@ -1,0 +1,35 @@
+$kind: http-request
+description: "**ID:** TC-SEC-014
+
+  **ID heredado:** TRN-12\r
+
+  **ID relacionado:** TC-BIZ-012\r
+
+  **Rol / token:** STAFF
+
+  **Resultado esperado:** HTTP 200
+
+  **Precondiciones:** Configurar: AUTH-12 → staffToken, baseUrl, TKT-05 → ticketT2. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"id\":0,\"ticketCode\":\"{{ticketUsableCode}}\",\"type\":\"GENERAL\",\"price\":0.00,\"status\":\"PAID\",\"purchaseDate\":\"<ISO-8601>\",\"userEmail\":\"{{userAEmail}}\",\"eventCode\":\"{{publishedEventCode}}\",\"eventName\":\"<nombre>\"}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Respuesta 200 con status=USED; ejecutar TC-STATE-TRN-12 y confirmar la lectura persistida.
+
+  **Notas de ejecución:** PAID→USED. Irreversible."
+url: "{{baseUrl}}/api/tickets/{{ticketUsableCode}}/use"
+method: PATCH
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{staffToken}}"
+order: 18000

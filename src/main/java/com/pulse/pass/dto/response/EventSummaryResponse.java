@@ -12,5 +12,6 @@ public record EventSummaryResponse(
 	EventStatus status,
 	LocalDateTime eventDate,
 	String venueCode,
-	String venueName) {
+	String venueName,
+	String imageUrl) {
 }

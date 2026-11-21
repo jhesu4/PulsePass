@@ -1,0 +1,28 @@
+$kind: http-request
+description: "**ID:** JWT-06
+
+  **Rol / token:** USER_A con esquema distinto de Bearer
+
+  **Resultado esperado:** HTTP 401
+
+  **Precondiciones:** Configurar userAToken y baseUrl. Enviar el token válido con el esquema `Token`, no `Bearer`. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":401,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar HTTP 401 y ErrorResponse; el esquema distinto de `Bearer` no autentica."
+url: "{{baseUrl}}/api/auth/me"
+method: GET
+headers:
+  Accept: application/json
+  Authorization: Token {{userAToken}}
+auth:
+  type: noauth
+order: 25000

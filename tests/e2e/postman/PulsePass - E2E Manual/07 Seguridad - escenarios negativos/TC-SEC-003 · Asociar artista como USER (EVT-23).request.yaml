@@ -1,0 +1,31 @@
+$kind: http-request
+description: "**ID:** TC-SEC-003
+
+  **ID heredado:** EVT-23\r
+
+  **Rol / token:** USER (A)
+
+  **Resultado esperado:** HTTP 403
+
+  **Precondiciones:** Configurar: AUTH-09 → userAToken, baseUrl, draftEventCode, PUB-04 → artistId. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"timestamp\":\"<ISO-8601>\",\"status\":403,\"error\":\"<HTTP reason>\",\"message\":\"<mensaje del error>\",\"details\":{}}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Confirmar HTTP 403 y que JSON.status=403; revisar message/details para el motivo esperado y que el error no exponga credenciales."
+url: "{{baseUrl}}/api/events/{{draftEventCode}}/artists/{{artistId}}"
+method: POST
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{userAToken}}"
+order: 10000

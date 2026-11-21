@@ -1,0 +1,2 @@
+$kind: collection
+description: Colección Postman v2.1 para pruebas E2E manuales, agrupadas por módulo. Sin scripts, Runner ni Newman. Cada request se envía manualmente y se verifica contra el JSON esperado.

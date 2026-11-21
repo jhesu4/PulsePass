@@ -37,7 +37,7 @@ class ArtistControllerTest {
     @DisplayName("GET /api/artists/active should return active artists")
     void shouldExposeActiveArtistsEndpoint() throws Exception {
         given(artistService.findActiveArtists())
-                .willReturn(List.of(new ArtistResponse(1L, "Solar Beat", "Spain", "Electronic", true)));
+                .willReturn(List.of(new ArtistResponse(1L, "Solar Beat", "Spain", "Electronic", true, null)));
 
         mockMvc.perform(get("/api/artists/active"))
                 .andExpect(status().isOk())
@@ -50,7 +50,7 @@ class ArtistControllerTest {
         @DisplayName("GET /api/artists/by-stage-name should return an artist")
         void shouldReturnArtistByStageName() throws Exception {
         given(artistService.findByStageName("Solar Beat"))
-                .willReturn(new ArtistResponse(1L, "Solar Beat", "Spain", "Electronic", true));
+                .willReturn(new ArtistResponse(1L, "Solar Beat", "Spain", "Electronic", true, null));
 
         mockMvc.perform(get("/api/artists/by-stage-name").param("stageName", "Solar Beat"))
                 .andExpect(status().isOk())
@@ -63,7 +63,7 @@ class ArtistControllerTest {
     @DisplayName("GET /api/artists/{id} should return an artist")
     void shouldReturnArtistById() throws Exception {
         given(artistService.findById(1L))
-                .willReturn(new ArtistResponse(1L, "Solar Beat", "Spain", "Electronic", true));
+                .willReturn(new ArtistResponse(1L, "Solar Beat", "Spain", "Electronic", true, null));
 
         mockMvc.perform(get("/api/artists/1"))
                 .andExpect(status().isOk())

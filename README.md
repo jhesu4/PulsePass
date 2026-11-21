@@ -56,7 +56,7 @@ src/
 │   │   └── mapper/            Mappers MapStruct
 │   └── resources/
 │       ├── application.yaml
-│       └── db/migration/      Migraciones V1 a V4
+│       └── db/migration/      Migraciones V1 a V6
 └── test/java/com/pulse/pass/
     ├── controller/            Pruebas MockMvc
     ├── security/              Pruebas unitarias de seguridad
@@ -88,8 +88,10 @@ Las migraciones de `src/main/resources/db/migration/` se aplican en orden:
 | `V2__insert_initial.artists.sql` | Catálogo inicial de artistas. |
 | `V3__add_streaming_url_to_event.sql` | Campo opcional `streaming_url` para eventos. |
 | `V4__security_credentials_roles.sql` | Tablas de credenciales y roles. |
+| `V5__seed_demo_catalog.sql` | Ocho sedes y doce eventos publicados de demostración, con artistas asociados. |
+| `V6__expand_demo_catalog_and_add_images.sql` | Diez sedes, trece artistas y treinta eventos publicados, con imágenes asignadas a cada artista y evento. |
 
-Una migración aplicada no se edita; todo cambio estructural futuro debe agregarse en una nueva versión. Las claves foráneas, unicidad y rangos se protegen también en PostgreSQL. Los enums se persisten por nombre, no por ordinal.
+Una migración aplicada no se edita; todo cambio estructural futuro debe agregarse en una nueva versión. Las claves foráneas, unicidad y rangos se protegen también en PostgreSQL. Los enums se persisten por nombre, no por ordinal. Las migraciones V5 y V6 agregan contenido inicial de catálogo, pero no crean usuarios ni entradas compradas; las entradas se generan mediante compras autenticadas.
 
 ## API REST
 

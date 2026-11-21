@@ -1,0 +1,37 @@
+$kind: http-request
+description: "**ID:** AUTH-11
+
+  **Rol / token:** Público
+
+  **Resultado esperado:** HTTP 200
+
+  **Precondiciones:** Configurar: baseUrl, AUTH-02 → userBUsername, userBPassword. Usar la base E2E y un runId único.
+
+  **JSON esperado:**\r
+
+  ```json\r
+
+  {\"accessToken\":\"<JWT; no guardar>\",\"tokenType\":\"Bearer\",\"expiresIn\":900}\r
+
+  ```\r
+
+  Los IDs `0` y textos entre `<...>` son marcadores de forma; comparar los valores concretos y campos indicados abajo.
+
+  **Comprobaciones específicas:** Verificar tokenType=Bearer y expiresIn={{expectedTokenTtlSeconds}}; decodificar payload sin registrar el JWT y revisar sub, iss={{expectedIssuer}}, iat, exp (TTL exacto) y jti UUID único.
+
+  **Notas de ejecución:** Copiar `accessToken` a `userBToken`."
+url: "{{baseUrl}}/api/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "identifier": "{{userBUsername}}",
+      "password": "{{userBPassword}}"
+    }
+auth:
+  type: noauth
+order: 3000
