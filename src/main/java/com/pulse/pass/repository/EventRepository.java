@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -16,6 +18,14 @@ import com.pulse.pass.domain.EventStatus;
 public interface EventRepository extends JpaRepository<Event, Long> {
 
     Optional<Event> findByEventCode(String eventCode);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT e FROM Event e WHERE e.eventCode = :eventCode")
+    Optional<Event> findByEventCodeForUpdate(@Param("eventCode") String eventCode);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT e FROM Event e WHERE e.id = (SELECT t.event.id FROM Ticket t WHERE t.ticketCode = :ticketCode)")
+    Optional<Event> findByTicketCodeForUpdate(@Param("ticketCode") String ticketCode);
 
     boolean existsByEventCode(String eventCode);
 

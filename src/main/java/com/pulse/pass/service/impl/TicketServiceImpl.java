@@ -56,7 +56,7 @@ public class TicketServiceImpl implements TicketService {
             throw new BusinessRuleException("Inactive user cannot purchase tickets: " + request.userEmail());
         }
 
-        Event event = eventRepository.findByEventCode(request.eventCode())
+        Event event = eventRepository.findByEventCodeForUpdate(request.eventCode())
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found: " + request.eventCode()));
         if (event.getStatus() != EventStatus.PUBLISHED) {
             throw new BusinessRuleException("Tickets can only be purchased for PUBLISHED events: " + request.eventCode());
@@ -67,9 +67,9 @@ public class TicketServiceImpl implements TicketService {
 
         validateMinimumAge(user.getProfile(), event);
 
-        long paidTickets = ticketRepository.countByEventCodeAndStatus(event.getEventCode(), TicketStatus.PAID);
+        long occupiedSeats = countOccupiedSeats(event);
         int capacity = event.getVenue().getCapacity();
-        if (paidTickets >= capacity) {
+        if (occupiedSeats >= capacity) {
             throw new BusinessRuleException("Event has no remaining capacity: " + request.eventCode());
         }
 
@@ -83,7 +83,7 @@ public class TicketServiceImpl implements TicketService {
         ticket.setEvent(event);
 
         Ticket savedTicket = ticketRepository.save(ticket);
-        if (paidTickets + 1 == capacity) {
+        if (occupiedSeats + 1 == capacity) {
             event.setStatus(EventStatus.SOLD_OUT);
             eventRepository.save(event);
         }
@@ -121,15 +121,21 @@ public class TicketServiceImpl implements TicketService {
     @PreAuthorize("@authorizationService.canManageTicket(#p0)")
     @Transactional
     public TicketResponse cancel(String ticketCode) {
+        Event event = lockTicketEvent(ticketCode);
         Ticket ticket = ticketRepository.findByTicketCode(ticketCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found: " + ticketCode));
         if (ticket.getStatus() != TicketStatus.PAID) {
             throw new BusinessRuleException("Only PAID tickets can be cancelled: " + ticketCode);
         }
-        if (!ticket.getEvent().getEventDate().isAfter(LocalDateTime.now())) {
+        if (!event.getEventDate().isAfter(LocalDateTime.now())) {
             throw new BusinessRuleException("Cannot cancel a ticket after the event date: " + ticketCode);
         }
 
+        // The ticket being cancelled still counts toward the current occupancy.
+        if (event.getStatus() == EventStatus.SOLD_OUT
+                && countOccupiedSeats(event) <= event.getVenue().getCapacity()) {
+            event.setStatus(EventStatus.PUBLISHED);
+        }
         ticket.setStatus(TicketStatus.CANCELLED);
         return ticketMapper.toResponse(ticketRepository.save(ticket));
     }
@@ -138,6 +144,7 @@ public class TicketServiceImpl implements TicketService {
     @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
     @Transactional
     public TicketResponse markAsUsed(String ticketCode) {
+        lockTicketEvent(ticketCode);
         Ticket ticket = ticketRepository.findByTicketCode(ticketCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found: " + ticketCode));
         if (ticket.getStatus() != TicketStatus.PAID) {
@@ -146,6 +153,17 @@ public class TicketServiceImpl implements TicketService {
 
         ticket.setStatus(TicketStatus.USED);
         return ticketMapper.toResponse(ticketRepository.save(ticket));
+    }
+
+    private Event lockTicketEvent(String ticketCode) {
+        return eventRepository.findByTicketCodeForUpdate(ticketCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found: " + ticketCode));
+    }
+
+    private long countOccupiedSeats(Event event) {
+        String eventCode = event.getEventCode();
+        return ticketRepository.countByEventCodeAndStatus(eventCode, TicketStatus.PAID)
+                + ticketRepository.countByEventCodeAndStatus(eventCode, TicketStatus.USED);
     }
 
     private void validateMinimumAge(UserProfile profile, Event event) {
